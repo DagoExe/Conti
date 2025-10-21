@@ -3,8 +3,8 @@ package com.example.conti
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.example.Conti.R
-import com.example.Conti.databinding.ActivityMainBinding
+import com.example.conti.R
+import com.example.conti.databinding.ActivityMainBinding
 import com.example.conti.ui.ViewModelFactory
 import com.example.conti.ui.home.HomeViewModel
 
