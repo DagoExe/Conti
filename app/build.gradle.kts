@@ -1,15 +1,15 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("com.google.devtools.ksp") version "1.9.20-1.0.14"
+    id("com.google.devtools.ksp")
 }
 
 android {
-    namespace = "com.example.Conti"
+    namespace = "com.example.conti"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.Conti"
+        applicationId = "com.example.conti"
         minSdk = 26
         targetSdk = 34
         versionCode = 1
@@ -17,10 +17,10 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        // Configurazione per Java 8+ date/time API
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments["room.schemaLocation"] = "$projectDir/schemas"
+                arguments["room.incremental"] = "true"
             }
         }
     }
@@ -38,7 +38,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-        // Abilita il supporto per le API Java 8+ (LocalDate, LocalDateTime)
         isCoreLibraryDesugaringEnabled = true
     }
 
@@ -49,6 +48,12 @@ android {
     buildFeatures {
         viewBinding = true
     }
+    
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
 }
 
 dependencies {
@@ -57,7 +62,7 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-
+    
     // Activity & Fragment
     implementation("androidx.activity:activity-ktx:1.8.2")
     implementation("androidx.fragment:fragment-ktx:1.6.2")
@@ -81,18 +86,18 @@ dependencies {
     // Apache POI per Excel
     implementation("org.apache.poi:poi:5.2.5")
     implementation("org.apache.poi:poi-ooxml:5.2.5")
-
+    
     // Dipendenze richieste da POI
     implementation("org.apache.xmlbeans:xmlbeans:5.1.1")
     implementation("org.apache.commons:commons-compress:1.24.0")
     implementation("commons-io:commons-io:2.15.0")
 
-    // Navigation Component (per navigare tra fragment)
+    // Navigation Component
     val navVersion = "2.7.6"
     implementation("androidx.navigation:navigation-fragment-ktx:$navVersion")
     implementation("androidx.navigation:navigation-ui-ktx:$navVersion")
 
-    // Desugaring per supporto Java 8+ API su Android più vecchi
+    // Desugaring per supporto Java 8+ API
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 
     // Test
