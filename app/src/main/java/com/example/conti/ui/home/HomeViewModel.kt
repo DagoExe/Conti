@@ -6,11 +6,13 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.conti.data.database.entities.Conto
 import com.example.conti.data.database.entities.Movimento
+import com.example.conti.data.excel.ExcelReader
 import com.example.conti.data.repository.MovimentiRepository
 import com.example.conti.utils.DateUtils
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlin.math.abs
 
 /**
  * ViewModel per la schermata Home.
@@ -24,7 +26,7 @@ import kotlinx.coroutines.launch
  * e mantiene i dati in modo reattivo tramite LiveData/Flow.
  */
 class HomeViewModel(
-    private val repository: MovimentiRepository
+    public val repository: MovimentiRepository
 ) : ViewModel() {
 
     // ========================================
@@ -186,27 +188,46 @@ class HomeViewModel(
         onSuccess: (Int) -> Unit = {},
         onError: (String) -> Unit = {}
     ) {
+        android.util.Log.d("HomeViewModel", "=== aggiornaMovimentiDaExcel chiamato ===")
+        android.util.Log.d("HomeViewModel", "ContoId: $contoId")
+        android.util.Log.d("HomeViewModel", "FilePath: $filePath")
+
         viewModelScope.launch {
             try {
+                android.util.Log.d("HomeViewModel", "Creazione ExcelReader...")
                 val excelReader = com.example.conti.data.excel.ExcelReader()
+
+                android.util.Log.d("HomeViewModel", "Lettura file Excel...")
                 val result = excelReader.leggiExcel(filePath, contoId)
 
+                android.util.Log.d("HomeViewModel", "Movimenti letti: ${result.movimenti.size}")
+                android.util.Log.d("HomeViewModel", "Errori: ${result.errori.size}")
+
                 if (result.errori.isNotEmpty()) {
-                    onError("Errori durante l'importazione:\n${result.errori.joinToString("\n")}")
+                    val errore = "Errori durante l'importazione:\n${result.errori.joinToString("\n")}"
+                    android.util.Log.e("HomeViewModel", errore)
+                    onError(errore)
                     return@launch
                 }
 
                 if (result.movimenti.isEmpty()) {
-                    onError("Nessun movimento trovato nel file Excel")
+                    val errore = "Nessun movimento trovato nel file Excel"
+                    android.util.Log.w("HomeViewModel", errore)
+                    onError(errore)
                     return@launch
                 }
 
+                android.util.Log.d("HomeViewModel", "Salvataggio movimenti nel database...")
                 // Sostituisci i movimenti del conto
                 repository.sostituisciMovimentiDaExcel(contoId, result.movimenti)
+
+                android.util.Log.d("HomeViewModel", "✅ Import completato con successo!")
                 onSuccess(result.movimenti.size)
 
             } catch (e: Exception) {
-                onError(e.message ?: "Errore durante l'importazione da Excel")
+                val errore = e.message ?: "Errore durante l'importazione da Excel"
+                android.util.Log.e("HomeViewModel", "❌ Eccezione durante import", e)
+                onError(errore)
             }
         }
     }
@@ -241,7 +262,7 @@ class HomeViewModel(
 
         return repository.getMovimentiByDateRange(inizio, fine).map { movimenti ->
             val entrate = movimenti.filter { it.importo > 0 }.sumOf { it.importo }
-            val uscite = movimenti.filter { it.importo < 0 }.sumOf { kotlin.math.abs(it.importo) }
+            val uscite = movimenti.filter { it.importo < 0 }.sumOf { abs(it.importo) }
             val bilancio = entrate - uscite
 
             StatisticheMese(

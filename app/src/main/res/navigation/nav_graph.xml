@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/navigation_home">
+
+    <fragment
+        android:id="@+id/navigation_home"
+        android:name="com.example.conti.ui.home.HomeFragment"
+        android:label="Home"
+        tools:layout="@layout/fragment_home" />
+
+    <fragment
+        android:id="@+id/navigation_movimenti"
+        android:name="com.example.conti.ui.movimenti.MovimentiFragment"
+        android:label="Movimenti"
+        tools:layout="@layout/fragment_movimenti" />
+
+    <fragment
+        android:id="@+id/navigation_abbonamenti"
+        android:name="com.example.conti.ui.abbonamenti.AbbonamentiFragment"
+        android:label="Abbonamenti"
+        tools:layout="@layout/fragment_abbonamenti" />
+
+    <fragment
+        android:id="@+id/navigation_conti"
+        android:name="com.example.conti.ui.conti.ContiFragment"
+        android:label="Conti"
+        tools:layout="@layout/fragment_conti" />
+
+</navigation>

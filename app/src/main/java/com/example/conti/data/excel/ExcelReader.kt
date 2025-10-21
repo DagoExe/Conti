@@ -1,43 +1,49 @@
 package com.example.conti.data.excel
 
 import com.example.conti.data.database.entities.Movimento
-import com.example.conti.utils.Constants
 import com.example.conti.utils.CurrencyUtils
 import org.apache.poi.ss.usermodel.*
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import java.io.File
 import java.io.FileInputStream
 import java.time.LocalDate
-import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 /**
  * Classe per leggere e parsare file Excel contenenti movimenti bancari.
  *
+ * ADATTATO PER IL FORMATO:
+ * - Data operazione | Data contabile | Iban | Tipologia | Nome | Descrizione | Importo ( € )
+ *
  * Utilizza Apache POI per leggere file .xlsx e .xls.
- *
- * Struttura attesa del file Excel:
- * - Prima riga: intestazioni (Data, Descrizione, Importo, Categoria, Note)
- * - Righe successive: dati dei movimenti
- *
- * Esempio:
- * | Data       | Descrizione          | Importo  | Categoria    | Note        |
- * |------------|---------------------|----------|--------------|-------------|
- * | 01/09/2025 | Stipendio           | 2500.00  | Stipendio    |             |
- * | 05/09/2025 | Netflix             | -12.99   | Abbonamento  | Piano Basic |
- * | 10/09/2025 | Spesa Supermercato  | -85.50   | Spesa        |             |
  */
 class ExcelReader {
 
     /**
      * Risultato della lettura di un file Excel.
-     *
-     * @param movimenti Lista di movimenti parsati con successo
-     * @param errori Lista di errori incontrati durante il parsing
      */
     data class ExcelResult(
         val movimenti: List<Movimento>,
         val errori: List<String>
     )
+
+    /**
+     * Indici delle colonne nel file Excel
+     */
+    private object ColonneExcel {
+        const val DATA_OPERAZIONE = 0      // A - Data operazione
+        const val DATA_CONTABILE = 1       // B - Data contabile
+        const val IBAN = 2                 // C - Iban
+        const val TIPOLOGIA = 3            // D - Tipologia
+        const val NOME = 4                 // E - Nome
+        const val DESCRIZIONE = 5          // F - Descrizione
+        const val IMPORTO = 6              // G - Importo ( € )
+    }
+
+    /**
+     * Formatter per le date in formato dd/MM/yyyy
+     */
+    private val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
     /**
      * Legge un file Excel e restituisce una lista di movimenti.
@@ -47,241 +53,329 @@ class ExcelReader {
      * @return ExcelResult con movimenti ed eventuali errori
      */
     fun leggiExcel(filePath: String, contoId: Long): ExcelResult {
+        android.util.Log.d("ExcelReader", "=== INIZIO LETTURA EXCEL ===")
+        android.util.Log.d("ExcelReader", "File path: $filePath")
+        android.util.Log.d("ExcelReader", "Conto ID: $contoId")
+
         val movimenti = mutableListOf<Movimento>()
         val errori = mutableListOf<String>()
 
         try {
             val file = File(filePath)
+            android.util.Log.d("ExcelReader", "File exists: ${file.exists()}")
+            android.util.Log.d("ExcelReader", "File size: ${file.length()} bytes")
 
             // Verifica esistenza file
             if (!file.exists()) {
-                errori.add("File non trovato: $filePath")
+                val errore = "File non trovato: $filePath"
+                android.util.Log.e("ExcelReader", errore)
+                errori.add(errore)
                 return ExcelResult(emptyList(), errori)
             }
 
             // Verifica estensione
             val estensione = file.extension.lowercase()
-            if (!Constants.Excel.ESTENSIONI_SUPPORTATE.contains(".$estensione")) {
-                errori.add("Formato file non supportato: .$estensione")
+            android.util.Log.d("ExcelReader", "Estensione file: $estensione")
+
+            if (estensione != "xlsx" && estensione != "xls") {
+                val errore = "Formato file non supportato: .$estensione"
+                android.util.Log.e("ExcelReader", errore)
+                errori.add(errore)
                 return ExcelResult(emptyList(), errori)
             }
+
+            android.util.Log.d("ExcelReader", "Apertura file Excel...")
 
             // Apri il file Excel
             FileInputStream(file).use { fis ->
                 val workbook: Workbook = XSSFWorkbook(fis)
-                val sheet = workbook.getSheetAt(0) // Leggi il primo foglio
+                val sheet = workbook.getSheetAt(0)
+
+                android.util.Log.d("ExcelReader", "Foglio caricato: ${sheet.sheetName}")
+                android.util.Log.d("ExcelReader", "Numero righe: ${sheet.physicalNumberOfRows}")
 
                 // Verifica che ci siano righe
-                if (sheet.physicalNumberOfRows == 0) {
-                    errori.add("Il file Excel è vuoto")
+                if (sheet.physicalNumberOfRows <= 1) {
+                    val errore = "Il file Excel è vuoto o contiene solo l'intestazione"
+                    android.util.Log.e("ExcelReader", errore)
+                    errori.add(errore)
                     return ExcelResult(emptyList(), errori)
                 }
 
-                // Leggi la riga di intestazione (prima riga)
-                val headerRow = sheet.getRow(0)
-                if (headerRow == null) {
-                    errori.add("Intestazione mancante")
-                    return ExcelResult(emptyList(), errori)
-                }
-
-                // Identifica gli indici delle colonne
-                val colonneMap = mappaColonne(headerRow)
-
-                if (colonneMap.isEmpty()) {
-                    errori.add("Intestazioni non valide. Assicurati che le colonne siano: Data, Descrizione, Importo")
-                    return ExcelResult(emptyList(), errori)
-                }
-
-                // Leggi i dati (dalla seconda riga in poi)
-                for (i in 1 until sheet.physicalNumberOfRows) {
-                    val row = sheet.getRow(i) ?: continue
+                // Salta la riga di intestazione (riga 0) e leggi i dati
+                for (rowIndex in 1 until sheet.physicalNumberOfRows) {
+                    val row = sheet.getRow(rowIndex) ?: continue
 
                     try {
-                        val movimento = parsaRiga(row, colonneMap, contoId)
+                        val movimento = parsaRiga(row, contoId, rowIndex + 1)
                         if (movimento != null) {
                             movimenti.add(movimento)
+                            if (rowIndex <= 3) { // Log solo per le prime 3 righe
+                                android.util.Log.d("ExcelReader", "Riga $rowIndex parsata: ${movimento.descrizione} - ${movimento.importo}€")
+                            }
+                        } else {
+                            android.util.Log.w("ExcelReader", "Riga $rowIndex: movimento null")
                         }
                     } catch (e: Exception) {
-                        errori.add("Errore riga ${i + 1}: ${e.message}")
+                        val errore = "Errore riga ${rowIndex + 1}: ${e.message}"
+                        android.util.Log.e("ExcelReader", errore, e)
+                        errori.add(errore)
                     }
                 }
 
                 workbook.close()
+                android.util.Log.d("ExcelReader", "File chiuso correttamente")
             }
 
         } catch (e: Exception) {
-            errori.add("Errore lettura file: ${e.message}")
+            val errore = "Errore lettura file: ${e.message}"
+            android.util.Log.e("ExcelReader", errore, e)
+            errori.add(errore)
         }
+
+        android.util.Log.d("ExcelReader", "=== FINE LETTURA EXCEL ===")
+        android.util.Log.d("ExcelReader", "Movimenti parsati: ${movimenti.size}")
+        android.util.Log.d("ExcelReader", "Errori: ${errori.size}")
 
         return ExcelResult(movimenti, errori)
     }
 
     /**
-     * Mappa le colonne del file Excel in base alle intestazioni.
-     *
-     * @return Map con nome colonna → indice
-     */
-    private fun mappaColonne(headerRow: Row): Map<String, Int> {
-        val mappa = mutableMapOf<String, Int>()
-
-        for (cellIndex in 0 until headerRow.lastCellNum) {
-            val cell = headerRow.getCell(cellIndex) ?: continue
-            val headerName = cell.stringCellValue.trim().lowercase()
-
-            when {
-                headerName.contains("data") -> mappa["data"] = cellIndex
-                headerName.contains("descrizione") || headerName.contains("causale") ->
-                    mappa["descrizione"] = cellIndex
-                headerName.contains("importo") || headerName.contains("ammontare") ->
-                    mappa["importo"] = cellIndex
-                headerName.contains("categoria") -> mappa["categoria"] = cellIndex
-                headerName.contains("note") -> mappa["note"] = cellIndex
-            }
-        }
-
-        return mappa
-    }
-
-    /**
      * Parsa una singola riga del file Excel e crea un Movimento.
+     *
+     * @param row La riga da parsare
+     * @param contoId ID del conto
+     * @param numeroRiga Numero della riga (per messaggi di errore)
+     * @return Movimento parsato o null se la riga non è valida
      */
-    private fun parsaRiga(row: Row, colonneMap: Map<String, Int>, contoId: Long): Movimento? {
-        // Colonne obbligatorie
-        val dataIndex = colonneMap["data"] ?: return null
-        val descrizioneIndex = colonneMap["descrizione"] ?: return null
-        val importoIndex = colonneMap["importo"] ?: return null
+    private fun parsaRiga(row: Row, contoId: Long, numeroRiga: Int): Movimento? {
+        // === LEGGI DATA OPERAZIONE (colonna A) ===
+        val dataOperazioneCell = row.getCell(ColonneExcel.DATA_OPERAZIONE) ?: return null
+        val data = parseData(dataOperazioneCell) ?: return null
 
-        // Colonne opzionali
-        val categoriaIndex = colonneMap["categoria"]
-        val noteIndex = colonneMap["note"]
+        // === LEGGI TIPOLOGIA (colonna D) ===
+        val tipologiaCell = row.getCell(ColonneExcel.TIPOLOGIA)
+        val tipologia = getCellStringValue(tipologiaCell) ?: "Altro"
 
-        // Leggi DATA
-        val dataCell = row.getCell(dataIndex) ?: return null
-        val data = when (dataCell.cellType) {
-            CellType.NUMERIC -> {
-                if (DateUtil.isCellDateFormatted(dataCell)) {
-                    // Data in formato Excel
-                    dataCell.dateCellValue.toInstant()
-                        .atZone(ZoneId.systemDefault())
-                        .toLocalDate()
-                } else {
-                    return null
-                }
-            }
-            CellType.STRING -> {
-                // Data in formato stringa (es. "01/09/2025")
-                parseDataFromString(dataCell.stringCellValue)
-            }
-            else -> return null
-        } ?: return null
+        // === LEGGI NOME (colonna E) ===
+        val nomeCell = row.getCell(ColonneExcel.NOME)
+        val nome = getCellStringValue(nomeCell) ?: ""
 
-        // Leggi DESCRIZIONE
-        val descrizioneCell = row.getCell(descrizioneIndex) ?: return null
-        val descrizione = when (descrizioneCell.cellType) {
-            CellType.STRING -> descrizioneCell.stringCellValue.trim()
-            CellType.NUMERIC -> descrizioneCell.numericCellValue.toString()
-            else -> return null
+        // === LEGGI DESCRIZIONE (colonna F) ===
+        val descrizioneCell = row.getCell(ColonneExcel.DESCRIZIONE)
+        val descrizioneCompleta = getCellStringValue(descrizioneCell) ?: ""
+
+        // Combina Nome e Descrizione per creare la descrizione del movimento
+        val descrizione = if (nome.isNotBlank() && descrizioneCompleta.isNotBlank()) {
+            "$nome - $descrizioneCompleta"
+        } else if (nome.isNotBlank()) {
+            nome
+        } else if (descrizioneCompleta.isNotBlank()) {
+            descrizioneCompleta
+        } else {
+            "Movimento"
         }
 
-        if (descrizione.isBlank()) return null
+        // === LEGGI IMPORTO (colonna G) ===
+        val importoCell = row.getCell(ColonneExcel.IMPORTO) ?: return null
+        val importo = parseImporto(importoCell) ?: return null
 
-        // Leggi IMPORTO
-        val importoCell = row.getCell(importoIndex) ?: return null
-        val importo = when (importoCell.cellType) {
-            CellType.NUMERIC -> importoCell.numericCellValue
-            CellType.STRING -> CurrencyUtils.parseImporto(importoCell.stringCellValue)
-            else -> null
-        } ?: return null
+        // === DETERMINA CATEGORIA AUTOMATICAMENTE ===
+        val categoria = determinaCategoria(tipologia, nome, descrizioneCompleta, importo)
 
-        // Leggi CATEGORIA (opzionale)
-        val categoria = categoriaIndex?.let { idx ->
-            val cell = row.getCell(idx)
-            when (cell?.cellType) {
-                CellType.STRING -> cell.stringCellValue.trim()
-                else -> null
-            }
-        } ?: determinaCategoriaDaDescrizione(descrizione, importo)
-
-        // Leggi NOTE (opzionale)
-        val note = noteIndex?.let { idx ->
-            val cell = row.getCell(idx)
-            when (cell?.cellType) {
-                CellType.STRING -> cell.stringCellValue.trim().takeIf { it.isNotBlank() }
-                else -> null
-            }
-        }
-
+        // === CREA IL MOVIMENTO ===
         return Movimento(
             contoId = contoId,
             data = data,
-            descrizione = descrizione,
+            descrizione = descrizione.trim(),
             importo = importo,
             categoria = categoria,
-            note = note,
+            note = "Importato da Excel - Tipologia: $tipologia",
             isRicorrente = false,
             dataInserimento = LocalDate.now()
         )
     }
 
     /**
-     * Prova a parsare una data da una stringa in vari formati.
+     * Legge una data da una cella.
+     * Supporta sia date formattate che stringhe.
      */
-    private fun parseDataFromString(dataString: String): LocalDate? {
-        val formati = listOf(
-            "dd/MM/yyyy",
-            "dd-MM-yyyy",
-            "yyyy-MM-dd",
-            "dd/MM/yy",
-            "dd-MM-yy"
-        )
-
-        for (formato in formati) {
-            try {
-                val formatter = java.time.format.DateTimeFormatter.ofPattern(formato)
-                return LocalDate.parse(dataString, formatter)
-            } catch (e: Exception) {
-                // Prova il prossimo formato
-                continue
+    private fun parseData(cell: Cell?): LocalDate? {
+        return try {
+            when (cell?.cellType) {
+                CellType.NUMERIC -> {
+                    if (DateUtil.isCellDateFormatted(cell)) {
+                        // Data in formato Excel
+                        val javaDate = cell.dateCellValue
+                        javaDate.toInstant()
+                            .atZone(java.time.ZoneId.systemDefault())
+                            .toLocalDate()
+                    } else {
+                        null
+                    }
+                }
+                CellType.STRING -> {
+                    // Data in formato stringa (es. "30/09/2025")
+                    val dateString = cell.stringCellValue.trim()
+                    LocalDate.parse(dateString, dateFormatter)
+                }
+                else -> null
             }
+        } catch (e: Exception) {
+            null
         }
-
-        return null
     }
 
     /**
-     * Determina automaticamente la categoria in base alla descrizione e all'importo.
-     *
-     * Questa è una logica di base. Puoi espanderla con regole più sofisticate.
+     * Legge un importo da una cella.
+     * Supporta sia valori numerici che stringhe.
      */
-    private fun determinaCategoriaDaDescrizione(descrizione: String, importo: Double): String {
-        val desc = descrizione.lowercase()
+    private fun parseImporto(cell: Cell?): Double? {
+        return try {
+            when (cell?.cellType) {
+                CellType.NUMERIC -> cell.numericCellValue
+                CellType.STRING -> {
+                    val importoString = cell.stringCellValue.trim()
+                    CurrencyUtils.parseImporto(importoString)
+                }
+                else -> null
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
 
+    /**
+     * Ottiene il valore stringa di una cella.
+     */
+    private fun getCellStringValue(cell: Cell?): String? {
+        return try {
+            when (cell?.cellType) {
+                CellType.STRING -> cell.stringCellValue.trim()
+                CellType.NUMERIC -> cell.numericCellValue.toString()
+                else -> null
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    /**
+     * Determina automaticamente la categoria in base alla tipologia, nome e importo.
+     *
+     * Utilizza euristiche per categorizzare i movimenti.
+     */
+    private fun determinaCategoria(
+        tipologia: String,
+        nome: String,
+        descrizione: String,
+        importo: Double
+    ): String {
+        val tipologiaLower = tipologia.lowercase()
+        val nomeLower = nome.lowercase()
+        val descrizoneLower = descrizione.lowercase()
+
+        // ENTRATE
+        if (importo > 0) {
+            return when {
+                tipologiaLower.contains("bonifico") -> "Bonifico"
+                tipologiaLower.contains("stipendio") ||
+                        nomeLower.contains("stipendio") -> "Stipendio"
+                tipologiaLower.contains("accredito") -> "Entrata"
+                else -> "Entrata"
+            }
+        }
+
+        // USCITE
         return when {
-            // Entrate
-            importo > 0 && (desc.contains("stipendio") || desc.contains("salary")) -> "Stipendio"
-            importo > 0 && desc.contains("bonifico") -> "Bonifico"
-            importo > 0 -> "Entrata"
+            // Abbonamenti e servizi
+            nomeLower.contains("netflix") || nomeLower.contains("spotify") ||
+                    nomeLower.contains("amazon prime") || nomeLower.contains("disney") ||
+                    nomeLower.contains("xbox") || nomeLower.contains("playstation") -> "Abbonamento"
 
-            // Uscite
-            desc.contains("netflix") || desc.contains("spotify") ||
-                    desc.contains("abbonamento") -> "Abbonamento"
+            // Spesa alimentare
+            nomeLower.contains("conad") || nomeLower.contains("esselunga") ||
+                    nomeLower.contains("lidl") || nomeLower.contains("eurospin") ||
+                    nomeLower.contains("carrefour") || nomeLower.contains("coop") ||
+                    nomeLower.contains("iper") || nomeLower.contains("md discount") -> "Spesa"
 
-            desc.contains("supermercato") || desc.contains("conad") ||
-                    desc.contains("esselunga") -> "Spesa"
+            // Ristoranti e bar
+            nomeLower.contains("ristorante") || nomeLower.contains("pizzeria") ||
+                    nomeLower.contains("bar") || nomeLower.contains("trattoria") ||
+                    nomeLower.contains("osteria") || nomeLower.contains("pub") ||
+                    nomeLower.contains("mc donald") || nomeLower.contains("burger king") -> "Ristorante"
 
-            desc.contains("ristorante") || desc.contains("pizzeria") ||
-                    desc.contains("bar") -> "Ristorante"
+            // Trasporti e carburante
+            nomeLower.contains("eni") || nomeLower.contains("ip") ||
+                    nomeLower.contains("q8") || nomeLower.contains("tamoil") ||
+                    nomeLower.contains("benzina") || nomeLower.contains("diesel") -> "Benzina"
 
-            desc.contains("benzina") || desc.contains("carburante") -> "Benzina"
+            nomeLower.contains("trenitalia") || nomeLower.contains("italo") ||
+                    nomeLower.contains("gtt") || nomeLower.contains("atm") ||
+                    nomeLower.contains("taxi") || nomeLower.contains("uber") -> "Trasporti"
 
-            desc.contains("bolletta") || desc.contains("enel") ||
-                    desc.contains("gas") -> "Bollette"
+            // Bollette e utenze
+            nomeLower.contains("enel") || nomeLower.contains("eni gas") ||
+                    nomeLower.contains("tim") || nomeLower.contains("vodafone") ||
+                    nomeLower.contains("wind") || nomeLower.contains("iliad") ||
+                    nomeLower.contains("bolletta") -> "Bollette"
 
-            desc.contains("affitto") || desc.contains("rent") -> "Affitto"
+            // Shopping
+            nomeLower.contains("zara") || nomeLower.contains("h&m") ||
+                    nomeLower.contains("decathlon") || nomeLower.contains("ikea") ||
+                    nomeLower.contains("mediaworld") || nomeLower.contains("euronics") -> "Shopping"
 
-            desc.contains("prelievo") || desc.contains("bancomat") -> "Prelievo"
+            // PayPal e pagamenti online
+            nomeLower.contains("paypal") -> "Pagamento Online"
+
+            // Prelievi
+            tipologiaLower.contains("prelievo") ||
+                    nomeLower.contains("bancomat") -> "Prelievo"
+
+            // Default: usa la tipologia come categoria
+            tipologiaLower.contains("bonifico") -> "Bonifico"
+            tipologiaLower.contains("pagamento") -> "Pagamento"
 
             else -> "Altro"
+        }
+    }
+
+    /**
+     * Metodo helper per verificare se un file Excel è valido prima di leggerlo.
+     *
+     * @param filePath Percorso del file
+     * @return Pair<Boolean, String> - (isValid, messaggioErrore)
+     */
+    fun verificaFileExcel(filePath: String): Pair<Boolean, String> {
+        try {
+            val file = File(filePath)
+
+            if (!file.exists()) {
+                return Pair(false, "File non trovato")
+            }
+
+            if (!file.canRead()) {
+                return Pair(false, "Impossibile leggere il file (permessi negati)")
+            }
+
+            val estensione = file.extension.lowercase()
+            if (estensione != "xlsx" && estensione != "xls") {
+                return Pair(false, "Formato file non valido (deve essere .xlsx o .xls)")
+            }
+
+            // Prova ad aprire il file
+            FileInputStream(file).use { fis ->
+                val workbook = XSSFWorkbook(fis)
+                if (workbook.numberOfSheets == 0) {
+                    return Pair(false, "Il file non contiene fogli")
+                }
+                workbook.close()
+            }
+
+            return Pair(true, "File valido")
+
+        } catch (e: Exception) {
+            return Pair(false, "Errore durante la verifica: ${e.message}")
         }
     }
 }
