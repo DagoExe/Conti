@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "404921205660",
+    "project_id": "banckingapp",
+    "storage_bucket": "banckingapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:404921205660:android:fc47312688f2666fca3e59",
+        "android_client_info": {
+          "package_name": "com.example.conti"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyASsSxPcufRSTxZersh46CShxfp3Wnbwtw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

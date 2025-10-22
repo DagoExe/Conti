@@ -5,6 +5,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.conti.databinding.ActivityMainBinding
+import com.google.firebase.FirebaseApp
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreSettings
 
 /**
  * MainActivity - Activity principale dell'applicazione con Bottom Navigation.
@@ -18,24 +21,37 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
+    private lateinit var db: FirebaseFirestore
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
 
-        android.util.Log.d("MainActivity", "=== APP AVVIATA ===")
+        // Inizializza Firebase
+        FirebaseApp.initializeApp(this)
 
-        // Inizializza il ViewBinding
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        // Configura Firestore
+        db = FirebaseFirestore.getInstance().apply {
+            firestoreSettings = FirebaseFirestoreSettings.Builder()
+                .setPersistenceEnabled(true) // Supporto offline
+                .setCacheSizeBytes(FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED)
+                .build()
+        }
 
-        android.util.Log.d("MainActivity", "ViewBinding inizializzato")
+        // Verifica connessione
+        testFirestoreConnection()
+    }
 
-        // Configura la Toolbar
-        setSupportActionBar(binding.toolbar)
-
-        // Setup Navigation Component
-        setupNavigation()
-
-        android.util.Log.d("MainActivity", "Setup completato")
+    private fun testFirestoreConnection() {
+        db.collection("test")
+            .document("connection")
+            .set(mapOf("timestamp" to System.currentTimeMillis()))
+            .addOnSuccessListener {
+                println("✅ Firestore connesso correttamente!")
+            }
+            .addOnFailureListener { e ->
+                println("❌ Errore connessione Firestore: ${e.message}")
+            }
     }
 
     /**
