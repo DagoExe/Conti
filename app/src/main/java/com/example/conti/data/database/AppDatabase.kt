@@ -29,7 +29,7 @@ import com.example.conti.data.database.entities.Movimento
         Abbonamento::class
     ],
     version = 1,
-    exportSchema = true // Salva lo schema per migrazioni future
+    exportSchema = false // ✅ Disabilita export schema (più semplice per sviluppo)
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {

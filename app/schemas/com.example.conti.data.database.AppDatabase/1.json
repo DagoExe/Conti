@@ -1,0 +1,316 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "8978297aa70c984a9dd55996d836b8bf",
+    "entities": [
+      {
+        "tableName": "conti",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `nome` TEXT NOT NULL, `istituto` TEXT NOT NULL, `saldoIniziale` REAL NOT NULL, `colore` TEXT NOT NULL, `isFromExcel` INTEGER NOT NULL, `pathExcel` TEXT, `dataUltimoAggiornamento` INTEGER)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nome",
+            "columnName": "nome",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "istituto",
+            "columnName": "istituto",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "saldoIniziale",
+            "columnName": "saldoIniziale",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "colore",
+            "columnName": "colore",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isFromExcel",
+            "columnName": "isFromExcel",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pathExcel",
+            "columnName": "pathExcel",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "dataUltimoAggiornamento",
+            "columnName": "dataUltimoAggiornamento",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "movimenti",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `contoId` INTEGER NOT NULL, `data` INTEGER NOT NULL, `descrizione` TEXT NOT NULL, `importo` REAL NOT NULL, `categoria` TEXT NOT NULL, `note` TEXT, `isRicorrente` INTEGER NOT NULL, `idAbbonamento` INTEGER, `dataInserimento` INTEGER NOT NULL, FOREIGN KEY(`contoId`) REFERENCES `conti`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "contoId",
+            "columnName": "contoId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "data",
+            "columnName": "data",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "descrizione",
+            "columnName": "descrizione",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "importo",
+            "columnName": "importo",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "categoria",
+            "columnName": "categoria",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "note",
+            "columnName": "note",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "isRicorrente",
+            "columnName": "isRicorrente",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "idAbbonamento",
+            "columnName": "idAbbonamento",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "dataInserimento",
+            "columnName": "dataInserimento",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_movimenti_contoId",
+            "unique": false,
+            "columnNames": [
+              "contoId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_movimenti_contoId` ON `${TABLE_NAME}` (`contoId`)"
+          },
+          {
+            "name": "index_movimenti_data",
+            "unique": false,
+            "columnNames": [
+              "data"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_movimenti_data` ON `${TABLE_NAME}` (`data`)"
+          },
+          {
+            "name": "index_movimenti_categoria",
+            "unique": false,
+            "columnNames": [
+              "categoria"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_movimenti_categoria` ON `${TABLE_NAME}` (`categoria`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "conti",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "contoId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "abbonamenti",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `nome` TEXT NOT NULL, `descrizione` TEXT, `importo` REAL NOT NULL, `frequenza` TEXT NOT NULL, `dataInizio` INTEGER NOT NULL, `dataProssimoRinnovo` INTEGER NOT NULL, `dataFine` INTEGER, `contoId` INTEGER NOT NULL, `categoria` TEXT NOT NULL, `isAttivo` INTEGER NOT NULL, `note` TEXT, FOREIGN KEY(`contoId`) REFERENCES `conti`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nome",
+            "columnName": "nome",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "descrizione",
+            "columnName": "descrizione",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "importo",
+            "columnName": "importo",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "frequenza",
+            "columnName": "frequenza",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dataInizio",
+            "columnName": "dataInizio",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dataProssimoRinnovo",
+            "columnName": "dataProssimoRinnovo",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dataFine",
+            "columnName": "dataFine",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "contoId",
+            "columnName": "contoId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "categoria",
+            "columnName": "categoria",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isAttivo",
+            "columnName": "isAttivo",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "note",
+            "columnName": "note",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_abbonamenti_contoId",
+            "unique": false,
+            "columnNames": [
+              "contoId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_abbonamenti_contoId` ON `${TABLE_NAME}` (`contoId`)"
+          },
+          {
+            "name": "index_abbonamenti_isAttivo",
+            "unique": false,
+            "columnNames": [
+              "isAttivo"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_abbonamenti_isAttivo` ON `${TABLE_NAME}` (`isAttivo`)"
+          },
+          {
+            "name": "index_abbonamenti_dataProssimoRinnovo",
+            "unique": false,
+            "columnNames": [
+              "dataProssimoRinnovo"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_abbonamenti_dataProssimoRinnovo` ON `${TABLE_NAME}` (`dataProssimoRinnovo`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "conti",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "contoId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8978297aa70c984a9dd55996d836b8bf')"
+    ]
+  }
+}
