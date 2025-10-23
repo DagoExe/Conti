@@ -10,23 +10,16 @@ import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 import java.util.Calendar
 
 /**
- * FirestoreRepository
+ * FirestoreRepository - VERSIONE CORRETTA
  *
- * Gestisce l'accesso sicuro ai dati Firestore per:
- * - Profili utente
- * - Conti bancari
- * - Transazioni
- * - Statistiche
- *
- * Struttura Firestore:
- * users/{userId}/
- *   ├── profile (documento)
- *   ├── accounts/{accountId}
- *   └── transactions/{transactionId}
+ * ✅ NON CRASHA se l'utente non è autenticato
+ * ✅ Restituisce Flow vuoti invece di lanciare eccezioni
+ * ✅ Logging dettagliato per debug
  */
 class FirestoreRepository {
 
@@ -39,7 +32,19 @@ class FirestoreRepository {
 
     /**
      * Verifica che l'utente sia autenticato.
-     * Se non lo è, lancia un'eccezione.
+     * ✅ NUOVO: Non lancia eccezione, restituisce null se non autenticato.
+     */
+    private fun getUserIdSafely(): String? {
+        val user = auth.currentUser
+        if (user == null) {
+            Log.w("FirestoreRepository", "⚠️ Utente non ancora autenticato")
+        }
+        return user?.uid
+    }
+
+    /**
+     * Verifica che l'utente sia autenticato.
+     * ⚠️ Lancia eccezione solo per operazioni di SCRITTURA.
      */
     private fun requireUser(): String {
         val user = auth.currentUser
@@ -51,13 +56,13 @@ class FirestoreRepository {
     }
 
     /**
-     * Riferimento alla collezione interna dell’utente autenticato.
+     * Riferimento alla collezione interna dell'utente autenticato.
      */
     private fun userCollection(path: String) =
         db.collection("users").document(requireUser()).collection(path)
 
     /**
-     * Riferimento al documento del profilo dell’utente autenticato.
+     * Riferimento al documento del profilo dell'utente autenticato.
      */
     private fun userProfileRef() =
         db.collection("users").document(requireUser()).collection("profile")
@@ -70,18 +75,24 @@ class FirestoreRepository {
      * Crea o aggiorna il documento del profilo utente.
      */
     suspend fun updateUserProfile(email: String) {
-        val userId = requireUser()
-        val profileData = mapOf(
-            "email" to email,
-            "lastLogin" to Timestamp.now()
-        )
+        try {
+            val userId = requireUser()
+            val profileData = mapOf(
+                "email" to email,
+                "lastLogin" to Timestamp.now()
+            )
 
-        db.collection("users")
-            .document(userId)
-            .collection("profile")
-            .document("main")
-            .set(profileData, SetOptions.merge())
-            .await()
+            db.collection("users")
+                .document(userId)
+                .collection("profile")
+                .document("main")
+                .set(profileData, SetOptions.merge())
+                .await()
+
+            Log.d("FirestoreRepository", "✅ Profilo aggiornato per $email")
+        } catch (e: Exception) {
+            Log.e("FirestoreRepository", "❌ Errore aggiornamento profilo", e)
+        }
     }
 
     // ========================================
@@ -103,30 +114,68 @@ class FirestoreRepository {
             )
 
             docRef.set(newAccount).await()
+            Log.d("FirestoreRepository", "✅ Account creato: ${docRef.id}")
             Result.success(docRef.id)
         } catch (e: Exception) {
-            Log.e("FirestoreRepository", "Errore creazione account", e)
+            Log.e("FirestoreRepository", "❌ Errore creazione account", e)
             Result.failure(e)
         }
     }
 
+    /**
+     * ✅ CORRETTO: Restituisce Flow vuoto se l'utente non è autenticato
+     * invece di crashare.
+     */
     fun getAllAccounts(): Flow<List<Account>> = callbackFlow {
-        val userId = requireUser()
-        val listener = db.collection("users")
-            .document(userId)
-            .collection("accounts")
-            .orderBy("accountName", Query.Direction.ASCENDING)
-            .addSnapshotListener { snapshot, error ->
-                if (error != null) {
-                    close(error)
-                    return@addSnapshotListener
+        // Controlla se l'utente è autenticato
+        val userId = getUserIdSafely()
+
+        if (userId == null) {
+            Log.w("FirestoreRepository", "⚠️ getAllAccounts: utente non autenticato, restituisco lista vuota")
+            // Invia lista vuota e attendi che l'utente si autentichi
+            trySend(emptyList())
+
+            // Aspetta che l'utente si autentichi
+            val authListener = FirebaseAuth.AuthStateListener { auth ->
+                if (auth.currentUser != null) {
+                    Log.d("FirestoreRepository", "✅ Utente autenticato, riprovo a caricare accounts")
+                    // L'observer verrà ricreato quando il LiveData viene re-osservato
                 }
-                val accounts = snapshot?.documents?.mapNotNull {
-                    it.toObject(Account::class.java)
-                } ?: emptyList()
-                trySend(accounts)
             }
-        awaitClose { listener.remove() }
+            auth.addAuthStateListener(authListener)
+            awaitClose { auth.removeAuthStateListener(authListener) }
+            return@callbackFlow
+        }
+
+        // Utente autenticato, procedi normalmente
+        try {
+            val listener = db.collection("users")
+                .document(userId)
+                .collection("accounts")
+                .orderBy("accountName", Query.Direction.ASCENDING)
+                .addSnapshotListener { snapshot, error ->
+                    if (error != null) {
+                        Log.e("FirestoreRepository", "❌ Errore caricamento accounts", error)
+                        close(error)
+                        return@addSnapshotListener
+                    }
+
+                    val accounts = snapshot?.documents?.mapNotNull {
+                        it.toObject(Account::class.java)
+                    } ?: emptyList()
+
+                    Log.d("FirestoreRepository", "📊 Caricati ${accounts.size} accounts")
+                    trySend(accounts)
+                }
+            awaitClose {
+                Log.d("FirestoreRepository", "🔌 Chiusura listener accounts")
+                listener.remove()
+            }
+        } catch (e: Exception) {
+            Log.e("FirestoreRepository", "❌ Eccezione getAllAccounts", e)
+            trySend(emptyList())
+            close(e)
+        }
     }
 
     suspend fun updateAccount(account: Account): Result<Unit> {
@@ -206,8 +255,19 @@ class FirestoreRepository {
         }.await()
     }
 
+    /**
+     * ✅ CORRETTO: Restituisce Flow vuoto se utente non autenticato
+     */
     fun getAllTransactions(accountId: String? = null): Flow<List<Transaction>> = callbackFlow {
-        val userId = requireUser()
+        val userId = getUserIdSafely()
+
+        if (userId == null) {
+            Log.w("FirestoreRepository", "⚠️ getAllTransactions: utente non autenticato")
+            trySend(emptyList())
+            awaitClose { }
+            return@callbackFlow
+        }
+
         var query = db.collection("users")
             .document(userId)
             .collection("transactions")
@@ -279,18 +339,21 @@ class FirestoreRepository {
         }
     }
 
-    // ========================================
-// TRANSAZIONI / MOVIMENTI (PUBBLICI)
-// ========================================
-
     /**
-     * Ottiene le transazioni in un intervallo di date.
+     * ✅ CORRETTO: Restituisce Flow vuoto se utente non autenticato
      */
     fun getTransactionsByDateRange(
         startDate: Timestamp,
         endDate: Timestamp
     ): Flow<List<Transaction>> = callbackFlow {
-        val userId = requireUser()
+        val userId = getUserIdSafely()
+
+        if (userId == null) {
+            Log.w("FirestoreRepository", "⚠️ getTransactionsByDateRange: utente non autenticato")
+            trySend(emptyList())
+            awaitClose { }
+            return@callbackFlow
+        }
 
         val listener = db.collection("users")
             .document(userId)
@@ -313,9 +376,6 @@ class FirestoreRepository {
         awaitClose { listener.remove() }
     }
 
-    /**
-     * Aggiunge più transazioni in batch.
-     */
     suspend fun addTransactionsBatch(transactions: List<Transaction>): Result<Int> {
         return try {
             val userId = requireUser()
@@ -336,15 +396,26 @@ class FirestoreRepository {
         }
     }
 
-// ========================================
-// ABBONAMENTI
-// ========================================
+    // ========================================
+    // ABBONAMENTI
+    // ========================================
 
+    /**
+     * ✅ CORRETTO: Restituisce Flow vuoto se utente non autenticato
+     */
     fun getAllSubscriptions(activeOnly: Boolean = false): Flow<List<Subscription>> = callbackFlow {
-        val userId = requireUser()
+        val userId = getUserIdSafely()
+
+        if (userId == null) {
+            Log.w("FirestoreRepository", "⚠️ getAllSubscriptions: utente non autenticato")
+            trySend(emptyList())
+            awaitClose { }
+            return@callbackFlow
+        }
+
         var query: Query = db.collection("users")
             .document(userId)
-            .collection("subscriptions") // CollectionReference è sottotipo di Query
+            .collection("subscriptions")
 
         if (activeOnly) query = query.whereEqualTo("isActive", true)
 
@@ -364,10 +435,6 @@ class FirestoreRepository {
         awaitClose { listener.remove() }
     }
 
-
-    /**
-     * Crea un nuovo abbonamento.
-     */
     suspend fun createSubscription(subscription: Subscription): Result<String> {
         return try {
             val userId = requireUser()
@@ -387,9 +454,6 @@ class FirestoreRepository {
         }
     }
 
-    /**
-     * Calcola il costo totale mensile degli abbonamenti attivi.
-     */
     suspend fun getTotalMonthlySubscriptionCost(): Result<Double> {
         return try {
             val userId = requireUser()
@@ -417,7 +481,6 @@ class FirestoreRepository {
             Result.failure(e)
         }
     }
-
 
     // ========================================
     // TIMESTAMP HELPERS

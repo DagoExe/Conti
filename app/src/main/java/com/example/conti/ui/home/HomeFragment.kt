@@ -18,13 +18,10 @@ import kotlinx.coroutines.launch
 /**
  * HomeFragment - Schermata principale dell'app.
  *
- * Mostra:
- * - Saldo totale di tutti i conti
- * - Statistiche del mese corrente (entrate/uscite)
- * - Riepilogo abbonamenti attivi
- * - Lista dei conti con saldi
- *
- * VERSIONE FIRESTORE - CON GESTIONE ERRORI MIGLIORATA
+ * ✅ VERSIONE CORRETTA CON:
+ * - Migliore gestione errori
+ * - Logging dettagliato
+ * - Inizializzazione sicura
  */
 class HomeFragment : Fragment() {
 
@@ -49,7 +46,9 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         try {
+            android.util.Log.d("HomeFragment", "=== onCreateView START ===")
             _binding = FragmentHomeBinding.inflate(inflater, container, false)
+            android.util.Log.d("HomeFragment", "✅ Binding inflated correttamente")
             return binding.root
         } catch (e: Exception) {
             android.util.Log.e("HomeFragment", "❌ Errore onCreateView", e)
@@ -61,22 +60,24 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         try {
+            android.util.Log.d("HomeFragment", "=== onViewCreated START ===")
+
+            // 1. Setup RecyclerView
             setupRecyclerView()
+            android.util.Log.d("HomeFragment", "✅ RecyclerView configurata")
 
-            // SOLO accounts (niente stats, niente subscriptions)
-            viewModel.accounts.observe(viewLifecycleOwner) { accounts ->
-                contiAdapter.submitList(accounts)
+            // 2. Mostra layout vuoto inizialmente
+            showEmptyState()
+            android.util.Log.d("HomeFragment", "✅ Layout vuoto mostrato")
 
-                if (accounts.isEmpty()) {
-                    binding.rvConti.visibility = View.GONE
-                    binding.layoutNoConti.visibility = View.VISIBLE
-                } else {
-                    binding.rvConti.visibility = View.VISIBLE
-                    binding.layoutNoConti.visibility = View.GONE
-                }
-            }
+            // 3. Osserva gli account con gestione errori
+            setupAccountsObserver()
+            android.util.Log.d("HomeFragment", "✅ Observer configurato")
+
+            android.util.Log.d("HomeFragment", "=== onViewCreated END ===")
         } catch (e: Exception) {
-            android.util.Log.e("HomeFragment", "Errore", e)
+            android.util.Log.e("HomeFragment", "❌ ERRORE CRITICO in onViewCreated", e)
+            showError("Errore caricamento: ${e.message}")
         }
     }
 
@@ -88,7 +89,6 @@ class HomeFragment : Fragment() {
             onContoClick = { account ->
                 android.util.Log.d("HomeFragment", "Conto cliccato: ${account.name}")
                 // TODO: Navigare al dettaglio del conto
-                // findNavController().navigate(...)
             }
         )
 
@@ -99,42 +99,22 @@ class HomeFragment : Fragment() {
     }
 
     /**
-     * Configura gli observer per i LiveData del ViewModel.
-     * VERSIONE SICURA: controlla che viewLifecycleOwner sia valido.
+     * Configura l'observer per gli account con gestione errori robusta.
      */
-    private fun setupObservers() {
-        // Verifica che viewLifecycleOwner sia inizializzato
-        if (!viewLifecycleOwner.lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.INITIALIZED)) {
-            android.util.Log.w("HomeFragment", "⚠️ ViewLifecycleOwner non ancora inizializzato")
-            return
-        }
-
+    private fun setupAccountsObserver() {
         try {
-            // Osserva la lista degli account
             viewModel.accounts.observe(viewLifecycleOwner) { accounts ->
-                updateAccountsUI(accounts)
-            }
-
-            // Osserva le statistiche del mese corrente
-            viewLifecycleOwner.lifecycleScope.launch {
                 try {
-                    viewModel.monthlyStats.collect { stats ->
-                        updateMonthlyStatsUI(stats)
-                    }
+                    android.util.Log.d("HomeFragment", "📊 Ricevuti ${accounts.size} account")
+                    updateAccountsUI(accounts)
                 } catch (e: Exception) {
-                    android.util.Log.e("HomeFragment", "❌ Errore raccolta monthlyStats", e)
+                    android.util.Log.e("HomeFragment", "❌ Errore aggiornamento UI", e)
+                    showError("Errore visualizzazione conti")
                 }
             }
-
-            // Osserva gli abbonamenti
-            viewModel.activeSubscriptions.observe(viewLifecycleOwner) { subscriptions: List<com.example.conti.models.Subscription> ->
-                updateSubscriptionsUI(subscriptions)
-            }
-
-
         } catch (e: Exception) {
-            android.util.Log.e("HomeFragment", "❌ Errore setupObservers", e)
-            showError("Errore caricamento dati: ${e.message}")
+            android.util.Log.e("HomeFragment", "❌ Errore setup observer", e)
+            showError("Errore inizializzazione")
         }
     }
 
@@ -144,8 +124,7 @@ class HomeFragment : Fragment() {
     private fun updateAccountsUI(accounts: List<com.example.conti.models.Account>) {
         try {
             if (accounts.isEmpty()) {
-                binding.rvConti.visibility = View.GONE
-                binding.layoutNoConti.visibility = View.VISIBLE
+                showEmptyState()
                 binding.tvNumeroConti.text = "0 conti"
                 binding.tvSaldoTotale.text = CurrencyUtils.formatImporto(0.0)
             } else {
@@ -173,29 +152,11 @@ class HomeFragment : Fragment() {
     }
 
     /**
-     * Aggiorna l'UI con le statistiche mensili.
+     * Mostra lo stato vuoto.
      */
-    private fun updateMonthlyStatsUI(stats: HomeViewModel.MonthlyStats) {
-        try {
-            binding.tvEntrateMese.text = CurrencyUtils.formatImporto(stats.totalIncome)
-            binding.tvUsciteMese.text = CurrencyUtils.formatImporto(stats.totalExpenses)
-        } catch (e: Exception) {
-            android.util.Log.e("HomeFragment", "❌ Errore updateMonthlyStatsUI", e)
-        }
-    }
-
-    /**
-     * Aggiorna l'UI con gli abbonamenti.
-     */
-    private fun updateSubscriptionsUI(subscriptions: List<com.example.conti.models.Subscription>) {
-        try {
-            binding.tvNumeroAbbonamenti.text = subscriptions.size.toString()
-
-            val costoMensile = subscriptions.sumOf { it.getMonthlyCost() }
-            binding.tvCostoAbbonamenti.text = CurrencyUtils.formatImporto(costoMensile)
-        } catch (e: Exception) {
-            android.util.Log.e("HomeFragment", "❌ Errore updateSubscriptionsUI", e)
-        }
+    private fun showEmptyState() {
+        binding.rvConti.visibility = View.GONE
+        binding.layoutNoConti.visibility = View.VISIBLE
     }
 
     /**
@@ -203,11 +164,9 @@ class HomeFragment : Fragment() {
      */
     private fun showError(message: String) {
         try {
-            // Nasconde tutto e mostra messaggio
             binding.rvConti.visibility = View.GONE
             binding.layoutNoConti.visibility = View.VISIBLE
 
-            // Usa i TextView del layout per mostrare l'errore
             val errorView = binding.root.findViewById<android.widget.TextView>(
                 com.example.conti.R.id.tvEmptyMessage
             )
@@ -228,6 +187,7 @@ class HomeFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         try {
+            android.util.Log.d("HomeFragment", "=== onDestroyView ===")
             _binding = null
         } catch (e: Exception) {
             android.util.Log.e("HomeFragment", "❌ Errore onDestroyView", e)
