@@ -40,7 +40,7 @@ class ContiFragment : Fragment() {
 
     private val viewModel: HomeViewModel by viewModels {
         val application = requireActivity().application as ContiApplication
-        ViewModelFactory(application.repository)
+        ViewModelFactory(application.repository) // Ora è FirestoreRepository
     }
 
     private lateinit var contiAdapter: ContiAdapter
