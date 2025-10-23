@@ -13,15 +13,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 /**
- * ViewModel per la schermata Home - Versione Firestore.
+ * ViewModel per la schermata Home - Versione Firestore CORRETTA.
  *
- * Responsabilità:
- * - Fornire i dati degli account dall'UI
- * - Gestire operazioni CRUD su Firestore
- * - Calcolare statistiche
- *
- * Il ViewModel sopravvive ai cambiamenti di configurazione (rotazione schermo, ecc.)
- * e mantiene i dati in modo reattivo tramite Flow.
+ * ✅ FIXES:
+ * - Type inference esplicito per la conversione da Movimento a Transaction
+ * - Import corretto dell'entità Movimento
  */
 class HomeViewModel(
     private val repository: FirestoreRepository
@@ -33,7 +29,6 @@ class HomeViewModel(
 
     /**
      * Lista di tutti gli account, osservabile dall'UI.
-     * Si aggiorna automaticamente quando i dati in Firestore cambiano.
      */
     val accounts = repository.getAllAccounts().asLiveData()
 
@@ -54,9 +49,6 @@ class HomeViewModel(
     // STATISTICHE CALCOLATE
     // ========================================
 
-    /**
-     * Statistiche del mese corrente (entrate, uscite, bilancio).
-     */
     data class MonthlyStats(
         val totalIncome: Double = 0.0,
         val totalExpenses: Double = 0.0,
@@ -64,9 +56,6 @@ class HomeViewModel(
         val transactionCount: Int = 0
     )
 
-    /**
-     * Flow delle statistiche mensili.
-     */
     val monthlyStats: Flow<MonthlyStats> = repository.getTransactionsByDateRange(
         startDate = FirestoreRepository.getStartOfCurrentMonth(),
         endDate = FirestoreRepository.getEndOfCurrentMonth()
@@ -82,9 +71,6 @@ class HomeViewModel(
         )
     }
 
-    /**
-     * Saldo totale di tutti gli account.
-     */
     val totalBalance: Flow<Double> = repository.getAllAccounts().map { accounts ->
         accounts.sumOf { it.balance }
     }
@@ -93,9 +79,6 @@ class HomeViewModel(
     // OPERAZIONI ACCOUNT
     // ========================================
 
-    /**
-     * Crea un nuovo account.
-     */
     fun createAccount(
         account: Account,
         onSuccess: (String) -> Unit = {},
@@ -114,9 +97,6 @@ class HomeViewModel(
         }
     }
 
-    /**
-     * Aggiorna un account esistente.
-     */
     fun updateAccount(
         account: Account,
         onSuccess: () -> Unit = {},
@@ -135,9 +115,6 @@ class HomeViewModel(
         }
     }
 
-    /**
-     * Elimina un account.
-     */
     fun deleteAccount(
         accountId: String,
         onSuccess: () -> Unit = {},
@@ -160,9 +137,6 @@ class HomeViewModel(
     // OPERAZIONI TRANSAZIONI
     // ========================================
 
-    /**
-     * Aggiunge una singola transazione.
-     */
     fun addTransaction(
         transaction: Transaction,
         onSuccess: (String) -> Unit = {},
@@ -182,7 +156,7 @@ class HomeViewModel(
     }
 
     /**
-     * Importa transazioni da Excel (batch).
+     * ✅ CORRETTO: Importa transazioni da Excel con type inference esplicito
      */
     fun importTransactionsFromExcel(
         accountId: String,
@@ -211,8 +185,8 @@ class HomeViewModel(
                     return@launch
                 }
 
-                // Converti i movimenti Room in Transaction Firestore
-                val transactions = result.movimenti.map { movimento ->
+                // ✅ FIX: Type inference esplicito per evitare errori di compilazione
+                val transactions = result.movimenti.map { movimento: com.example.conti.data.database.entities.Movimento ->
                     Transaction(
                         accountId = accountId,
                         amount = movimento.importo,
@@ -248,9 +222,6 @@ class HomeViewModel(
         }
     }
 
-    /**
-     * Elimina una transazione.
-     */
     fun deleteTransaction(
         transactionId: String,
         onSuccess: () -> Unit = {},
@@ -273,9 +244,6 @@ class HomeViewModel(
     // OPERAZIONI ABBONAMENTI
     // ========================================
 
-    /**
-     * Crea un nuovo abbonamento.
-     */
     fun createSubscription(
         subscription: Subscription,
         onSuccess: (String) -> Unit = {},
@@ -294,9 +262,6 @@ class HomeViewModel(
         }
     }
 
-    /**
-     * Ottiene il costo mensile totale degli abbonamenti.
-     */
     fun getTotalMonthlyCost(
         onSuccess: (Double) -> Unit = {},
         onError: (String) -> Unit = {}

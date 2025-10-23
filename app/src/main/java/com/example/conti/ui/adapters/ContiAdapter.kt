@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.conti.data.database.entities.Conto
+import com.example.conti.models.Account
 import com.example.conti.databinding.ItemContoBinding
 import com.example.conti.utils.CurrencyUtils
 
@@ -14,10 +14,11 @@ import com.example.conti.utils.CurrencyUtils
  * Adapter per visualizzare la lista di conti in una RecyclerView.
  *
  * Utilizza ListAdapter con DiffUtil per aggiornamenti efficienti.
+ * Versione Firestore - usa Account invece di Conto.
  */
 class ContiAdapter(
-    private val onContoClick: (Conto) -> Unit
-) : ListAdapter<Conto, ContiAdapter.ContoViewHolder>(ContoDiffCallback()) {
+    private val onContoClick: (Account) -> Unit
+) : ListAdapter<Account, ContiAdapter.ContoViewHolder>(ContoDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContoViewHolder {
         val binding = ItemContoBinding.inflate(
@@ -37,34 +38,34 @@ class ContiAdapter(
      */
     class ContoViewHolder(
         private val binding: ItemContoBinding,
-        private val onContoClick: (Conto) -> Unit
+        private val onContoClick: (Account) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(conto: Conto) {
+        fun bind(account: Account) {
             binding.apply {
-                // Nome e istituto
-                tvNomeConto.text = conto.nome
-                tvIstituto.text = conto.istituto
+                // Nome e istituto bancario
+                tvNomeConto.text = account.name
+                tvIstituto.text = account.bankName
 
-                // Saldo (solo saldo iniziale per ora, verrà aggiornato con i movimenti)
-                tvSaldo.text = CurrencyUtils.formatImporto(conto.saldoIniziale)
+                // Saldo corrente
+                tvSaldo.text = CurrencyUtils.formatImporto(account.balance)
 
                 // Colore identificativo
                 try {
-                    viewColore.setBackgroundColor(Color.parseColor(conto.colore))
+                    viewColore.setBackgroundColor(Color.parseColor(account.color))
                 } catch (e: Exception) {
                     viewColore.setBackgroundColor(Color.parseColor("#4CAF50"))
                 }
 
                 // Badge se sincronizzato da Excel
-                if (conto.isFromExcel) {
+                if (account.isFromExcel) {
                     badgeExcel.visibility = android.view.View.VISIBLE
                 } else {
                     badgeExcel.visibility = android.view.View.GONE
                 }
 
                 // Click listener
-                root.setOnClickListener { onContoClick(conto) }
+                root.setOnClickListener { onContoClick(account) }
             }
         }
     }
@@ -72,12 +73,12 @@ class ContiAdapter(
     /**
      * DiffUtil callback per confrontare i conti e aggiornare solo le differenze.
      */
-    private class ContoDiffCallback : DiffUtil.ItemCallback<Conto>() {
-        override fun areItemsTheSame(oldItem: Conto, newItem: Conto): Boolean {
+    private class ContoDiffCallback : DiffUtil.ItemCallback<Account>() {
+        override fun areItemsTheSame(oldItem: Account, newItem: Account): Boolean {
             return oldItem.id == newItem.id
         }
 
-        override fun areContentsTheSame(oldItem: Conto, newItem: Conto): Boolean {
+        override fun areContentsTheSame(oldItem: Account, newItem: Account): Boolean {
             return oldItem == newItem
         }
     }

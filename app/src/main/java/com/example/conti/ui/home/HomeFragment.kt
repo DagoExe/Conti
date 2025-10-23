@@ -22,6 +22,8 @@ import com.example.conti.utils.CurrencyUtils
  * - Statistiche del mese corrente (entrate/uscite)
  * - Riepilogo abbonamenti attivi
  * - Lista dei conti con saldi
+ *
+ * VERSIONE FIRESTORE
  */
 class HomeFragment : Fragment() {
 
@@ -56,7 +58,7 @@ class HomeFragment : Fragment() {
      */
     private fun setupRecyclerView() {
         contiAdapter = ContiAdapter(
-            onContoClick = { conto ->
+            onContoClick = { account ->
                 // TODO: Navigare al dettaglio del conto
                 // findNavController().navigate(...)
             }
@@ -72,87 +74,46 @@ class HomeFragment : Fragment() {
      * Configura gli observer per i LiveData del ViewModel.
      */
     private fun setupObservers() {
-        // Osserva la lista dei conti
-        viewModel.conti.observe(viewLifecycleOwner) { conti ->
-            if (conti.isEmpty()) {
+        // Osserva la lista degli account
+        viewModel.accounts.observe(viewLifecycleOwner) { accounts ->
+            if (accounts.isEmpty()) {
                 binding.rvConti.visibility = View.GONE
                 binding.layoutNoConti.visibility = View.VISIBLE
                 binding.tvNumeroConti.text = "0 conti"
+                binding.tvSaldoTotale.text = CurrencyUtils.formatImporto(0.0)
             } else {
                 binding.rvConti.visibility = View.VISIBLE
                 binding.layoutNoConti.visibility = View.GONE
-                binding.tvNumeroConti.text = "${conti.size} ${if (conti.size == 1) "conto" else "conti"}"
+                binding.tvNumeroConti.text = "${accounts.size} ${if (accounts.size == 1) "conto" else "conti"}"
 
-                // Log per debug
-                android.util.Log.d("HomeFragment", "📊 Conti caricati: ${conti.size}")
-                conti.forEach { conto ->
-                    android.util.Log.d("HomeFragment", "  - ${conto.nome} (${conto.istituto})")
+                contiAdapter.submitList(accounts)
+
+                // Calcola saldo totale
+                val saldoTotale = accounts.sumOf { it.balance }
+                binding.tvSaldoTotale.text = CurrencyUtils.formatImporto(saldoTotale)
+
+                // Cambia colore in base al saldo
+                val colore = when {
+                    saldoTotale > 0 -> android.graphics.Color.parseColor("#4CAF50")
+                    saldoTotale < 0 -> android.graphics.Color.parseColor("#F44336")
+                    else -> android.graphics.Color.WHITE
                 }
-
-                // Calcola e mostra il saldo totale
-                calcolaSaldoTotale()
+                binding.tvSaldoTotale.setTextColor(colore)
             }
         }
 
         // Osserva le statistiche del mese corrente
-        viewModel.movimentiMeseCorrente.observe(viewLifecycleOwner) { movimenti ->
-            val entrate = movimenti.filter { it.importo > 0 }.sumOf { it.importo }
-            val uscite = movimenti.filter { it.importo < 0 }.sumOf { kotlin.math.abs(it.importo) }
-
-            binding.tvEntrateMese.text = CurrencyUtils.formatImporto(entrate)
-            binding.tvUsciteMese.text = CurrencyUtils.formatImporto(uscite)
+        viewModel.monthlyStats.asLiveData().observe(viewLifecycleOwner) { stats ->
+            binding.tvEntrateMese.text = CurrencyUtils.formatImporto(stats.totalIncome)
+            binding.tvUsciteMese.text = CurrencyUtils.formatImporto(stats.totalExpenses)
         }
 
         // Osserva gli abbonamenti
-        viewModel.numeroAbbonamentiAttivi.observe(viewLifecycleOwner) { numero ->
-            binding.tvNumeroAbbonamenti.text = numero.toString()
-        }
+        viewModel.activeSubscriptions.observe(viewLifecycleOwner) { subscriptions ->
+            binding.tvNumeroAbbonamenti.text = subscriptions.size.toString()
 
-        viewModel.costoAbbonamentiMensile.observe(viewLifecycleOwner) { costo ->
-            binding.tvCostoAbbonamenti.text = CurrencyUtils.formatImporto(costo)
-        }
-    }
-
-    /**
-     * Calcola il saldo totale di tutti i conti.
-     */
-    private fun calcolaSaldoTotale() {
-        viewModel.conti.value?.let { conti ->
-            if (conti.isEmpty()) {
-                binding.tvSaldoTotale.text = CurrencyUtils.formatImporto(0.0)
-                return
-            }
-
-            // Somma il saldo iniziale di tutti i conti
-            val saldoInizialeTotale = conti.sumOf { it.saldoIniziale }
-
-            // Osserva la somma dei movimenti di tutti i conti
-            // Questo è un approccio semplificato - in produzione useresti Combine o Flow
-            var saldoMovimentiTotale = 0.0
-            var contiProcessati = 0
-
-            conti.forEach { conto ->
-                viewModel.repository.getSaldoByContoId(conto.id)
-                    .asLiveData()
-                    .observe(viewLifecycleOwner) { saldoMovimenti ->
-                        saldoMovimentiTotale += saldoMovimenti
-                        contiProcessati++
-
-                        // Aggiorna solo quando tutti i conti sono stati processati
-                        if (contiProcessati == conti.size) {
-                            val saldoTotale = saldoInizialeTotale + saldoMovimentiTotale
-                            binding.tvSaldoTotale.text = CurrencyUtils.formatImporto(saldoTotale)
-
-                            // Cambia colore in base al saldo
-                            val colore = when {
-                                saldoTotale > 0 -> android.graphics.Color.parseColor("#4CAF50")
-                                saldoTotale < 0 -> android.graphics.Color.parseColor("#F44336")
-                                else -> android.graphics.Color.WHITE
-                            }
-                            binding.tvSaldoTotale.setTextColor(colore)
-                        }
-                    }
-            }
+            val costoMensile = subscriptions.sumOf { it.getMonthlyCost() }
+            binding.tvCostoAbbonamenti.text = CurrencyUtils.formatImporto(costoMensile)
         }
     }
 

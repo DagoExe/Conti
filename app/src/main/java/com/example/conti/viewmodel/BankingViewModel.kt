@@ -83,19 +83,23 @@ class BankingViewModel : ViewModel() {
             // BuddyBank
             repository.createAccount(
                 Account(
-                    accountName = "BuddyBank",
+                    name = "BuddyBank",  // ✅ CORRETTO
                     accountType = "buddybank",
+                    bankName = "UniCredit",
                     balance = 0.0,
-                    iban = "IT60X..." // Opzionale
+                    initialBalance = 0.0,
+                    iban = "IT60X..."
                 )
             )
 
             // Hype
             repository.createAccount(
                 Account(
-                    accountName = "Hype",
+                    name = "Hype",  // ✅ CORRETTO
                     accountType = "hype",
-                    balance = 0.0
+                    bankName = "Banca Sella",
+                    balance = 0.0,
+                    initialBalance = 0.0
                 )
             )
 

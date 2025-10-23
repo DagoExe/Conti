@@ -18,6 +18,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.conti.ContiApplication
 import com.example.conti.databinding.FragmentContiBinding
+import com.example.conti.models.Account
 import com.example.conti.ui.ViewModelFactory
 import com.example.conti.ui.adapters.ContiAdapter
 import com.example.conti.ui.home.HomeViewModel
@@ -32,6 +33,8 @@ import kotlinx.coroutines.launch
  * - Permette di aggiungere nuovi conti
  * - Permette di importare movimenti da Excel per conti esistenti
  * - Permette di modificare/eliminare conti
+ *
+ * VERSIONE FIRESTORE
  */
 class ContiFragment : Fragment() {
 
@@ -40,10 +43,13 @@ class ContiFragment : Fragment() {
 
     private val viewModel: HomeViewModel by viewModels {
         val application = requireActivity().application as ContiApplication
-        ViewModelFactory(application.repository) // Ora è FirestoreRepository
+        ViewModelFactory(application.repository)
     }
 
     private lateinit var contiAdapter: ContiAdapter
+
+    // ID del conto per cui importare movimenti
+    private var accountIdForImport: String? = null
 
     // Launcher per selezionare file
     private val pickFileLauncher = registerForActivityResult(
@@ -60,26 +66,12 @@ class ContiFragment : Fragment() {
                 val filePath = getRealPathFromURI(uri)
                 android.util.Log.d("ContiFragment", "File path: $filePath")
 
-                if (filePath != null) {
-                    // Usa l'ID del conto memorizzato
-                    val contoId = contoIdPerImport
-                    android.util.Log.d("ContiFragment", "ContoId per import: $contoId")
-
-                    if (contoId != null) {
-                        mostraDialogImportExcel(filePath, contoId)
-                    } else {
-                        android.util.Log.e("ContiFragment", "❌ ContoId è null!")
-                        Toast.makeText(requireContext(), "Errore: ID conto non trovato", Toast.LENGTH_SHORT).show()
-                    }
+                if (filePath != null && accountIdForImport != null) {
+                    importExcelFile(filePath, accountIdForImport!!)
                 } else {
-                    android.util.Log.e("ContiFragment", "❌ Impossibile ottenere il percorso del file")
-                    Toast.makeText(requireContext(), "Impossibile leggere il file", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Errore durante la selezione del file", Toast.LENGTH_SHORT).show()
                 }
-            } ?: run {
-                android.util.Log.e("ContiFragment", "❌ URI del file è null")
             }
-        } else {
-            android.util.Log.w("ContiFragment", "File picker cancellato o errore")
         }
     }
 
@@ -99,7 +91,6 @@ class ContiFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        android.util.Log.d("ContiFragment", "=== onCreateView chiamato ===")
         _binding = FragmentContiBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -107,14 +98,10 @@ class ContiFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        android.util.Log.d("ContiFragment", "=== onViewCreated chiamato ===")
-
         setupRecyclerView()
         setupTabs()
         setupFab()
         setupObservers()
-
-        android.util.Log.d("ContiFragment", "Setup completato")
     }
 
     /**
@@ -122,8 +109,8 @@ class ContiFragment : Fragment() {
      */
     private fun setupRecyclerView() {
         contiAdapter = ContiAdapter(
-            onContoClick = { conto ->
-                mostraDialogOpzioniConto(conto)
+            onContoClick = { account ->
+                mostraDialogOpzioniConto(account)
             }
         )
 
@@ -154,20 +141,14 @@ class ContiFragment : Fragment() {
      * Configura il FAB per aggiungere conti.
      */
     private fun setupFab() {
-        android.util.Log.d("ContiFragment", "setupFab() chiamato")
-
         binding.fabAggiungi.setOnClickListener {
-            android.util.Log.d("ContiFragment", "=== FAB CLICCATO ===")
             val selectedTab = binding.tabLayout.selectedTabPosition
-            android.util.Log.d("ContiFragment", "Tab selezionato: $selectedTab")
 
             if (selectedTab == 0) {
                 // Aggiungi conto da Excel
-                android.util.Log.d("ContiFragment", "Mostrando dialog conto Excel")
                 mostraDialogAggiungiContoExcel()
             } else {
                 // Aggiungi conto manuale
-                android.util.Log.d("ContiFragment", "Mostrando dialog conto manuale")
                 mostraDialogAggiungiContoManuale()
             }
         }
@@ -177,8 +158,8 @@ class ContiFragment : Fragment() {
      * Configura gli observer.
      */
     private fun setupObservers() {
-        viewModel.conti.observe(viewLifecycleOwner) { conti ->
-            // Mostra i conti in base al tab selezionato
+        viewModel.accounts.observe(viewLifecycleOwner) { accounts ->
+            // Aggiorna la vista in base al tab selezionato
             val selectedTab = binding.tabLayout.selectedTabPosition
             if (selectedTab == 0) {
                 mostraContiExcel()
@@ -193,17 +174,18 @@ class ContiFragment : Fragment() {
      */
     private fun mostraContiExcel() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.repository.getContiFromExcel().collect { conti ->
-                if (conti.isEmpty()) {
+            viewModel.accounts.observe(viewLifecycleOwner) { accounts ->
+                val excelAccounts = accounts.filter { it.isFromExcel }
+
+                if (excelAccounts.isEmpty()) {
                     binding.rvConti.visibility = View.GONE
                     binding.layoutEmpty.visibility = View.VISIBLE
                     binding.tvEmptyMessage.text = "Nessun conto Excel configurato"
                     binding.tvEmptyDescription.text = "Aggiungi un conto collegato a un file Excel"
-                    binding.fabAggiungi.text = "Aggiungi da Excel"
                 } else {
                     binding.rvConti.visibility = View.VISIBLE
                     binding.layoutEmpty.visibility = View.GONE
-                    contiAdapter.submitList(conti)
+                    contiAdapter.submitList(excelAccounts)
                 }
             }
         }
@@ -214,17 +196,18 @@ class ContiFragment : Fragment() {
      */
     private fun mostraContiManuali() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.repository.getContiManuali().collect { conti ->
-                if (conti.isEmpty()) {
+            viewModel.accounts.observe(viewLifecycleOwner) { accounts ->
+                val manualAccounts = accounts.filter { !it.isFromExcel }
+
+                if (manualAccounts.isEmpty()) {
                     binding.rvConti.visibility = View.GONE
                     binding.layoutEmpty.visibility = View.VISIBLE
                     binding.tvEmptyMessage.text = "Nessun conto manuale"
                     binding.tvEmptyDescription.text = "Aggiungi un conto per inserire movimenti manualmente"
-                    binding.fabAggiungi.text = "Aggiungi Manuale"
                 } else {
                     binding.rvConti.visibility = View.VISIBLE
                     binding.layoutEmpty.visibility = View.GONE
-                    contiAdapter.submitList(conti)
+                    contiAdapter.submitList(manualAccounts)
                 }
             }
         }
@@ -234,11 +217,8 @@ class ContiFragment : Fragment() {
      * Mostra dialog per aggiungere un conto da Excel.
      */
     private fun mostraDialogAggiungiContoExcel() {
-        android.util.Log.d("ContiFragment", "=== mostraDialogAggiungiContoExcel chiamato ===")
-
         val dialogView = layoutInflater.inflate(com.example.conti.R.layout.dialog_aggiungi_conto_excel, null)
 
-        // Ottieni i riferimenti ai campi
         val etNomeConto = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(com.example.conti.R.id.etNomeConto)
         val etIstituto = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(com.example.conti.R.id.etIstituto)
         val etSaldoIniziale = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(com.example.conti.R.id.etSaldoIniziale)
@@ -251,8 +231,6 @@ class ContiFragment : Fragment() {
                 val istituto = etIstituto?.text?.toString() ?: ""
                 val saldoStr = etSaldoIniziale?.text?.toString() ?: "0"
 
-                android.util.Log.d("ContiFragment", "Dati inseriti - Nome: $nome, Istituto: $istituto, Saldo: $saldoStr")
-
                 if (nome.isBlank()) {
                     Toast.makeText(requireContext(), "Inserisci il nome del conto", Toast.LENGTH_SHORT).show()
                     return@setPositiveButton
@@ -260,31 +238,30 @@ class ContiFragment : Fragment() {
 
                 val saldoIniziale = saldoStr.toDoubleOrNull() ?: 0.0
 
-                // PRIMA: Crea il conto
-                val nuovoConto = com.example.conti.data.database.entities.Conto(
-                    nome = nome,
-                    istituto = istituto,
-                    saldoIniziale = saldoIniziale,
-                    colore = "#2196F3",
+                // Crea il nuovo account
+                val nuovoAccount = Account(
+                    name = nome,
+                    bankName = istituto,
+                    initialBalance = saldoIniziale,
+                    balance = saldoIniziale,
+                    accountType = "excel",
                     isFromExcel = true,
-                    pathExcel = null
+                    color = "#2196F3"
                 )
 
-                android.util.Log.d("ContiFragment", "Creazione conto: $nuovoConto")
-
-                // Inserisci il conto nel database
-                viewModel.inserisciConto(
-                    conto = nuovoConto,
-                    onSuccess = { contoId ->
-                        android.util.Log.d("ContiFragment", "✅ Conto creato con ID: $contoId")
+                // Crea l'account in Firestore
+                viewModel.createAccount(
+                    account = nuovoAccount,
+                    onSuccess = { accountId ->
+                        android.util.Log.d("ContiFragment", "✅ Account creato con ID: $accountId")
                         Toast.makeText(requireContext(), "Conto creato! Ora seleziona il file Excel", Toast.LENGTH_LONG).show()
 
-                        // POI: Apri il file picker per importare i movimenti
-                        contoIdPerImport = contoId
+                        // Memorizza l'ID per l'import
+                        accountIdForImport = accountId
                         checkPermissionAndSelectFile()
                     },
                     onError = { errore ->
-                        android.util.Log.e("ContiFragment", "❌ Errore creazione conto: $errore")
+                        android.util.Log.e("ContiFragment", "❌ Errore creazione account: $errore")
                         Toast.makeText(requireContext(), "Errore: $errore", Toast.LENGTH_LONG).show()
                     }
                 )
@@ -293,36 +270,74 @@ class ContiFragment : Fragment() {
             .show()
     }
 
-    // Variabile per memorizzare l'ID del conto da importare
-    private var contoIdPerImport: Long? = null
-
     /**
      * Mostra dialog per aggiungere un conto manuale.
      */
     private fun mostraDialogAggiungiContoManuale() {
-        // TODO: Implementare dialog per aggiunta conto manuale
-        Toast.makeText(requireContext(), "Funzionalità in arrivo", Toast.LENGTH_SHORT).show()
+        val dialogView = layoutInflater.inflate(com.example.conti.R.layout.dialog_aggiungi_conto_excel, null)
+
+        val etNomeConto = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(com.example.conti.R.id.etNomeConto)
+        val etIstituto = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(com.example.conti.R.id.etIstituto)
+        val etSaldoIniziale = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(com.example.conti.R.id.etSaldoIniziale)
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Aggiungi Conto Manuale")
+            .setView(dialogView)
+            .setPositiveButton("Crea") { _, _ ->
+                val nome = etNomeConto?.text?.toString() ?: ""
+                val istituto = etIstituto?.text?.toString() ?: ""
+                val saldoStr = etSaldoIniziale?.text?.toString() ?: "0"
+
+                if (nome.isBlank()) {
+                    Toast.makeText(requireContext(), "Inserisci il nome del conto", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+
+                val saldoIniziale = saldoStr.toDoubleOrNull() ?: 0.0
+
+                val nuovoAccount = Account(
+                    name = nome,
+                    bankName = istituto,
+                    initialBalance = saldoIniziale,
+                    balance = saldoIniziale,
+                    accountType = "manual",
+                    isFromExcel = false,
+                    color = "#4CAF50"
+                )
+
+                viewModel.createAccount(
+                    account = nuovoAccount,
+                    onSuccess = { accountId ->
+                        Toast.makeText(requireContext(), "Conto creato con successo!", Toast.LENGTH_SHORT).show()
+                    },
+                    onError = { errore ->
+                        Toast.makeText(requireContext(), "Errore: $errore", Toast.LENGTH_LONG).show()
+                    }
+                )
+            }
+            .setNegativeButton("Annulla", null)
+            .show()
     }
 
     /**
-     * Mostra dialog con opzioni per un conto (modifica, elimina, aggiorna da Excel).
+     * Mostra dialog con opzioni per un conto.
      */
-    private fun mostraDialogOpzioniConto(conto: com.example.conti.data.database.entities.Conto) {
-        val opzioni = if (conto.isFromExcel) {
+    private fun mostraDialogOpzioniConto(account: Account) {
+        val opzioni = if (account.isFromExcel) {
             arrayOf("Aggiorna da Excel", "Modifica", "Elimina")
         } else {
             arrayOf("Modifica", "Elimina")
         }
 
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle(conto.nome)
+            .setTitle(account.name)
             .setItems(opzioni) { _, which ->
                 when {
-                    conto.isFromExcel && which == 0 -> aggiornaContoExcel(conto)
-                    conto.isFromExcel && which == 1 -> modificaConto(conto)
-                    conto.isFromExcel && which == 2 -> eliminaConto(conto)
-                    !conto.isFromExcel && which == 0 -> modificaConto(conto)
-                    !conto.isFromExcel && which == 1 -> eliminaConto(conto)
+                    account.isFromExcel && which == 0 -> aggiornaContoExcel(account)
+                    account.isFromExcel && which == 1 -> modificaConto(account)
+                    account.isFromExcel && which == 2 -> eliminaConto(account)
+                    !account.isFromExcel && which == 0 -> modificaConto(account)
+                    !account.isFromExcel && which == 1 -> eliminaConto(account)
                 }
             }
             .show()
@@ -331,32 +346,28 @@ class ContiFragment : Fragment() {
     /**
      * Aggiorna i movimenti di un conto da Excel.
      */
-    private fun aggiornaContoExcel(conto: com.example.conti.data.database.entities.Conto) {
-        if (conto.pathExcel != null) {
-            mostraDialogImportExcel(conto.pathExcel, conto.id)
-        } else {
-            checkPermissionAndSelectFileForConto(conto.id)
-        }
+    private fun aggiornaContoExcel(account: Account) {
+        accountIdForImport = account.id
+        checkPermissionAndSelectFile()
     }
 
     /**
      * Modifica un conto.
      */
-    private fun modificaConto(conto: com.example.conti.data.database.entities.Conto) {
-        // TODO: Implementare dialog modifica
+    private fun modificaConto(account: Account) {
         Toast.makeText(requireContext(), "Funzionalità in arrivo", Toast.LENGTH_SHORT).show()
     }
 
     /**
      * Elimina un conto.
      */
-    private fun eliminaConto(conto: com.example.conti.data.database.entities.Conto) {
+    private fun eliminaConto(account: Account) {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle("Elimina Conto")
-            .setMessage("Sei sicuro di voler eliminare '${conto.nome}'? Tutti i movimenti associati verranno eliminati.")
+            .setMessage("Sei sicuro di voler eliminare '${account.name}'? Tutti i movimenti associati verranno eliminati.")
             .setPositiveButton("Elimina") { _, _ ->
-                viewModel.eliminaConto(
-                    conto = conto,
+                viewModel.deleteAccount(
+                    accountId = account.id,
                     onSuccess = {
                         Toast.makeText(requireContext(), "Conto eliminato", Toast.LENGTH_SHORT).show()
                     },
@@ -374,10 +385,9 @@ class ContiFragment : Fragment() {
      */
     private fun checkPermissionAndSelectFile() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            // Android 13+ - Non serve permesso per READ_EXTERNAL_STORAGE
+            // Android 13+ - Non serve permesso
             selezionaFileExcel()
         } else {
-            // Android 12 e precedenti
             when {
                 ContextCompat.checkSelfPermission(
                     requireContext(),
@@ -398,10 +408,10 @@ class ContiFragment : Fragment() {
     private fun selezionaFileExcel() {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
-            type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" // .xlsx
+            type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             putExtra(Intent.EXTRA_MIME_TYPES, arrayOf(
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
-                "application/vnd.ms-excel" // .xls
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "application/vnd.ms-excel"
             ))
         }
         pickFileLauncher.launch(intent)
@@ -411,8 +421,6 @@ class ContiFragment : Fragment() {
      * Ottiene il percorso reale del file da URI.
      */
     private fun getRealPathFromURI(uri: android.net.Uri): String? {
-        // Per semplicità, usiamo il content resolver per copiare il file
-        // In una app di produzione, dovresti gestire meglio gli URI
         return try {
             val inputStream = requireContext().contentResolver.openInputStream(uri)
             val tempFile = java.io.File(requireContext().cacheDir, "temp_excel.xlsx")
@@ -428,60 +436,29 @@ class ContiFragment : Fragment() {
     }
 
     /**
-     * Mostra dialog per importare movimenti da Excel.
+     * Importa movimenti da file Excel.
      */
-    private fun mostraDialogImportExcel(filePath: String, contoId: Long? = null) {
-        android.util.Log.d("ContiFragment", "=== INIZIO IMPORT EXCEL ===")
-        android.util.Log.d("ContiFragment", "File path: $filePath")
-        android.util.Log.d("ContiFragment", "Conto ID: $contoId")
+    private fun importExcelFile(filePath: String, accountId: String) {
+        Toast.makeText(requireContext(), "Importazione da Excel...", Toast.LENGTH_SHORT).show()
 
-        Toast.makeText(requireContext(), "Importazione da: $filePath", Toast.LENGTH_SHORT).show()
-
-        if (contoId != null) {
-            // Aggiorna conto esistente
-            viewModel.aggiornaMovimentiDaExcel(
-                contoId = contoId,
-                filePath = filePath,
-                onSuccess = { numeroMovimenti ->
-                    android.util.Log.d("ContiFragment", "✅ IMPORT SUCCESS: $numeroMovimenti movimenti importati")
-                    Toast.makeText(requireContext(),
-                        "✅ Importati $numeroMovimenti movimenti con successo!",
-                        Toast.LENGTH_LONG).show()
-
-                    // Verifica i movimenti nel database
-                    verificaMovimentiImportati(contoId)
-                },
-                onError = { errore ->
-                    android.util.Log.e("ContiFragment", "❌ IMPORT ERROR: $errore")
-                    Toast.makeText(requireContext(), "❌ Errore: $errore", Toast.LENGTH_LONG).show()
-                }
-            )
-        } else {
-            android.util.Log.w("ContiFragment", "⚠️ ContoId è null - impossibile importare")
-        }
-    }
-
-    /**
-     * Verifica che i movimenti siano stati effettivamente salvati nel database.
-     */
-    private fun verificaMovimentiImportati(contoId: Long) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.repository.getMovimentiByContoId(contoId).collect { movimenti ->
-                android.util.Log.d("ContiFragment", "📊 Movimenti nel database per conto $contoId: ${movimenti.size}")
-
-                if (movimenti.isNotEmpty()) {
-                    // Mostra i primi 3 movimenti come esempio
-                    movimenti.take(3).forEachIndexed { index, movimento ->
-                        android.util.Log.d("ContiFragment", "  ${index + 1}. ${movimento.data} - ${movimento.descrizione}: ${movimento.importo}€")
-                    }
-                }
+        viewModel.importTransactionsFromExcel(
+            accountId = accountId,
+            filePath = filePath,
+            onSuccess = { count ->
+                Toast.makeText(
+                    requireContext(),
+                    "✅ Importati $count movimenti con successo!",
+                    Toast.LENGTH_LONG
+                ).show()
+            },
+            onError = { errore ->
+                Toast.makeText(
+                    requireContext(),
+                    "❌ Errore: $errore",
+                    Toast.LENGTH_LONG
+                ).show()
             }
-        }
-    }
-
-    private fun checkPermissionAndSelectFileForConto(contoId: Long) {
-        // Implementazione simile a checkPermissionAndSelectFile
-        checkPermissionAndSelectFile()
+        )
     }
 
     override fun onDestroyView() {
