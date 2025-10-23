@@ -8,16 +8,14 @@ import androidx.navigation.ui.setupWithNavController
 import com.example.conti.auth.AuthManager
 import com.example.conti.data.repository.FirestoreRepository
 import com.example.conti.databinding.ActivityMainBinding
+import com.example.conti.utils.FirebaseDiagnostic
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
 
 /**
  * MainActivity - Activity principale dell'app.
  *
- * ✅ VERSIONE CORRETTA CON:
- * - Migliore gestione errori Firebase
- * - Logging dettagliato
- * - Fallback in caso di errori di autenticazione
+ * ✅ VERSIONE CORRETTA CON DIAGNOSTICA
  */
 class MainActivity : AppCompatActivity() {
 
@@ -29,14 +27,19 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         try {
-            android.util.Log.d("MainActivity", "=== onCreate START ===")
+            android.util.Log.d("MainActivity", "═══════════════════════════════════════")
+            android.util.Log.d("MainActivity", "   APP STARTUP")
+            android.util.Log.d("MainActivity", "═══════════════════════════════════════")
+
+            // 🔥 ESEGUI DIAGNOSTICA FIREBASE
+            FirebaseDiagnostic.runDiagnostic(applicationContext)
 
             // 1. Inflate layout
             binding = ActivityMainBinding.inflate(layoutInflater)
             setContentView(binding.root)
             android.util.Log.d("MainActivity", "✅ Layout inflated")
 
-            // 2. Setup UI PRIMA di Firebase
+            // 2. Setup UI PRIMA di Firebase (così l'app non crasha anche se Firebase fallisce)
             setupNavigation()
             android.util.Log.d("MainActivity", "✅ Navigation setup")
 
@@ -46,17 +49,31 @@ class MainActivity : AppCompatActivity() {
 
             // 4. Controlla autenticazione
             if (!authManager.isAuthenticated) {
-                android.util.Log.d("MainActivity", "⚠️ Utente non autenticato, login anonimo...")
-                performAnonymousLogin()
+                android.util.Log.d("MainActivity", "⚠️ Utente non autenticato")
+
+                // 🔥 TEST LOGIN ANONIMO CON DIAGNOSTICA
+                FirebaseDiagnostic.testAnonymousLogin { success, message ->
+                    if (success) {
+                        android.util.Log.d("MainActivity", "✅ Test login riuscito: $message")
+                        setupUserProfile()
+                        observeAuthState()
+                    } else {
+                        android.util.Log.e("MainActivity", "❌ Test login fallito: $message")
+                        showFirebaseError(message)
+                    }
+                }
             } else {
                 android.util.Log.d("MainActivity", "✅ Utente già autenticato: ${authManager.currentUser?.uid}")
                 setupUserProfile()
                 observeAuthState()
             }
 
-            android.util.Log.d("MainActivity", "=== onCreate END ===")
+            android.util.Log.d("MainActivity", "═══════════════════════════════════════")
+            android.util.Log.d("MainActivity", "   SETUP COMPLETED")
+            android.util.Log.d("MainActivity", "═══════════════════════════════════════")
+
         } catch (e: Exception) {
-            android.util.Log.e("MainActivity", "❌ ERRORE CRITICO in onCreate", e)
+            android.util.Log.e("MainActivity", "❌❌❌ ERRORE CRITICO in onCreate ❌❌❌", e)
             e.printStackTrace()
             showCriticalError(e)
         }
@@ -91,37 +108,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Effettua login anonimo con gestione errori robusta.
-     */
-    private fun performAnonymousLogin() {
-        lifecycleScope.launch {
-            try {
-                android.util.Log.d("MainActivity", "🔐 Tentativo login anonimo...")
-
-                authManager.signInAnonymously()
-                    .onSuccess { user ->
-                        android.util.Log.d("MainActivity", "✅ Login anonimo riuscito: ${user.uid}")
-                        setupUserProfile()
-                        observeAuthState()
-                    }
-                    .onFailure { error ->
-                        android.util.Log.e("MainActivity", "❌ Errore login anonimo", error)
-
-                        // IMPORTANTE: Non bloccare l'app, mostra errore ma continua
-                        showLoginError(error)
-
-                        // Continua comunque con UI limitata
-                        observeAuthState()
-                    }
-            } catch (e: Exception) {
-                android.util.Log.e("MainActivity", "❌ Eccezione durante login", e)
-                showLoginError(e)
-                observeAuthState()
-            }
-        }
-    }
-
-    /**
      * Crea o aggiorna il profilo utente su Firestore.
      */
     private fun setupUserProfile() {
@@ -146,8 +132,6 @@ class MainActivity : AppCompatActivity() {
                 authManager.authState.collect { user ->
                     if (user == null) {
                         android.util.Log.w("MainActivity", "⚠️ Utente disconnesso")
-                        // Non tentare nuovamente il login automaticamente
-                        // per evitare loop infiniti
                     } else {
                         android.util.Log.d("MainActivity", "👤 Utente connesso: ${user.uid}")
                         setupUserProfile()
@@ -160,22 +144,25 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Mostra un errore di login senza bloccare l'app.
+     * Mostra un errore specifico di Firebase.
      */
-    private fun showLoginError(error: Throwable) {
+    private fun showFirebaseError(message: String) {
         try {
-            android.util.Log.w("MainActivity", "⚠️ Mostrando errore login all'utente")
-
-            // Mostra un Toast invece di un dialog bloccante
             runOnUiThread {
-                android.widget.Toast.makeText(
-                    this,
-                    "⚠️ Errore autenticazione: ${error.message}\nAlcune funzionalità potrebbero non essere disponibili.",
-                    android.widget.Toast.LENGTH_LONG
-                ).show()
+                MaterialAlertDialogBuilder(this)
+                    .setTitle("⚠️ Errore Firebase")
+                    .setMessage("Impossibile autenticarsi:\n\n$message\n\nVerifica:\n• Connessione internet\n• Configurazione google-services.json\n• Regole Firestore")
+                    .setPositiveButton("Riprova") { _, _ ->
+                        recreate()
+                    }
+                    .setNegativeButton("Continua senza Firebase") { _, _ ->
+                        // L'app continuerà a funzionare in modalità limitata
+                    }
+                    .setCancelable(false)
+                    .show()
             }
         } catch (e: Exception) {
-            android.util.Log.e("MainActivity", "❌ Errore mostrando errore", e)
+            android.util.Log.e("MainActivity", "❌ Errore mostrando dialog Firebase", e)
         }
     }
 
@@ -187,9 +174,9 @@ class MainActivity : AppCompatActivity() {
             runOnUiThread {
                 MaterialAlertDialogBuilder(this)
                     .setTitle("❌ Errore Critico")
-                    .setMessage("Impossibile avviare l'app:\n\n${error.message}\n\nVerifica la configurazione di Firebase.")
+                    .setMessage("Impossibile avviare l'app:\n\n${error.message}\n\n${error.stackTraceToString()}")
                     .setPositiveButton("Riprova") { _, _ ->
-                        recreate() // Riavvia l'activity
+                        recreate()
                     }
                     .setNegativeButton("Esci") { _, _ ->
                         finish()
@@ -199,7 +186,7 @@ class MainActivity : AppCompatActivity() {
             }
         } catch (e: Exception) {
             android.util.Log.e("MainActivity", "❌ Impossibile mostrare dialog errore", e)
-            finish() // Chiudi l'app
+            finish()
         }
     }
 
