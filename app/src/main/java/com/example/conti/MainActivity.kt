@@ -6,51 +6,38 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.conti.auth.AuthManager
+import com.example.conti.data.repository.FirestoreRepository
 import com.example.conti.databinding.ActivityMainBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
 
-/**
- * MainActivity - Activity principale con autenticazione Firebase.
- *
- * Responsabilità:
- * - Gestire l'autenticazione
- * - Configurare la navigazione
- * - Fornire il NavController ai fragment
- */
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var authManager: AuthManager
+    private val firestoreRepository = FirestoreRepository()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Inizializza AuthManager
         authManager = AuthManager.getInstance()
 
-        // Verifica autenticazione
         if (!authManager.isAuthenticated) {
-            // Effettua login anonimo per permettere l'uso dell'app
             performAnonymousLogin()
         } else {
-            // Utente già autenticato, configura UI
+            setupUserProfile()
             setupUI()
         }
     }
 
-    /**
-     * Effettua login anonimo.
-     */
     private fun performAnonymousLogin() {
-        android.util.Log.d("MainActivity", "🔑 Login anonimo in corso...")
-
         lifecycleScope.launch {
             authManager.signInAnonymously()
                 .onSuccess { user ->
                     android.util.Log.d("MainActivity", "✅ Login anonimo riuscito: ${user.uid}")
+                    setupUserProfile()
                     setupUI()
                 }
                 .onFailure { error ->
@@ -61,28 +48,32 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Configura l'interfaccia utente dopo il login.
+     * Crea o aggiorna il profilo utente su Firestore
      */
+    private fun setupUserProfile() {
+        lifecycleScope.launch {
+            try {
+                val email = authManager.currentUser?.email ?: "anonymous@local"
+                firestoreRepository.updateUserProfile(email)
+                android.util.Log.d("MainActivity", "👤 Profilo aggiornato per $email")
+            } catch (e: Exception) {
+                android.util.Log.e("MainActivity", "❌ Errore aggiornamento profilo", e)
+            }
+        }
+    }
+
     private fun setupUI() {
         setupNavigation()
-
-        // Osserva lo stato di autenticazione
         observeAuthState()
     }
 
-    /**
-     * Configura il Navigation Component.
-     */
     private fun setupNavigation() {
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
 
         val navController = navHostFragment.navController
-
-        // Collega la Bottom Navigation al NavController
         binding.bottomNavigation.setupWithNavController(navController)
 
-        // Listener per cambiare il titolo della toolbar
         navController.addOnDestinationChangedListener { _, destination, _ ->
             binding.toolbar.title = when (destination.id) {
                 R.id.navigation_home -> "Home"
@@ -94,54 +85,32 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * Osserva lo stato di autenticazione.
-     */
     private fun observeAuthState() {
         lifecycleScope.launch {
             authManager.authState.collect { user ->
                 if (user == null) {
-                    // Utente disconnesso, effettua logout
                     android.util.Log.w("MainActivity", "⚠️ Utente disconnesso")
-                    // Qui potresti navigare a una schermata di login
                     performAnonymousLogin()
                 } else {
-                    android.util.Log.d("MainActivity", "✅ Utente autenticato: ${user.uid}")
+                    setupUserProfile()
                 }
             }
         }
     }
 
-    /**
-     * Mostra dialog di errore login.
-     */
     private fun showLoginErrorDialog() {
         MaterialAlertDialogBuilder(this)
             .setTitle("Errore Autenticazione")
-            .setMessage("Impossibile accedere all'app. Verifica la connessione Internet e riprova.")
-            .setPositiveButton("Riprova") { _, _ ->
-                performAnonymousLogin()
-            }
-            .setNegativeButton("Esci") { _, _ ->
-                finish()
-            }
+            .setMessage("Impossibile accedere all'app. Controlla la connessione e riprova.")
+            .setPositiveButton("Riprova") { _, _ -> performAnonymousLogin() }
+            .setNegativeButton("Esci") { _, _ -> finish() }
             .setCancelable(false)
             .show()
     }
 
-    /**
-     * Gestisce il tasto back.
-     */
     override fun onSupportNavigateUp(): Boolean {
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-        val navController = navHostFragment.navController
-        return navController.navigateUp() || super.onSupportNavigateUp()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        // Non fare logout automaticamente al destroy dell'activity
-        // L'utente rimane autenticato tra sessioni
+        return navHostFragment.navController.navigateUp() || super.onSupportNavigateUp()
     }
 }

@@ -1,5 +1,6 @@
 package com.example.conti.ui.home
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
@@ -30,20 +31,23 @@ class HomeViewModel(
     /**
      * Lista di tutti gli account, osservabile dall'UI.
      */
-    val accounts = repository.getAllAccounts().asLiveData()
+    val accounts: LiveData<List<Account>> =
+        repository.getAllAccounts().asLiveData()
 
     /**
      * Transazioni del mese corrente.
      */
-    val currentMonthTransactions = repository.getTransactionsByDateRange(
-        startDate = FirestoreRepository.getStartOfCurrentMonth(),
-        endDate = FirestoreRepository.getEndOfCurrentMonth()
-    ).asLiveData()
+    val currentMonthTransactions: LiveData<List<Transaction>> =
+        repository.getTransactionsByDateRange(
+            startDate = FirestoreRepository.getStartOfCurrentMonth(),
+            endDate = FirestoreRepository.getEndOfCurrentMonth()
+        ).asLiveData()
 
     /**
      * Abbonamenti attivi.
      */
-    val activeSubscriptions = repository.getAllSubscriptions(activeOnly = true).asLiveData()
+    val activeSubscriptions: androidx.lifecycle.LiveData<List<Subscription>> =
+        repository.getAllSubscriptions(activeOnly = true).asLiveData()
 
     // ========================================
     // STATISTICHE CALCOLATE
