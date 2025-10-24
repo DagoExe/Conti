@@ -28,7 +28,7 @@ class BankingRepository {
             val docRef = db.collection("users")
                 .document(userId)
                 .collection("accounts")
-                .document(account.accountType) // "buddybank" o "hype"
+                .document(account.accountType.name) // "buddybank" o "hype"
 
             docRef.set(account).await()
             Result.success(docRef.id)

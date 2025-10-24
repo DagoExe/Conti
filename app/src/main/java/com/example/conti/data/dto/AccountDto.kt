@@ -5,8 +5,12 @@ import com.example.conti.models.Account
 import com.example.conti.models.AccountType
 
 /**
- * Data Transfer Object per Account in Firestore
- * Mantiene la compatibilità diretta con la struttura del database
+ * Data Transfer Object per Account in Firestore.
+ * Mantiene la compatibilità diretta con la struttura del database.
+ *
+ * Questo DTO mappa esattamente la struttura in Firestore:
+ * - Non include accountId (è l'ID del documento)
+ * - Include solo i campi salvati nel documento
  */
 data class AccountDto(
     val accountName: String = "",
@@ -18,6 +22,8 @@ data class AccountDto(
 ) {
     /**
      * Converte il DTO nel modello di dominio
+     *
+     * @param accountId L'ID del documento Firestore
      */
     fun toDomain(accountId: String): Account {
         return Account(

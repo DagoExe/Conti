@@ -8,6 +8,15 @@ import com.google.firebase.firestore.ServerTimestamp
 /**
  * Modello dominio per un Account bancario.
  * Rappresenta un documento nella sottocollezione users/{userId}/accounts/{accountId}
+ *
+ * STRUTTURA FIRESTORE:
+ * users/{userId}/accounts/{accountId}
+ *   - accountName: string
+ *   - accountType: string ("buddybank" | "hype" | "other")
+ *   - balance: number
+ *   - currency: string
+ *   - iban: string (opzionale)
+ *   - lastUpdated: timestamp
  */
 data class Account(
     @DocumentId

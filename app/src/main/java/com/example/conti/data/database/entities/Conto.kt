@@ -1,5 +1,7 @@
 package com.example.conti.data.database.entities
 
+import com.example.conti.models.AccountType
+import com.google.firebase.Timestamp
 import java.time.LocalDate
 
 /**
@@ -69,15 +71,13 @@ data class Conto(
      */
     fun toFirestoreAccount(firestoreId: String = ""): com.example.conti.models.Account {
         return com.example.conti.models.Account(
-            id = firestoreId.ifEmpty { id.toString() },
-            name = nome,
-            bankName = istituto,
-            accountType = if (isFromExcel) "excel" else "manual",
+            accountId = firestoreId.ifEmpty { id.toString() },
+            accountName = nome,
+            accountType = if (isFromExcel) AccountType.HYPE else AccountType.BUDDYBANK,
             balance = saldoIniziale,
-            initialBalance = saldoIniziale,
-            color = colore,
-            isFromExcel = isFromExcel,
-            excelPath = pathExcel
+            currency = "EUR",
+            iban = null,
+            lastUpdated = Timestamp.now()
         )
     }
 }

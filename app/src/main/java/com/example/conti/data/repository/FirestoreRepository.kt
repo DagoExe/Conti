@@ -108,8 +108,12 @@ class FirestoreRepository {
                 .document()
 
             val newAccount = account.copy(
-                id = docRef.id,
-                createdAt = Timestamp.now(),
+                accountId = docRef.id,
+                accountName = "",
+                accountType = AccountType.OTHER,
+                balance = 0.0,
+                currency = "EUR",
+                iban = null,
                 lastUpdated = Timestamp.now()
             )
 
@@ -184,7 +188,7 @@ class FirestoreRepository {
             db.collection("users")
                 .document(userId)
                 .collection("accounts")
-                .document(account.id)
+                .document(account.accountName)
                 .set(account.copy(lastUpdated = Timestamp.now()), SetOptions.merge())
                 .await()
             Result.success(Unit)

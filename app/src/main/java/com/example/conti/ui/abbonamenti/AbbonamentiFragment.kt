@@ -4,27 +4,36 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
-import com.example.conti.R
+import androidx.fragment.app.viewModels
+import com.example.conti.databinding.FragmentAbbonamentiBinding
 
-/**
- * AbbonamentiFragment - Gestisce gli abbonamenti e spese ricorrenti.
- *
- * TODO: Implementare la lista degli abbonamenti.
- */
 class AbbonamentiFragment : Fragment() {
+
+    private var _binding: FragmentAbbonamentiBinding? = null
+    private val binding get() = _binding!!
+
+    // ✅ Quando creerai AbbonamentiViewModel, sarà così:
+    // private val viewModel: AbbonamentiViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val root = inflater.inflate(R.layout.fragment_abbonamenti, container, false)
+        _binding = FragmentAbbonamentiBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        val textView = root.findViewById<TextView>(R.id.tvPlaceholder)
-        textView.text = "📅 Abbonamenti\n\nQuesta sezione mostrerà tutti gli abbonamenti attivi\ne le spese ricorrenti."
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        return root
+        // Placeholder per ora
+        binding.tvPlaceholder.text = "Abbonamenti\n\n(In sviluppo)"
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

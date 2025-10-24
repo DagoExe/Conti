@@ -5,40 +5,6 @@ import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.ServerTimestamp
 
 /**
- * Modello per un conto corrente/bancario in Firestore.
- *
- * Struttura Firestore: /users/{userId}/accounts/{accountId}
- */
-data class Account(
-    @DocumentId
-    val id: String = "",
-    val name: String = "",
-    val accountType: String = "", // "excel" o "manual"
-    val bankName: String = "",
-    val balance: Double = 0.0,
-    val initialBalance: Double = 0.0,
-    val currency: String = "EUR",
-    val color: String = "#4CAF50",
-    val iban: String? = null,
-    val isFromExcel: Boolean = false,
-    val excelPath: String? = null,
-    @ServerTimestamp
-    val lastUpdated: Timestamp? = null,
-    @ServerTimestamp
-    val createdAt: Timestamp? = null
-) {
-    // Costruttore vuoto richiesto da Firestore
-    constructor() : this(
-        id = "",
-        name = "",
-        accountType = "",
-        bankName = "",
-        balance = 0.0,
-        initialBalance = 0.0
-    )
-}
-
-/**
  * Modello per un movimento bancario in Firestore.
  *
  * Struttura Firestore: /users/{userId}/transactions/{transactionId}

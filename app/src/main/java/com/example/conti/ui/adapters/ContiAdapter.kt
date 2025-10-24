@@ -44,25 +44,25 @@ class ContiAdapter(
         fun bind(account: Account) {
             binding.apply {
                 // Nome e istituto bancario
-                tvNomeConto.text = account.name
-                tvIstituto.text = account.bankName
+                tvNomeConto.text = account.accountName
+                tvIstituto.text = account.accountType.name
 
                 // Saldo corrente
                 tvSaldo.text = CurrencyUtils.formatImporto(account.balance)
 
                 // Colore identificativo
-                try {
-                    viewColore.setBackgroundColor(Color.parseColor(account.color))
-                } catch (e: Exception) {
-                    viewColore.setBackgroundColor(Color.parseColor("#4CAF50"))
-                }
+                // try {
+                //     viewColore.setBackgroundColor(Color.parseColor("#4CAF50"))
+                // } catch (e: Exception) {
+                //     viewColore.setBackgroundColor(Color.parseColor("#4CAF50"))
+                // }
 
                 // Badge se sincronizzato da Excel
-                if (account.isFromExcel) {
-                    badgeExcel.visibility = android.view.View.VISIBLE
-                } else {
-                    badgeExcel.visibility = android.view.View.GONE
-                }
+                // if (account.) {
+                //     badgeExcel.visibility = android.view.View.VISIBLE
+                // } else {
+                //     badgeExcel.visibility = android.view.View.GONE
+                // }
 
                 // Click listener
                 root.setOnClickListener { onContoClick(account) }
@@ -75,7 +75,7 @@ class ContiAdapter(
      */
     private class ContoDiffCallback : DiffUtil.ItemCallback<Account>() {
         override fun areItemsTheSame(oldItem: Account, newItem: Account): Boolean {
-            return oldItem.id == newItem.id
+            return oldItem.accountName == newItem.accountName
         }
 
         override fun areContentsTheSame(oldItem: Account, newItem: Account): Boolean {

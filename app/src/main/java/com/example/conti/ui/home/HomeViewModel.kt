@@ -1,284 +1,112 @@
 package com.example.conti.ui.home
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.example.conti.data.repository.FirestoreRepository
+import com.example.conti.data.repository.AccountRepository
 import com.example.conti.models.Account
-import com.example.conti.models.Transaction
-import com.example.conti.models.Subscription
-import com.google.firebase.Timestamp
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import com.example.conti.utils.CurrencyUtils
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 /**
- * ViewModel per la schermata Home - Versione Firestore CORRETTA.
- *
- * ✅ FIXES:
- * - Type inference esplicito per la conversione da Movimento a Transaction
- * - Import corretto dell'entità Movimento
+ * ViewModel per la schermata Home.
+ * Gestisce il riepilogo totale, statistiche mensili e lista account.
  */
-class HomeViewModel(
-    private val repository: FirestoreRepository
-) : ViewModel() {
+class HomeViewModel : ViewModel() {
 
-    // ========================================
-    // DATI OSSERVABILI
-    // ========================================
+    private val accountRepository = AccountRepository.getInstance()
 
-    /**
-     * Lista di tutti gli account, osservabile dall'UI.
-     */
-    val accounts: LiveData<List<Account>> =
-        repository.getAllAccounts().asLiveData()
+    // State per la UI
+    private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Loading)
+    val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
+
+    init {
+        loadHomeData()
+    }
 
     /**
-     * Transazioni del mese corrente.
+     * Carica tutti i dati per la Home
      */
-    val currentMonthTransactions: LiveData<List<Transaction>> =
-        repository.getTransactionsByDateRange(
-            startDate = FirestoreRepository.getStartOfCurrentMonth(),
-            endDate = FirestoreRepository.getEndOfCurrentMonth()
-        ).asLiveData()
+    private fun loadHomeData() {
+        viewModelScope.launch {
+            accountRepository.getAccountsFlow()
+                .catch { exception ->
+                    android.util.Log.e("HomeViewModel", "Errore loadHomeData", exception)
+                    _uiState.value = HomeUiState.Error(exception.message ?: "Unknown error")
+                }
+                .collect { accounts ->
+                    if (accounts.isEmpty()) {
+                        _uiState.value = HomeUiState.Empty
+                    } else {
+                        val summary = calculateSummary(accounts)
+                        _uiState.value = HomeUiState.Success(
+                            accounts = accounts,
+                            totalBalance = summary.totalBalance,
+                            monthlyIncome = summary.monthlyIncome,
+                            monthlyExpenses = summary.monthlyExpenses,
+                            activeSubscriptions = summary.activeSubscriptions,
+                            subscriptionsCost = summary.subscriptionsCost
+                        )
+                    }
+                }
+        }
+    }
 
     /**
-     * Abbonamenti attivi.
+     * Calcola il riepilogo dei dati
      */
-    val activeSubscriptions: androidx.lifecycle.LiveData<List<Subscription>> =
-        repository.getAllSubscriptions(activeOnly = true).asLiveData()
+    private fun calculateSummary(accounts: List<Account>): HomeSummary {
+        val totalBalance = accounts.sumOf { it.balance }
 
-    // ========================================
-    // STATISTICHE CALCOLATE
-    // ========================================
+        // TODO: Implementare calcolo entrate/uscite mensili quando avremo TransactionRepository
+        val monthlyIncome = 0.0
+        val monthlyExpenses = 0.0
 
-    data class MonthlyStats(
-        val totalIncome: Double = 0.0,
-        val totalExpenses: Double = 0.0,
-        val balance: Double = 0.0,
-        val transactionCount: Int = 0
-    )
+        // TODO: Implementare calcolo abbonamenti quando avremo SubscriptionRepository
+        val activeSubscriptions = 0
+        val subscriptionsCost = 0.0
 
-    val monthlyStats: Flow<MonthlyStats> = repository.getTransactionsByDateRange(
-        startDate = FirestoreRepository.getStartOfCurrentMonth(),
-        endDate = FirestoreRepository.getEndOfCurrentMonth()
-    ).map { transactions ->
-        val income = transactions.filter { it.amount > 0 }.sumOf { it.amount }
-        val expenses = transactions.filter { it.amount < 0 }.sumOf { kotlin.math.abs(it.amount) }
-
-        MonthlyStats(
-            totalIncome = income,
-            totalExpenses = expenses,
-            balance = income - expenses,
-            transactionCount = transactions.size
+        return HomeSummary(
+            totalBalance = totalBalance,
+            monthlyIncome = monthlyIncome,
+            monthlyExpenses = monthlyExpenses,
+            activeSubscriptions = activeSubscriptions,
+            subscriptionsCost = subscriptionsCost
         )
     }
 
-    val totalBalance: Flow<Double> = repository.getAllAccounts().map { accounts ->
-        accounts.sumOf { it.balance }
-    }
-
-    // ========================================
-    // OPERAZIONI ACCOUNT
-    // ========================================
-
-    fun createAccount(
-        account: Account,
-        onSuccess: (String) -> Unit = {},
-        onError: (String) -> Unit = {}
-    ) {
-        viewModelScope.launch {
-            repository.createAccount(account)
-                .onSuccess { accountId ->
-                    android.util.Log.d("HomeViewModel", "✅ Account creato: $accountId")
-                    onSuccess(accountId)
-                }
-                .onFailure { error ->
-                    android.util.Log.e("HomeViewModel", "❌ Errore creazione account", error)
-                    onError(error.message ?: "Errore sconosciuto")
-                }
-        }
-    }
-
-    fun updateAccount(
-        account: Account,
-        onSuccess: () -> Unit = {},
-        onError: (String) -> Unit = {}
-    ) {
-        viewModelScope.launch {
-            repository.updateAccount(account)
-                .onSuccess {
-                    android.util.Log.d("HomeViewModel", "✅ Account aggiornato")
-                    onSuccess()
-                }
-                .onFailure { error ->
-                    android.util.Log.e("HomeViewModel", "❌ Errore aggiornamento account", error)
-                    onError(error.message ?: "Errore sconosciuto")
-                }
-        }
-    }
-
-    fun deleteAccount(
-        accountId: String,
-        onSuccess: () -> Unit = {},
-        onError: (String) -> Unit = {}
-    ) {
-        viewModelScope.launch {
-            repository.deleteAccount(accountId)
-                .onSuccess {
-                    android.util.Log.d("HomeViewModel", "✅ Account eliminato")
-                    onSuccess()
-                }
-                .onFailure { error ->
-                    android.util.Log.e("HomeViewModel", "❌ Errore eliminazione account", error)
-                    onError(error.message ?: "Errore sconosciuto")
-                }
-        }
-    }
-
-    // ========================================
-    // OPERAZIONI TRANSAZIONI
-    // ========================================
-
-    fun addTransaction(
-        transaction: Transaction,
-        onSuccess: (String) -> Unit = {},
-        onError: (String) -> Unit = {}
-    ) {
-        viewModelScope.launch {
-            repository.addTransaction(transaction)
-                .onSuccess { transactionId ->
-                    android.util.Log.d("HomeViewModel", "✅ Transazione aggiunta: $transactionId")
-                    onSuccess(transactionId)
-                }
-                .onFailure { error ->
-                    android.util.Log.e("HomeViewModel", "❌ Errore aggiunta transazione", error)
-                    onError(error.message ?: "Errore sconosciuto")
-                }
-        }
-    }
-
     /**
-     * ✅ CORRETTO: Importa transazioni da Excel con type inference esplicito
+     * Ricarica i dati
      */
-    fun importTransactionsFromExcel(
-        accountId: String,
-        filePath: String,
-        onSuccess: (Int) -> Unit = {},
-        onError: (String) -> Unit = {}
-    ) {
-        viewModelScope.launch {
-            try {
-                android.util.Log.d("HomeViewModel", "📊 Importazione da Excel: $filePath")
-
-                // Leggi file Excel
-                val excelReader = com.example.conti.data.excel.ExcelReader()
-                val result = excelReader.leggiExcel(filePath, accountId.toLongOrNull() ?: 0)
-
-                if (result.errori.isNotEmpty()) {
-                    val errorMessage = "Errori lettura Excel:\n${result.errori.joinToString("\n")}"
-                    android.util.Log.e("HomeViewModel", errorMessage)
-                    onError(errorMessage)
-                    return@launch
-                }
-
-                if (result.movimenti.isEmpty()) {
-                    android.util.Log.w("HomeViewModel", "⚠️ Nessun movimento trovato")
-                    onError("Nessun movimento trovato nel file")
-                    return@launch
-                }
-
-                // ✅ FIX: Type inference esplicito per evitare errori di compilazione
-                val transactions = result.movimenti.map { movimento: com.example.conti.data.database.entities.Movimento ->
-                    Transaction(
-                        accountId = accountId,
-                        amount = movimento.importo,
-                        description = movimento.descrizione,
-                        category = movimento.categoria,
-                        notes = movimento.note,
-                        date = Timestamp(java.util.Date.from(
-                            movimento.data.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()
-                        )),
-                        type = if (movimento.importo >= 0) "income" else "expense",
-                        isRecurring = movimento.isRicorrente,
-                        subscriptionId = movimento.idAbbonamento?.toString()
-                    )
-                }
-
-                android.util.Log.d("HomeViewModel", "📤 Invio ${transactions.size} transazioni a Firestore")
-
-                // Salva in batch
-                repository.addTransactionsBatch(transactions)
-                    .onSuccess { count ->
-                        android.util.Log.d("HomeViewModel", "✅ Importate $count transazioni")
-                        onSuccess(count)
-                    }
-                    .onFailure { error ->
-                        android.util.Log.e("HomeViewModel", "❌ Errore import batch", error)
-                        onError(error.message ?: "Errore import")
-                    }
-
-            } catch (e: Exception) {
-                android.util.Log.e("HomeViewModel", "❌ Errore import Excel", e)
-                onError(e.message ?: "Errore sconosciuto")
-            }
-        }
+    fun refresh() {
+        loadHomeData()
     }
+}
 
-    fun deleteTransaction(
-        transactionId: String,
-        onSuccess: () -> Unit = {},
-        onError: (String) -> Unit = {}
-    ) {
-        viewModelScope.launch {
-            repository.deleteTransaction(transactionId)
-                .onSuccess {
-                    android.util.Log.d("HomeViewModel", "✅ Transazione eliminata")
-                    onSuccess()
-                }
-                .onFailure { error ->
-                    android.util.Log.e("HomeViewModel", "❌ Errore eliminazione transazione", error)
-                    onError(error.message ?: "Errore sconosciuto")
-                }
-        }
-    }
+/**
+ * Data class per il riepilogo Home
+ */
+data class HomeSummary(
+    val totalBalance: Double,
+    val monthlyIncome: Double,
+    val monthlyExpenses: Double,
+    val activeSubscriptions: Int,
+    val subscriptionsCost: Double
+)
 
-    // ========================================
-    // OPERAZIONI ABBONAMENTI
-    // ========================================
-
-    fun createSubscription(
-        subscription: Subscription,
-        onSuccess: (String) -> Unit = {},
-        onError: (String) -> Unit = {}
-    ) {
-        viewModelScope.launch {
-            repository.createSubscription(subscription)
-                .onSuccess { subscriptionId ->
-                    android.util.Log.d("HomeViewModel", "✅ Abbonamento creato: $subscriptionId")
-                    onSuccess(subscriptionId)
-                }
-                .onFailure { error ->
-                    android.util.Log.e("HomeViewModel", "❌ Errore creazione abbonamento", error)
-                    onError(error.message ?: "Errore sconosciuto")
-                }
-        }
-    }
-
-    fun getTotalMonthlyCost(
-        onSuccess: (Double) -> Unit = {},
-        onError: (String) -> Unit = {}
-    ) {
-        viewModelScope.launch {
-            repository.getTotalMonthlySubscriptionCost()
-                .onSuccess { total ->
-                    onSuccess(total)
-                }
-                .onFailure { error ->
-                    android.util.Log.e("HomeViewModel", "❌ Errore calcolo costo", error)
-                    onError(error.message ?: "Errore sconosciuto")
-                }
-        }
-    }
+/**
+ * Sealed class per gli stati della UI
+ */
+sealed class HomeUiState {
+    object Loading : HomeUiState()
+    object Empty : HomeUiState()
+    data class Success(
+        val accounts: List<Account>,
+        val totalBalance: Double,
+        val monthlyIncome: Double,
+        val monthlyExpenses: Double,
+        val activeSubscriptions: Int,
+        val subscriptionsCost: Double
+    ) : HomeUiState()
+    data class Error(val message: String) : HomeUiState()
 }

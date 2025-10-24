@@ -2,21 +2,22 @@ package com.example.conti.data.repository
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.snapshots
-import com.google.firebase.firestore.ktx.toObject
+import com.google.firebase.firestore.snapshots
+import com.google.firebase.firestore.toObject
 import com.example.conti.data.dto.AccountDto
 import com.example.conti.models.Account
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class AccountRepository @Inject constructor(
-    private val firestore: FirebaseFirestore,
-    private val auth: FirebaseAuth
-) {
+/**
+ * Repository per gestire gli Account in Firestore.
+ * Singleton pattern per evitare multiple istanze.
+ */
+class AccountRepository private constructor() {
+
+    private val firestore = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
 
     private fun getUserAccountsCollection() =
         firestore.collection("users")
@@ -31,9 +32,35 @@ class AccountRepository @Inject constructor(
             .snapshots()
             .map { snapshot ->
                 snapshot.documents.mapNotNull { doc ->
-                    doc.toObject<AccountDto>()?.toDomain(doc.id)
+                    try {
+                        doc.toObject<AccountDto>()?.toDomain(doc.id)
+                    } catch (e: Exception) {
+                        android.util.Log.e("AccountRepository", "Errore parsing account ${doc.id}", e)
+                        null
+                    }
                 }
             }
+    }
+
+    /**
+     * Ottiene tutti gli account (snapshot singolo, no real-time)
+     */
+    suspend fun getAccounts(): Result<List<Account>> {
+        return try {
+            val snapshot = getUserAccountsCollection().get().await()
+            val accounts = snapshot.documents.mapNotNull { doc ->
+                try {
+                    doc.toObject<AccountDto>()?.toDomain(doc.id)
+                } catch (e: Exception) {
+                    android.util.Log.e("AccountRepository", "Errore parsing account ${doc.id}", e)
+                    null
+                }
+            }
+            Result.success(accounts)
+        } catch (e: Exception) {
+            android.util.Log.e("AccountRepository", "Errore getAccounts", e)
+            Result.failure(e)
+        }
     }
 
     /**
@@ -58,6 +85,7 @@ class AccountRepository @Inject constructor(
                 Result.failure(Exception("Account not found"))
             }
         } catch (e: Exception) {
+            android.util.Log.e("AccountRepository", "Errore getAccount", e)
             Result.failure(e)
         }
     }
@@ -77,8 +105,10 @@ class AccountRepository @Inject constructor(
                 .set(accountDto)
                 .await()
 
+            android.util.Log.d("AccountRepository", "✅ Account salvato: ${account.accountId}")
             Result.success(Unit)
         } catch (e: Exception) {
+            android.util.Log.e("AccountRepository", "❌ Errore saveAccount", e)
             Result.failure(e)
         }
     }
@@ -98,8 +128,10 @@ class AccountRepository @Inject constructor(
                 )
                 .await()
 
+            android.util.Log.d("AccountRepository", "✅ Saldo aggiornato per $accountId")
             Result.success(Unit)
         } catch (e: Exception) {
+            android.util.Log.e("AccountRepository", "❌ Errore updateBalance", e)
             Result.failure(e)
         }
     }
@@ -114,8 +146,10 @@ class AccountRepository @Inject constructor(
                 .delete()
                 .await()
 
+            android.util.Log.d("AccountRepository", "✅ Account eliminato: $accountId")
             Result.success(Unit)
         } catch (e: Exception) {
+            android.util.Log.e("AccountRepository", "❌ Errore deleteAccount", e)
             Result.failure(e)
         }
     }
@@ -131,7 +165,21 @@ class AccountRepository @Inject constructor(
             }
             Result.success(total)
         } catch (e: Exception) {
+            android.util.Log.e("AccountRepository", "❌ Errore getTotalBalance", e)
             Result.failure(e)
+        }
+    }
+
+    companion object {
+        @Volatile
+        private var INSTANCE: AccountRepository? = null
+
+        fun getInstance(): AccountRepository {
+            return INSTANCE ?: synchronized(this) {
+                val instance = AccountRepository()
+                INSTANCE = instance
+                instance
+            }
         }
     }
 }
