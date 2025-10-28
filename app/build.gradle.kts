@@ -15,6 +15,7 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -45,6 +46,10 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            // ✅ Escludi file duplicati da Apache POI
+            excludes += "/META-INF/LICENSE.md"
+            excludes += "/META-INF/LICENSE-notice.md"
+            excludes += "/META-INF/NOTICE.md"
         }
     }
 }
@@ -71,19 +76,22 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
 
-    // Apache POI per Excel
-    implementation("org.apache.poi:poi:5.2.5")
-    implementation("org.apache.poi:poi-ooxml:5.2.5")
+    // Apache POI per Excel - ✅ Versioni compatibili
+    implementation("org.apache.poi:poi:5.2.3")
+    implementation("org.apache.poi:poi-ooxml:5.2.3")
+
+    // Dipendenze richieste da POI - ✅ Versioni compatibili
     implementation("org.apache.xmlbeans:xmlbeans:5.1.1")
     implementation("org.apache.commons:commons-compress:1.24.0")
     implementation("commons-io:commons-io:2.15.0")
+    implementation("org.apache.commons:commons-collections4:4.4")
 
     // Navigation Component
     val navVersion = "2.7.6"
     implementation("androidx.navigation:navigation-fragment-ktx:$navVersion")
     implementation("androidx.navigation:navigation-ui-ktx:$navVersion")
 
-    // Desugaring
+    // Desugaring per supporto Java 8+ API
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 
     // Test
@@ -91,10 +99,10 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 
-    // Firebase BoM
-    implementation(platform("com.google.firebase:firebase-bom:34.4.0"))
-    implementation("com.google.firebase:firebase-firestore")
-    implementation("com.google.firebase:firebase-auth")
+    // Firebase BoM (gestione automatica versioni)
+    implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
+
+    // Firebase - IMPORTANTE: usa i nomi SENZA -ktx quando usi il BoM
     implementation("com.google.firebase:firebase-firestore-ktx")
     implementation("com.google.firebase:firebase-auth-ktx")
 }
