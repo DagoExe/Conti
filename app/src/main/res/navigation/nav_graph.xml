@@ -15,7 +15,21 @@
         android:id="@+id/navigation_movimenti"
         android:name="com.example.conti.ui.movimenti.MovimentiFragment"
         android:label="Movimenti"
-        tools:layout="@layout/fragment_movimenti" />
+        tools:layout="@layout/fragment_movimenti">
+
+        <!-- Argomenti opzionali per filtrare per conto -->
+        <argument
+            android:name="accountId"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
+
+        <argument
+            android:name="accountName"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_abbonamenti"
@@ -27,6 +41,16 @@
         android:id="@+id/navigation_conti"
         android:name="com.example.conti.ui.conti.ContiFragment"
         android:label="Conti"
-        tools:layout="@layout/fragment_conti" />
+        tools:layout="@layout/fragment_conti">
+
+        <!-- Azione per navigare ai movimenti di un conto -->
+        <action
+            android:id="@+id/action_conti_to_movimenti"
+            app:destination="@id/navigation_movimenti"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/slide_out_right"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/slide_out_right" />
+    </fragment>
 
 </navigation>

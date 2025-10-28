@@ -5,16 +5,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import com.example.conti.databinding.FragmentAbbonamentiBinding
 
+/**
+ * Fragment per la sezione Abbonamenti.
+ *
+ * ✅ Mostra un messaggio di benvenuto.
+ * 🚧 Funzionalità in sviluppo.
+ */
 class AbbonamentiFragment : Fragment() {
 
     private var _binding: FragmentAbbonamentiBinding? = null
     private val binding get() = _binding!!
-
-    // ✅ Quando creerai AbbonamentiViewModel, sarà così:
-    // private val viewModel: AbbonamentiViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -28,8 +30,19 @@ class AbbonamentiFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Placeholder per ora
-        binding.tvPlaceholder.text = "Abbonamenti\n\n(In sviluppo)"
+        // Messaggio di benvenuto
+        binding.tvPlaceholder.text = """
+            📅 Abbonamenti
+            
+            Benvenuto nella sezione abbonamenti!
+            
+            Qui potrai:
+            • Gestire i tuoi abbonamenti ricorrenti
+            • Monitorare scadenze e costi mensili
+            • Ricevere notifiche di rinnovo
+            
+            🚧 Funzionalità in arrivo...
+        """.trimIndent()
     }
 
     override fun onDestroyView() {

@@ -6,19 +6,17 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.conti.auth.AuthManager
-import com.example.conti.data.repository.AccountRepository
 import com.example.conti.data.repository.FirestoreRepository
 import com.example.conti.databinding.ActivityMainBinding
 import com.example.conti.utils.FirebaseDiagnostic
-import com.example.conti.viewmodel.BankingViewModel
+import com.example.conti.utils.TestDataGenerator
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
  * MainActivity - Activity principale dell'app.
  *
- * ✅ VERSIONE CORRETTA CON DIAGNOSTICA
+ * ✅ VERSIONE PULITA SENZA TEST AUTOMATICI
  */
 class MainActivity : AppCompatActivity() {
 
@@ -54,31 +52,14 @@ class MainActivity : AppCompatActivity() {
             if (!authManager.isAuthenticated) {
                 android.util.Log.d("MainActivity", "⚠️ Utente non autenticato")
 
-                // 🔥 TEST LOGIN ANONIMO CON DIAGNOSTICA
+                // 🔥 LOGIN ANONIMO CON DIAGNOSTICA
                 FirebaseDiagnostic.testAnonymousLogin { success, message ->
                     if (success) {
                         android.util.Log.d("MainActivity", "✅ Test login riuscito: $message")
                         setupUserProfile()
-
-                        // In MainActivity.onCreate(), dopo setupUserProfile()
-                        lifecycleScope.launch {
-                            // Test: crea account iniziali
-                            val viewModel = BankingViewModel()
-                            viewModel.createInitialAccounts()
-
-                            delay(2000) // Aspetta 2 secondi
-
-                            // Verifica
-                            val repo = AccountRepository.getInstance()
-                            repo.getAccounts().onSuccess { accounts ->
-                                android.util.Log.d("TEST", "✅ Account trovati: ${accounts.size}")
-                                accounts.forEach { account ->
-                                    android.util.Log.d("TEST", "  - ${account.accountName}: ${account.getFormattedBalance()}")
-                                }
-                            }
-                        }
-
                         observeAuthState()
+
+                        TestDataGenerator.createSampleTransactions()
                     } else {
                         android.util.Log.e("MainActivity", "❌ Test login fallito: $message")
                         showFirebaseError(message)
@@ -87,26 +68,9 @@ class MainActivity : AppCompatActivity() {
             } else {
                 android.util.Log.d("MainActivity", "✅ Utente già autenticato: ${authManager.currentUser?.uid}")
                 setupUserProfile()
-
-                // In MainActivity.onCreate(), dopo setupUserProfile()
-                lifecycleScope.launch {
-                    // Test: crea account iniziali
-                    val viewModel = BankingViewModel()
-                    viewModel.createInitialAccounts()
-
-                    delay(2000) // Aspetta 2 secondi
-
-                    // Verifica
-                    val repo = AccountRepository.getInstance()
-                    repo.getAccounts().onSuccess { accounts ->
-                        android.util.Log.d("TEST", "✅ Account trovati: ${accounts.size}")
-                        accounts.forEach { account ->
-                            android.util.Log.d("TEST", "  - ${account.accountName}: ${account.getFormattedBalance()}")
-                        }
-                    }
-                }
-
                 observeAuthState()
+
+                TestDataGenerator.createSampleTransactions()
             }
 
             android.util.Log.d("MainActivity", "═══════════════════════════════════════")
