@@ -11,13 +11,15 @@
         android:label="Home"
         tools:layout="@layout/fragment_home" />
 
+    <!-- ✅ MovimentiFragment diventa una destinazione di DETTAGLIO,
+         non più una destinazione principale della bottom navigation -->
     <fragment
         android:id="@+id/navigation_movimenti"
         android:name="com.example.conti.ui.movimenti.MovimentiFragment"
         android:label="Movimenti"
         tools:layout="@layout/fragment_movimenti">
 
-        <!-- Argomenti opzionali per filtrare per conto -->
+        <!-- Argomenti per filtrare per conto -->
         <argument
             android:name="accountId"
             app:argType="string"
@@ -43,7 +45,7 @@
         android:label="Conti"
         tools:layout="@layout/fragment_conti">
 
-        <!-- Azione per navigare ai movimenti di un conto -->
+        <!-- ✅ Azione per navigare ai movimenti di un conto -->
         <action
             android:id="@+id/action_conti_to_movimenti"
             app:destination="@id/navigation_movimenti"
