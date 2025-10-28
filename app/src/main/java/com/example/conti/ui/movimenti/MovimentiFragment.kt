@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
  *
  * ✅ Mostra tutti i movimenti o filtrati per conto
  * ✅ Visualizza statistiche (entrate/uscite)
+ * ✅ Permette di aggiungere nuovi movimenti tramite FAB
  */
 class MovimentiFragment : Fragment() {
 
@@ -59,6 +60,7 @@ class MovimentiFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupRecyclerView()
+        setupFAB()
         observeViewModel()
         loadData()
     }
@@ -72,6 +74,39 @@ class MovimentiFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = transactionAdapter
         }
+    }
+
+    /**
+     * ✅ NUOVO: Setup FAB per aggiungere movimento
+     */
+    private fun setupFAB() {
+        // Mostra il FAB solo se abbiamo un accountId
+        if (accountId != null) {
+            binding.fabAggiungiMovimento.visibility = View.VISIBLE
+
+            binding.fabAggiungiMovimento.setOnClickListener {
+                showAddTransactionDialog()
+            }
+        } else {
+            binding.fabAggiungiMovimento.visibility = View.GONE
+        }
+    }
+
+    /**
+     * ✅ NUOVO: Mostra dialog per aggiungere movimento
+     */
+    private fun showAddTransactionDialog() {
+        if (accountId == null) {
+            android.util.Log.w("MovimentiFragment", "⚠️ Impossibile aggiungere movimento senza accountId")
+            return
+        }
+
+        val dialog = AddTransactionDialogFragment.newInstance(
+            accountId = accountId!!,
+            accountName = accountName ?: "Conto"
+        )
+
+        dialog.show(childFragmentManager, AddTransactionDialogFragment.TAG)
     }
 
     private fun observeViewModel() {
@@ -127,14 +162,16 @@ class MovimentiFragment : Fragment() {
         binding.layoutContent.visibility = View.GONE
         binding.tvPlaceholder.visibility = View.VISIBLE
 
+        val hintText = if (accountId != null) {
+            "Nessun movimento per questo conto.\n\n💡 Tocca il pulsante + per aggiungere il primo movimento!"
+        } else {
+            "Nessun movimento presente.\n\n💡 Vai alla sezione Conti per aggiungere movimenti."
+        }
+
         binding.tvPlaceholder.text = """
             📊 $message
             
-            ${if (accountId != null) "Non ci sono ancora movimenti per questo conto." else "Non ci sono ancora movimenti."}
-            
-            💡 I movimenti verranno mostrati qui quando:
-            • Importi transazioni da Excel
-            • Aggiungi movimenti manualmente
+            $hintText
         """.trimIndent()
     }
 
@@ -181,7 +218,7 @@ class MovimentiFragment : Fragment() {
     private fun onTransactionClicked(transaction: Transaction) {
         android.util.Log.d("MovimentiFragment", "🖱️ Click su movimento: ${transaction.description}")
 
-        // TODO: Mostra dettaglio movimento
+        // TODO: Mostra dettaglio movimento o dialog per modifica/elimina
         android.widget.Toast.makeText(
             requireContext(),
             transaction.description,
