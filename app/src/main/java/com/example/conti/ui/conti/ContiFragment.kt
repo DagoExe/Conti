@@ -64,15 +64,18 @@ class ContiFragment : Fragment() {
         // Nascondi tab layout per ora
         binding.tabLayout.visibility = View.GONE
 
-        // FAB per aggiungere conto (per ora non implementato)
+        // FAB per aggiungere conto
         binding.fabAggiungi.setOnClickListener {
-            // TODO: Implementare aggiunta conto
-            android.widget.Toast.makeText(
-                requireContext(),
-                "Funzionalità in sviluppo",
-                android.widget.Toast.LENGTH_SHORT
-            ).show()
+            showAddAccountDialog()
         }
+    }
+
+    /**
+     * Mostra il dialog per aggiungere un nuovo conto
+     */
+    private fun showAddAccountDialog() {
+        val dialog = AddAccountDialogFragment.newInstance()
+        dialog.show(childFragmentManager, AddAccountDialogFragment.TAG)
     }
 
     private fun observeViewModel() {
