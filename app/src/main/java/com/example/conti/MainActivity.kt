@@ -12,13 +12,17 @@ import com.example.conti.data.repository.FirestoreRepository
 import com.example.conti.databinding.ActivityMainBinding
 import com.example.conti.utils.FirebaseDiagnostic
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.firebase.FirebaseApp
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
  * MainActivity - Activity principale dell'app.
  *
- * ✅ Gestisce correttamente la bottom navigation con back stack separati per ogni tab
- * ✅ Controlla autenticazione all'avvio e reindirizza a LoginActivity se necessario
+ * ✅ VERSIONE MIGLIORATA con:
+ * - Controllo autenticazione ritardato per permettere init Firebase
+ * - Migliore gestione degli stati di caricamento
+ * - Diagnostica Firebase integrata
  */
 class MainActivity : AppCompatActivity() {
 
@@ -29,46 +33,23 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        android.util.Log.d("MainActivity", "═══════════════════════════════════════")
+        android.util.Log.d("MainActivity", "   APP STARTUP")
+        android.util.Log.d("MainActivity", "═══════════════════════════════════════")
+
         try {
-            android.util.Log.d("MainActivity", "═══════════════════════════════════════")
-            android.util.Log.d("MainActivity", "   APP STARTUP")
-            android.util.Log.d("MainActivity", "═══════════════════════════════════════")
+            // 1. Assicurati che Firebase sia inizializzato
+            initializeFirebase()
 
-            // 🔥 ESEGUI DIAGNOSTICA FIREBASE
-            FirebaseDiagnostic.runDiagnostic(applicationContext)
-
-            // 1. Inizializza AuthManager PRIMA di tutto
+            // 2. Inizializza AuthManager
             authManager = AuthManager.getInstance()
             android.util.Log.d("MainActivity", "✅ AuthManager inizializzato")
 
-            // 2. ⚠️ CONTROLLO AUTENTICAZIONE - Se non autenticato, vai a LoginActivity
-            if (!authManager.isAuthenticated) {
-                android.util.Log.w("MainActivity", "⚠️ Utente non autenticato - Reindirizzo a LoginActivity")
-                navigateToLogin()
-                return
+            // 3. ⚠️ IMPORTANTE: Dai tempo a Firebase di completare l'inizializzazione
+            //    prima di controllare lo stato di autenticazione
+            lifecycleScope.launch {
+                checkAuthenticationAndProceed()
             }
-
-            android.util.Log.d("MainActivity", "✅ Utente autenticato: ${authManager.currentUser?.uid}")
-
-            // 3. Inflate layout (solo se autenticato)
-            binding = ActivityMainBinding.inflate(layoutInflater)
-            setContentView(binding.root)
-            android.util.Log.d("MainActivity", "✅ Layout inflated")
-
-            // 4. Setup UI
-            setupNavigation()
-            setupToolbarMenu()
-            android.util.Log.d("MainActivity", "✅ Navigation setup")
-
-            // 5. Setup profilo utente
-            setupUserProfile()
-
-            // 6. Osserva stato autenticazione (per logout)
-            observeAuthState()
-
-            android.util.Log.d("MainActivity", "═══════════════════════════════════════")
-            android.util.Log.d("MainActivity", "   SETUP COMPLETED")
-            android.util.Log.d("MainActivity", "═══════════════════════════════════════")
 
         } catch (e: Exception) {
             android.util.Log.e("MainActivity", "❌❌❌ ERRORE CRITICO in onCreate ❌❌❌", e)
@@ -78,7 +59,73 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * ✅ NUOVO: Setup menu toolbar con pulsante logout
+     * ✅ NUOVO: Assicura che Firebase sia inizializzato
+     */
+    private fun initializeFirebase() {
+        try {
+            // Verifica se Firebase è già inizializzato
+            FirebaseApp.getInstance()
+            android.util.Log.d("MainActivity", "✅ Firebase già inizializzato")
+        } catch (e: IllegalStateException) {
+            // Se non è inizializzato, inizializzalo
+            FirebaseApp.initializeApp(this)
+            android.util.Log.d("MainActivity", "✅ Firebase inizializzato ora")
+        }
+
+        // Esegui diagnostica Firebase (solo in debug)
+        // ✅ FIX: Usa applicationInfo invece di BuildConfig
+        if (0 != applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) {
+            FirebaseDiagnostic.runDiagnostic(applicationContext)
+        }
+    }
+
+    /**
+     * ✅ NUOVO: Controlla autenticazione con un piccolo delay per permettere init
+     */
+    private suspend fun checkAuthenticationAndProceed() {
+        // Piccolo delay per assicurarsi che Firebase sia pronto
+        delay(100)
+
+        // Controlla autenticazione
+        if (!authManager.isAuthenticated) {
+            android.util.Log.w("MainActivity", "⚠️ Utente non autenticato - Reindirizzo a LoginActivity")
+            navigateToLogin()
+            return
+        }
+
+        android.util.Log.d("MainActivity", "✅ Utente autenticato: ${authManager.currentUser?.uid}")
+
+        // Procedi con l'inizializzazione dell'UI
+        initializeUI()
+    }
+
+    /**
+     * ✅ NUOVO: Inizializza UI solo dopo verifica autenticazione
+     */
+    private fun initializeUI() {
+        // Inflate layout
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        android.util.Log.d("MainActivity", "✅ Layout inflated")
+
+        // Setup UI
+        setupNavigation()
+        setupToolbarMenu()
+        android.util.Log.d("MainActivity", "✅ Navigation setup")
+
+        // Setup profilo utente
+        setupUserProfile()
+
+        // Osserva stato autenticazione (per logout)
+        observeAuthState()
+
+        android.util.Log.d("MainActivity", "═══════════════════════════════════════")
+        android.util.Log.d("MainActivity", "   SETUP COMPLETED")
+        android.util.Log.d("MainActivity", "═══════════════════════════════════════")
+    }
+
+    /**
+     * Setup menu toolbar con pulsante logout
      */
     private fun setupToolbarMenu() {
         binding.toolbar.setOnMenuItemClickListener { menuItem ->
@@ -100,7 +147,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * ✅ NUOVO: Mostra dialog di conferma logout
+     * Mostra dialog di conferma logout
      */
     private fun showLogoutDialog() {
         MaterialAlertDialogBuilder(this)
@@ -114,7 +161,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * ✅ NUOVO: Esegue il logout e reindirizza a LoginActivity
+     * Esegue il logout e reindirizza a LoginActivity
      */
     private fun performLogout() {
         android.util.Log.d("MainActivity", "🚪 Logout in corso...")
@@ -127,7 +174,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * ✅ NUOVO: Mostra informazioni profilo
+     * Mostra informazioni profilo
      */
     private fun showProfileInfo() {
         val user = authManager.currentUser
@@ -142,7 +189,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * ✅ NUOVO: Naviga a LoginActivity
+     * Naviga a LoginActivity
      */
     private fun navigateToLogin() {
         val intent = Intent(this, LoginActivity::class.java)
