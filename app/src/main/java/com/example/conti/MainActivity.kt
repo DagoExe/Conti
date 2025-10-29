@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 /**
  * MainActivity - Activity principale dell'app.
  *
- * ✅ VERSIONE PULITA SENZA TEST AUTOMATICI
+ * ✅ Gestisce correttamente la bottom navigation con back stack separati per ogni tab
  */
 class MainActivity : AppCompatActivity() {
 
@@ -85,7 +85,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Setup della navigazione (può funzionare anche senza Firebase).
+     * Setup della navigazione con gestione corretta del back stack per ogni tab.
      */
     private fun setupNavigation() {
         try {
@@ -93,8 +93,51 @@ class MainActivity : AppCompatActivity() {
                 .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
 
             val navController = navHostFragment.navController
+
+            // ✅ Setup STANDARD della bottom navigation
             binding.bottomNavigation.setupWithNavController(navController)
 
+            // ✅ Listener personalizzato per gestire il "re-click" sulla stessa tab
+            binding.bottomNavigation.setOnItemSelectedListener { item ->
+                val currentDestination = navController.currentDestination?.id
+
+                when (item.itemId) {
+                    R.id.navigation_home -> {
+                        if (currentDestination != R.id.navigation_home) {
+                            // Naviga a Home
+                            navController.navigate(R.id.navigation_home)
+                        }
+                        true
+                    }
+                    R.id.navigation_abbonamenti -> {
+                        if (currentDestination != R.id.navigation_abbonamenti) {
+                            // Naviga ad Abbonamenti
+                            navController.navigate(R.id.navigation_abbonamenti)
+                        }
+                        true
+                    }
+                    R.id.navigation_conti -> {
+                        // ✅ COMPORTAMENTO SPECIALE PER "CONTI"
+                        // Se siamo già in Conti o Movimenti, torna sempre alla lista conti
+                        if (currentDestination == R.id.navigation_conti) {
+                            // Già nella lista conti, non fare nulla
+                            android.util.Log.d("MainActivity", "👍 Già nella lista Conti")
+                        } else if (currentDestination == R.id.navigation_movimenti) {
+                            // Siamo nei movimenti, torna alla lista conti
+                            android.util.Log.d("MainActivity", "⬅️ Torna alla lista Conti da Movimenti")
+                            navController.popBackStack(R.id.navigation_conti, false)
+                        } else {
+                            // Siamo in un'altra tab, naviga a Conti
+                            android.util.Log.d("MainActivity", "➡️ Naviga a Conti")
+                            navController.navigate(R.id.navigation_conti)
+                        }
+                        true
+                    }
+                    else -> false
+                }
+            }
+
+            // ✅ Listener per aggiornare il titolo della toolbar
             navController.addOnDestinationChangedListener { _, destination, _ ->
                 binding.toolbar.title = when (destination.id) {
                     R.id.navigation_home -> "Home"
@@ -195,9 +238,32 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * ✅ Gestisce il pulsante "back" di Android
+     */
     override fun onSupportNavigateUp(): Boolean {
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         return navHostFragment.navController.navigateUp() || super.onSupportNavigateUp()
+    }
+
+    /**
+     * ✅ NUOVO: Gestisce il pulsante back hardware
+     */
+    @Deprecated("Deprecated in Java")
+    override fun onBackPressed() {
+        val navHostFragment = supportFragmentManager
+            .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navController = navHostFragment.navController
+
+        // Se siamo nella home, esci dall'app
+        if (navController.currentDestination?.id == R.id.navigation_home) {
+            super.onBackPressed()
+        } else {
+            // Altrimenti, comportamento standard del NavController
+            if (!navController.popBackStack()) {
+                super.onBackPressed()
+            }
+        }
     }
 }
