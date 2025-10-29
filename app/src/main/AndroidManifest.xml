@@ -24,14 +24,25 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Conti"
         tools:targetApi="31">
+
+        <!-- ✅ LoginActivity - Activity di lancio -->
         <activity
-            android:name="com.example.conti.MainActivity"
-            android:exported="true">
+            android:name="com.example.conti.auth.LoginActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Conti"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- MainActivity - Activity principale (dopo login) -->
+        <activity
+            android:name="com.example.conti.MainActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Conti" />
+
     </application>
 
 </manifest>

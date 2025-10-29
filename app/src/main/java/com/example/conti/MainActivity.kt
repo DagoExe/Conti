@@ -1,15 +1,16 @@
 package com.example.conti
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.conti.auth.AuthManager
+import com.example.conti.auth.LoginActivity
 import com.example.conti.data.repository.FirestoreRepository
 import com.example.conti.databinding.ActivityMainBinding
 import com.example.conti.utils.FirebaseDiagnostic
-import com.example.conti.utils.TestDataGenerator
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
 
@@ -17,6 +18,7 @@ import kotlinx.coroutines.launch
  * MainActivity - Activity principale dell'app.
  *
  * ✅ Gestisce correttamente la bottom navigation con back stack separati per ogni tab
+ * ✅ Controlla autenticazione all'avvio e reindirizza a LoginActivity se necessario
  */
 class MainActivity : AppCompatActivity() {
 
@@ -35,43 +37,34 @@ class MainActivity : AppCompatActivity() {
             // 🔥 ESEGUI DIAGNOSTICA FIREBASE
             FirebaseDiagnostic.runDiagnostic(applicationContext)
 
-            // 1. Inflate layout
+            // 1. Inizializza AuthManager PRIMA di tutto
+            authManager = AuthManager.getInstance()
+            android.util.Log.d("MainActivity", "✅ AuthManager inizializzato")
+
+            // 2. ⚠️ CONTROLLO AUTENTICAZIONE - Se non autenticato, vai a LoginActivity
+            if (!authManager.isAuthenticated) {
+                android.util.Log.w("MainActivity", "⚠️ Utente non autenticato - Reindirizzo a LoginActivity")
+                navigateToLogin()
+                return
+            }
+
+            android.util.Log.d("MainActivity", "✅ Utente autenticato: ${authManager.currentUser?.uid}")
+
+            // 3. Inflate layout (solo se autenticato)
             binding = ActivityMainBinding.inflate(layoutInflater)
             setContentView(binding.root)
             android.util.Log.d("MainActivity", "✅ Layout inflated")
 
-            // 2. Setup UI PRIMA di Firebase (così l'app non crasha anche se Firebase fallisce)
+            // 4. Setup UI
             setupNavigation()
+            setupToolbarMenu()
             android.util.Log.d("MainActivity", "✅ Navigation setup")
 
-            // 3. Inizializza AuthManager
-            authManager = AuthManager.getInstance()
-            android.util.Log.d("MainActivity", "✅ AuthManager inizializzato")
+            // 5. Setup profilo utente
+            setupUserProfile()
 
-            // 4. Controlla autenticazione
-            if (!authManager.isAuthenticated) {
-                android.util.Log.d("MainActivity", "⚠️ Utente non autenticato")
-
-                // 🔥 LOGIN ANONIMO CON DIAGNOSTICA
-                FirebaseDiagnostic.testAnonymousLogin { success, message ->
-                    if (success) {
-                        android.util.Log.d("MainActivity", "✅ Test login riuscito: $message")
-                        setupUserProfile()
-                        observeAuthState()
-
-                        TestDataGenerator.createSampleTransactions()
-                    } else {
-                        android.util.Log.e("MainActivity", "❌ Test login fallito: $message")
-                        showFirebaseError(message)
-                    }
-                }
-            } else {
-                android.util.Log.d("MainActivity", "✅ Utente già autenticato: ${authManager.currentUser?.uid}")
-                setupUserProfile()
-                observeAuthState()
-
-                TestDataGenerator.createSampleTransactions()
-            }
+            // 6. Osserva stato autenticazione (per logout)
+            observeAuthState()
 
             android.util.Log.d("MainActivity", "═══════════════════════════════════════")
             android.util.Log.d("MainActivity", "   SETUP COMPLETED")
@@ -82,6 +75,80 @@ class MainActivity : AppCompatActivity() {
             e.printStackTrace()
             showCriticalError(e)
         }
+    }
+
+    /**
+     * ✅ NUOVO: Setup menu toolbar con pulsante logout
+     */
+    private fun setupToolbarMenu() {
+        binding.toolbar.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.action_logout -> {
+                    showLogoutDialog()
+                    true
+                }
+                R.id.action_profile -> {
+                    showProfileInfo()
+                    true
+                }
+                else -> false
+            }
+        }
+
+        // Infla il menu
+        binding.toolbar.inflateMenu(R.menu.toolbar_menu)
+    }
+
+    /**
+     * ✅ NUOVO: Mostra dialog di conferma logout
+     */
+    private fun showLogoutDialog() {
+        MaterialAlertDialogBuilder(this)
+            .setTitle("Logout")
+            .setMessage("Sei sicuro di voler uscire?")
+            .setPositiveButton("Sì, esci") { _, _ ->
+                performLogout()
+            }
+            .setNegativeButton("Annulla", null)
+            .show()
+    }
+
+    /**
+     * ✅ NUOVO: Esegue il logout e reindirizza a LoginActivity
+     */
+    private fun performLogout() {
+        android.util.Log.d("MainActivity", "🚪 Logout in corso...")
+
+        authManager.signOut()
+
+        android.util.Log.d("MainActivity", "✅ Logout completato")
+
+        navigateToLogin()
+    }
+
+    /**
+     * ✅ NUOVO: Mostra informazioni profilo
+     */
+    private fun showProfileInfo() {
+        val user = authManager.currentUser
+        val email = user?.email ?: "Utente anonimo"
+        val uid = user?.uid ?: "N/A"
+
+        MaterialAlertDialogBuilder(this)
+            .setTitle("👤 Profilo Utente")
+            .setMessage("Email: $email\n\nUser ID: $uid")
+            .setPositiveButton("OK", null)
+            .show()
+    }
+
+    /**
+     * ✅ NUOVO: Naviga a LoginActivity
+     */
+    private fun navigateToLogin() {
+        val intent = Intent(this, LoginActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        finish()
     }
 
     /**
@@ -104,30 +171,23 @@ class MainActivity : AppCompatActivity() {
                 when (item.itemId) {
                     R.id.navigation_home -> {
                         if (currentDestination != R.id.navigation_home) {
-                            // Naviga a Home
                             navController.navigate(R.id.navigation_home)
                         }
                         true
                     }
                     R.id.navigation_abbonamenti -> {
                         if (currentDestination != R.id.navigation_abbonamenti) {
-                            // Naviga ad Abbonamenti
                             navController.navigate(R.id.navigation_abbonamenti)
                         }
                         true
                     }
                     R.id.navigation_conti -> {
-                        // ✅ COMPORTAMENTO SPECIALE PER "CONTI"
-                        // Se siamo già in Conti o Movimenti, torna sempre alla lista conti
                         if (currentDestination == R.id.navigation_conti) {
-                            // Già nella lista conti, non fare nulla
                             android.util.Log.d("MainActivity", "👍 Già nella lista Conti")
                         } else if (currentDestination == R.id.navigation_movimenti) {
-                            // Siamo nei movimenti, torna alla lista conti
                             android.util.Log.d("MainActivity", "⬅️ Torna alla lista Conti da Movimenti")
                             navController.popBackStack(R.id.navigation_conti, false)
                         } else {
-                            // Siamo in un'altra tab, naviga a Conti
                             android.util.Log.d("MainActivity", "➡️ Naviga a Conti")
                             navController.navigate(R.id.navigation_conti)
                         }
@@ -166,7 +226,6 @@ class MainActivity : AppCompatActivity() {
                 android.util.Log.d("MainActivity", "👤 Profilo aggiornato per $email")
             } catch (e: Exception) {
                 android.util.Log.e("MainActivity", "❌ Errore aggiornamento profilo", e)
-                // Non bloccare l'app per questo errore
             }
         }
     }
@@ -179,38 +238,15 @@ class MainActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 authManager.authState.collect { user ->
                     if (user == null) {
-                        android.util.Log.w("MainActivity", "⚠️ Utente disconnesso")
+                        android.util.Log.w("MainActivity", "⚠️ Utente disconnesso - Reindirizzo a Login")
+                        navigateToLogin()
                     } else {
                         android.util.Log.d("MainActivity", "👤 Utente connesso: ${user.uid}")
-                        setupUserProfile()
                     }
                 }
             }
         } catch (e: Exception) {
             android.util.Log.e("MainActivity", "❌ Errore observeAuthState", e)
-        }
-    }
-
-    /**
-     * Mostra un errore specifico di Firebase.
-     */
-    private fun showFirebaseError(message: String) {
-        try {
-            runOnUiThread {
-                MaterialAlertDialogBuilder(this)
-                    .setTitle("⚠️ Errore Firebase")
-                    .setMessage("Impossibile autenticarsi:\n\n$message\n\nVerifica:\n• Connessione internet\n• Configurazione google-services.json\n• Regole Firestore")
-                    .setPositiveButton("Riprova") { _, _ ->
-                        recreate()
-                    }
-                    .setNegativeButton("Continua senza Firebase") { _, _ ->
-                        // L'app continuerà a funzionare in modalità limitata
-                    }
-                    .setCancelable(false)
-                    .show()
-            }
-        } catch (e: Exception) {
-            android.util.Log.e("MainActivity", "❌ Errore mostrando dialog Firebase", e)
         }
     }
 
@@ -248,7 +284,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * ✅ NUOVO: Gestisce il pulsante back hardware
+     * ✅ Gestisce il pulsante back hardware
      */
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
@@ -256,11 +292,9 @@ class MainActivity : AppCompatActivity() {
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         val navController = navHostFragment.navController
 
-        // Se siamo nella home, esci dall'app
         if (navController.currentDestination?.id == R.id.navigation_home) {
             super.onBackPressed()
         } else {
-            // Altrimenti, comportamento standard del NavController
             if (!navController.popBackStack()) {
                 super.onBackPressed()
             }
