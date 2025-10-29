@@ -1,3 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Conti</string>
+
+    <!-- ✅ IMPORTANTE: Questo viene generato automaticamente da google-services.json -->
+    <!-- Non modificarlo manualmente, verrà sovrascritto -->
+    <!-- Se non esiste, esegui: ./gradlew processDebugGoogleServices -->
 </resources>

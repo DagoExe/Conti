@@ -93,6 +93,25 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
+        // ✅ NUOVO: Controlla verifica email
+        val user = authManager.currentUser
+        if (user != null && !user.isEmailVerified && !user.isAnonymous) {
+            android.util.Log.w("MainActivity", "⚠️ Email non verificata - Reindirizzo a LoginActivity")
+
+            runOnUiThread {
+                MaterialAlertDialogBuilder(this)
+                    .setTitle("📧 Verifica Email Richiesta")
+                    .setMessage("Devi verificare la tua email prima di accedere all'app.")
+                    .setPositiveButton("OK") { _, _ ->
+                        authManager.signOut()
+                        navigateToLogin()
+                    }
+                    .setCancelable(false)
+                    .show()
+            }
+            return
+        }
+
         android.util.Log.d("MainActivity", "✅ Utente autenticato: ${authManager.currentUser?.uid}")
 
         // Procedi con l'inizializzazione dell'UI

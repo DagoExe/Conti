@@ -54,6 +54,49 @@
                 android:orientation="vertical"
                 android:padding="24dp">
 
+                <!-- ✅ NUOVO: Pulsante Google Sign-In -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/googleSignInButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:text="Continua con Google"
+                    android:textSize="16sp"
+                    android:textColor="#757575"
+                    app:icon="@android:drawable/ic_menu_search"
+                    app:iconTint="#4285F4"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- Divider "oppure" -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="16dp">
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_weight="1"
+                        android:background="#E0E0E0" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="oppure"
+                        android:textSize="12sp"
+                        android:textColor="#9E9E9E"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_weight="1"
+                        android:background="#E0E0E0" />
+                </LinearLayout>
+
                 <!-- Nome (solo per registrazione) -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/nameInputLayout"
@@ -168,11 +211,20 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="✅ Verifica email richiesta dopo la registrazione"
+            android:textSize="11sp"
+            android:textColor="#BDBDBD"
+            android:gravity="center"
+            android:layout_marginTop="16dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="Accedendo accetti i nostri Termini di Servizio e Privacy Policy"
             android:textSize="11sp"
             android:textColor="#BDBDBD"
             android:gravity="center"
-            android:layout_marginTop="24dp" />
+            android:layout_marginTop="8dp" />
 
     </LinearLayout>
 </ScrollView>
