@@ -12,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.conti.MainActivity
 import com.example.conti.databinding.ActivityLoginBinding
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.FirebaseNetworkException
@@ -58,6 +59,17 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        try {
+            val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken("404921205660-eljajs4jgjjdl91ebis8on4mghgqib85.apps.googleusercontent.com")
+                .requestEmail()
+                .build()
+
+            Log.d(TAG, "✅ GoogleSignInOptions configurato correttamente")
+        } catch (e: Exception) {
+            Log.e(TAG, "❌ Errore configurazione GoogleSignInOptions", e)
+        }
 
         Log.d(TAG, "═══════════════════════════════════════")
         Log.d(TAG, "   LOGIN ACTIVITY STARTED")
@@ -153,6 +165,19 @@ class LoginActivity : AppCompatActivity() {
      */
     private fun signInWithGoogle(account: com.google.android.gms.auth.api.signin.GoogleSignInAccount) {
         Log.d(TAG, "🔐 Autenticazione Google per: ${account.email}")
+        Log.d(TAG, "   ID Token presente: ${account.idToken != null}")
+
+        // ✅ Verifica che l'ID Token sia presente
+        if (account.idToken == null) {
+            Log.e(TAG, "❌ ID Token mancante! Configurazione OAuth non corretta.")
+            Toast.makeText(
+                this,
+                "❌ Errore configurazione Google Sign-In. Contatta lo sviluppatore.",
+                Toast.LENGTH_LONG
+            ).show()
+            showLoading(false)
+            return
+        }
 
         lifecycleScope.launch {
             authManager.signInWithGoogle(account)
@@ -167,7 +192,6 @@ class LoginActivity : AppCompatActivity() {
                         Toast.LENGTH_SHORT
                     ).show()
 
-                    // ✅ Google Sign-In verifica automaticamente l'email
                     navigateToMain()
                 }
                 .onFailure { e ->

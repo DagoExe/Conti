@@ -1,6 +1,5 @@
 package com.example.conti.auth
 
-import android.app.Activity
 import android.content.Context
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -19,37 +18,22 @@ import kotlinx.coroutines.tasks.await
 /**
  * Manager per gestire l'autenticazione Firebase.
  *
- * ✅ VERSIONE AGGIORNATA con:
- * - Google Sign-In
- * - Verifica email obbligatoria
- * - Ri-invio email di verifica
+ * ✅ VERSIONE CORRETTA con Web Client ID hardcoded
  */
 class AuthManager private constructor() {
 
     private val auth = FirebaseAuth.getInstance()
     private val firestore = FirebaseFirestore.getInstance()
 
-    /**
-     * Utente corrente (può essere null se non autenticato).
-     */
     val currentUser: FirebaseUser?
         get() = auth.currentUser
 
-    /**
-     * Verifica se l'utente è autenticato.
-     */
     val isAuthenticated: Boolean
         get() = currentUser != null
 
-    /**
-     * ✅ NUOVO: Verifica se l'email dell'utente è verificata.
-     */
     val isEmailVerified: Boolean
         get() = currentUser?.isEmailVerified ?: false
 
-    /**
-     * Flow che emette lo stato di autenticazione.
-     */
     val authState: Flow<FirebaseUser?> = callbackFlow {
         val listener = FirebaseAuth.AuthStateListener { auth ->
             trySend(auth.currentUser)
@@ -59,18 +43,25 @@ class AuthManager private constructor() {
     }
 
     // ========================================
-    // GOOGLE SIGN-IN
+    // GOOGLE SIGN-IN - VERSIONE CORRETTA
     // ========================================
 
     /**
-     * ✅ NUOVO: Crea GoogleSignInClient per Google Sign-In.
+     * ✅ VERSIONE CORRETTA: Usa Web Client ID hardcoded
      *
-     * IMPORTANTE: Devi avere configurato Google Sign-In nella Firebase Console
-     * e aggiunto la SHA-1 del tuo keystore.
+     * IMPORTANTE: Dopo aver aggiunto la SHA-1 in Firebase Console,
+     * questo ID dovrebbe funzionare correttamente.
      */
     fun getGoogleSignInClient(context: Context): GoogleSignInClient {
+        // ✅ FIX: Usa direttamente il Web Client ID dal tuo google-services.json
+        // Questo è il client_id di tipo 3 (Web client)
+        val webClientId = "404921205660-eljajs4jgjjdl91ebis8on4mghgqib85.apps.googleusercontent.com"
+
+        android.util.Log.d("AuthManager", "📱 Configurazione Google Sign-In")
+        android.util.Log.d("AuthManager", "   Web Client ID: $webClientId")
+
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getWebClientId(context))
+            .requestIdToken(webClientId)
             .requestEmail()
             .build()
 
@@ -78,52 +69,42 @@ class AuthManager private constructor() {
     }
 
     /**
-     * Ottiene il Web Client ID da Firebase (necessario per Google Sign-In).
-     *
-     * NOTA: Il Web Client ID si trova in:
-     * Firebase Console > Project Settings > General > Web API Key
-     * oppure nel file google-services.json sotto "oauth_client" con type 3
-     */
-    private fun getWebClientId(context: Context): String {
-        // ⚠️ IMPORTANTE: Sostituisci questo con il TUO Web Client ID
-        // Lo trovi in google-services.json sotto "client" > "oauth_client" > "client_id" (type 3)
-
-        // Per ora, proviamo a leggerlo dal google-services.json
-        try {
-            val resources = context.resources
-            val packageName = context.packageName
-            val resId = resources.getIdentifier(
-                "default_web_client_id",
-                "string",
-                packageName
-            )
-            return context.getString(resId)
-        } catch (e: Exception) {
-            android.util.Log.e("AuthManager", "❌ Impossibile ottenere Web Client ID", e)
-            throw IllegalStateException(
-                "Web Client ID non trovato. Assicurati di aver configurato Google Sign-In " +
-                        "nella Firebase Console e di aver aggiunto google-services.json al progetto."
-            )
-        }
-    }
-
-    /**
-     * ✅ NUOVO: Autentica con Google usando l'account selezionato.
-     *
-     * @param account Account Google selezionato dall'utente
-     * @return Result con l'utente Firebase autenticato
+     * Autentica con Google usando l'account selezionato.
      */
     suspend fun signInWithGoogle(account: GoogleSignInAccount): Result<FirebaseUser> {
         return try {
             android.util.Log.d("AuthManager", "🔐 Autenticazione Google in corso...")
+            android.util.Log.d("AuthManager", "   Account email: ${account.email}")
+            android.util.Log.d("AuthManager", "   ID Token presente: ${account.idToken != null}")
+            android.util.Log.d("AuthManager", "   ID Token length: ${account.idToken?.length ?: 0}")
+
+            if (account.idToken == null) {
+                android.util.Log.e("AuthManager", "❌ ID Token mancante!")
+                android.util.Log.e("AuthManager", "   Possibili cause:")
+                android.util.Log.e("AuthManager", "   1. SHA-1 non configurata in Firebase")
+                android.util.Log.e("AuthManager", "   2. Web Client ID errato")
+                android.util.Log.e("AuthManager", "   3. Package name non corretto")
+                return Result.failure(Exception(
+                    "Google Sign-In fallito: ID Token mancante.\n\n" +
+                            "Verifica che:\n" +
+                            "1. La SHA-1 sia stata aggiunta in Firebase Console\n" +
+                            "2. Il file google-services.json sia aggiornato\n" +
+                            "3. L'app sia stata ricompilata dopo le modifiche"
+                ))
+            }
 
             val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+            android.util.Log.d("AuthManager", "🔑 Credential creata, autenticazione con Firebase...")
+
             val result = auth.signInWithCredential(credential).await()
-            val user = result.user ?: throw Exception("Google Sign-In fallito")
+            val user = result.user ?: throw Exception("Google Sign-In fallito: utente null")
 
-            android.util.Log.d("AuthManager", "✅ Google Sign-In riuscito: ${user.uid}")
+            android.util.Log.d("AuthManager", "✅ Google Sign-In riuscito!")
+            android.util.Log.d("AuthManager", "   User ID: ${user.uid}")
+            android.util.Log.d("AuthManager", "   Email: ${user.email}")
+            android.util.Log.d("AuthManager", "   Display Name: ${user.displayName}")
 
-            // Crea profilo utente
+            // Crea o aggiorna profilo utente
             createUserProfile(user, displayName = account.displayName)
 
             // Aggiorna ultimo login
@@ -132,6 +113,8 @@ class AuthManager private constructor() {
             Result.success(user)
         } catch (e: Exception) {
             android.util.Log.e("AuthManager", "❌ Errore Google Sign-In", e)
+            android.util.Log.e("AuthManager", "   Messaggio: ${e.message}")
+            android.util.Log.e("AuthManager", "   Tipo: ${e.javaClass.simpleName}")
             Result.failure(e)
         }
     }
@@ -140,9 +123,6 @@ class AuthManager private constructor() {
     // VERIFICA EMAIL
     // ========================================
 
-    /**
-     * ✅ NUOVO: Invia email di verifica all'utente corrente.
-     */
     suspend fun sendEmailVerification(): Result<Unit> {
         return try {
             val user = currentUser ?: throw Exception("Nessun utente autenticato")
@@ -161,9 +141,6 @@ class AuthManager private constructor() {
         }
     }
 
-    /**
-     * ✅ NUOVO: Ricarica i dati dell'utente (per aggiornare isEmailVerified).
-     */
     suspend fun reloadUser(): Result<Unit> {
         return try {
             val user = currentUser ?: throw Exception("Nessun utente autenticato")
@@ -178,16 +155,11 @@ class AuthManager private constructor() {
     // LOGIN ANONIMO
     // ========================================
 
-    /**
-     * Effettua login anonimo.
-     * Utile per testing o per permettere l'uso dell'app senza registrazione.
-     */
     suspend fun signInAnonymously(): Result<FirebaseUser> {
         return try {
             val result = auth.signInAnonymously().await()
             val user = result.user ?: throw Exception("Login anonimo fallito")
 
-            // Crea profilo utente
             createUserProfile(user, isAnonymous = true)
 
             Result.success(user)
@@ -200,18 +172,12 @@ class AuthManager private constructor() {
     // LOGIN CON EMAIL/PASSWORD
     // ========================================
 
-    /**
-     * Registra un nuovo utente con email e password.
-     *
-     * ✅ AGGIORNATO: Invia automaticamente email di verifica dopo registrazione.
-     */
     suspend fun signUpWithEmail(
         email: String,
         password: String,
         displayName: String? = null
     ): Result<FirebaseUser> {
         return try {
-            // Valida email e password
             if (!isValidEmail(email)) {
                 return Result.failure(Exception("Email non valida"))
             }
@@ -219,14 +185,12 @@ class AuthManager private constructor() {
                 return Result.failure(Exception("Password troppo corta (minimo 6 caratteri)"))
             }
 
-            // Crea utente
             val result = auth.createUserWithEmailAndPassword(email, password).await()
             val user = result.user ?: throw Exception("Registrazione fallita")
 
-            // Crea profilo utente
             createUserProfile(user, displayName = displayName)
 
-            // ✅ NUOVO: Invia email di verifica
+            // Invia email di verifica
             user.sendEmailVerification().await()
             android.util.Log.d("AuthManager", "✅ Email di verifica inviata a: $email")
 
@@ -236,11 +200,6 @@ class AuthManager private constructor() {
         }
     }
 
-    /**
-     * Effettua login con email e password.
-     *
-     * ✅ NOTA: Dopo il login, controllare isEmailVerified prima di permettere accesso.
-     */
     suspend fun signInWithEmail(
         email: String,
         password: String
@@ -249,7 +208,6 @@ class AuthManager private constructor() {
             val result = auth.signInWithEmailAndPassword(email, password).await()
             val user = result.user ?: throw Exception("Login fallito")
 
-            // Aggiorna ultimo login
             updateLastLogin(user.uid)
 
             Result.success(user)
@@ -262,9 +220,6 @@ class AuthManager private constructor() {
     // LOGOUT
     // ========================================
 
-    /**
-     * Effettua logout.
-     */
     fun signOut() {
         auth.signOut()
     }
@@ -273,9 +228,6 @@ class AuthManager private constructor() {
     // GESTIONE PROFILO UTENTE
     // ========================================
 
-    /**
-     * Crea il profilo utente in Firestore.
-     */
     private suspend fun createUserProfile(
         user: FirebaseUser,
         displayName: String? = null,
@@ -300,9 +252,6 @@ class AuthManager private constructor() {
         }
     }
 
-    /**
-     * Aggiorna la data dell'ultimo login.
-     */
     private suspend fun updateLastLogin(userId: String) {
         try {
             firestore.collection("users")
@@ -318,16 +267,10 @@ class AuthManager private constructor() {
     // VALIDAZIONE
     // ========================================
 
-    /**
-     * Valida un indirizzo email.
-     */
     private fun isValidEmail(email: String): Boolean {
         return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
 
-    /**
-     * Valida una password (minimo 6 caratteri).
-     */
     private fun isValidPassword(password: String): Boolean {
         return password.length >= 6
     }
@@ -336,9 +279,6 @@ class AuthManager private constructor() {
     // RESET PASSWORD
     // ========================================
 
-    /**
-     * Invia email per reset password.
-     */
     suspend fun sendPasswordResetEmail(email: String): Result<Unit> {
         return try {
             auth.sendPasswordResetEmail(email).await()
@@ -352,18 +292,11 @@ class AuthManager private constructor() {
     // ELIMINA ACCOUNT
     // ========================================
 
-    /**
-     * Elimina l'account corrente.
-     * ATTENZIONE: Elimina anche tutti i dati Firestore.
-     */
     suspend fun deleteAccount(): Result<Unit> {
         return try {
             val user = currentUser ?: throw Exception("Nessun utente autenticato")
 
-            // Elimina dati Firestore
             deleteUserData(user.uid)
-
-            // Elimina account Firebase Auth
             user.delete().await()
 
             Result.success(Unit)
@@ -372,43 +305,20 @@ class AuthManager private constructor() {
         }
     }
 
-    /**
-     * Elimina tutti i dati dell'utente da Firestore.
-     */
     private suspend fun deleteUserData(userId: String) {
         try {
-            // Elimina tutti gli account
-            val accountsSnapshot = firestore.collection("users")
-                .document(userId)
-                .collection("accounts")
-                .get()
-                .await()
+            val userDocRef = firestore.collection("users").document(userId)
 
-            accountsSnapshot.documents.forEach { it.reference.delete().await() }
+            // Elimina sottocollezioni
+            val subcollections = listOf("accounts", "transactions", "subscriptions")
 
-            // Elimina tutte le transazioni
-            val transactionsSnapshot = firestore.collection("users")
-                .document(userId)
-                .collection("transactions")
-                .get()
-                .await()
+            for (subcollection in subcollections) {
+                val snapshot = userDocRef.collection(subcollection).get().await()
+                snapshot.documents.forEach { it.reference.delete().await() }
+            }
 
-            transactionsSnapshot.documents.forEach { it.reference.delete().await() }
-
-            // Elimina tutti gli abbonamenti
-            val subscriptionsSnapshot = firestore.collection("users")
-                .document(userId)
-                .collection("subscriptions")
-                .get()
-                .await()
-
-            subscriptionsSnapshot.documents.forEach { it.reference.delete().await() }
-
-            // Elimina profilo utente
-            firestore.collection("users")
-                .document(userId)
-                .delete()
-                .await()
+            // Elimina documento principale
+            userDocRef.delete().await()
 
             android.util.Log.d("AuthManager", "✅ Dati utente eliminati")
         } catch (e: Exception) {
@@ -417,9 +327,6 @@ class AuthManager private constructor() {
     }
 
     companion object {
-        /**
-         * Istanza singleton di AuthManager.
-         */
         @Volatile
         private var INSTANCE: AuthManager? = null
 
