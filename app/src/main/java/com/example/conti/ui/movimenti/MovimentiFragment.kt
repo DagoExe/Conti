@@ -17,9 +17,9 @@ import kotlinx.coroutines.launch
 /**
  * Fragment per la sezione Movimenti.
  *
- * ✅ Mostra tutti i movimenti o filtrati per conto
- * ✅ Visualizza statistiche (entrate/uscite)
- * ✅ Permette di aggiungere nuovi movimenti tramite FAB
+ * ✅ VERSIONE AGGIORNATA:
+ * - Mostra il saldo corrente dell'account (che include il saldo iniziale)
+ * - Il bilancio NON è più calcolato come entrate - uscite, ma è il balance dell'account
  */
 class MovimentiFragment : Fragment() {
 
@@ -77,7 +77,7 @@ class MovimentiFragment : Fragment() {
     }
 
     /**
-     * ✅ NUOVO: Setup FAB per aggiungere movimento
+     * Setup FAB per aggiungere movimento
      */
     private fun setupFAB() {
         // Mostra il FAB solo se abbiamo un accountId
@@ -93,7 +93,7 @@ class MovimentiFragment : Fragment() {
     }
 
     /**
-     * ✅ NUOVO: Mostra dialog per aggiungere movimento
+     * Mostra dialog per aggiungere movimento
      */
     private fun showAddTransactionDialog() {
         if (accountId == null) {
@@ -175,6 +175,9 @@ class MovimentiFragment : Fragment() {
         """.trimIndent()
     }
 
+    /**
+     * ✅ AGGIORNATO: Mostra il saldo corrente dell'account invece del bilancio calcolato
+     */
     private fun showTransactions(state: MovimentiUiState.Success) {
         binding.tvPlaceholder.visibility = View.GONE
         binding.layoutContent.visibility = View.VISIBLE
@@ -183,21 +186,27 @@ class MovimentiFragment : Fragment() {
         binding.tvTotaleEntrate.text = CurrencyUtils.formatImporto(state.totalIncome)
         binding.tvTotaleUscite.text = CurrencyUtils.formatImporto(state.totalExpenses)
 
-        val bilancio = state.totalIncome - state.totalExpenses
-        binding.tvBilancio.text = CurrencyUtils.formatImporto(bilancio)
+        // ✅ IMPORTANTE: Mostra il saldo corrente dell'account (include già il saldo iniziale)
+        binding.tvBilancio.text = CurrencyUtils.formatImporto(state.currentBalance)
 
-        // Colore bilancio
-        val bilancioColor = if (bilancio >= 0) {
-            android.graphics.Color.parseColor("#4CAF50")
+        // Colore del saldo corrente
+        val bilancioColor = if (state.currentBalance >= 0) {
+            android.graphics.Color.parseColor("#4CAF50") // Verde
         } else {
-            android.graphics.Color.parseColor("#F44336")
+            android.graphics.Color.parseColor("#F44336") // Rosso
         }
         binding.tvBilancio.setTextColor(bilancioColor)
 
         // Aggiorna lista movimenti
         transactionAdapter.submitList(state.transactions)
 
-        android.util.Log.d("MovimentiFragment", "✅ Visualizzati ${state.transactions.size} movimenti")
+        android.util.Log.d("MovimentiFragment", """
+            ✅ Visualizzazione aggiornata:
+               - ${state.transactions.size} movimenti
+               - Entrate: ${state.totalIncome}€
+               - Uscite: ${state.totalExpenses}€
+               - Saldo Corrente: ${state.currentBalance}€
+        """.trimIndent())
     }
 
     private fun showError(message: String) {

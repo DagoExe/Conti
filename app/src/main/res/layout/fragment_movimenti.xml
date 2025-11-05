@@ -111,7 +111,7 @@
                                 android:layout_marginTop="4dp" />
                         </LinearLayout>
 
-                        <!-- Bilancio -->
+                        <!-- Saldo Corrente (✅ ETICHETTA AGGIORNATA) -->
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -122,7 +122,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="💰 Bilancio"
+                                android:text="💰 Saldo"
                                 android:textSize="12sp"
                                 android:textColor="#757575" />
 
@@ -137,6 +137,16 @@
                                 android:layout_marginTop="4dp" />
                         </LinearLayout>
                     </LinearLayout>
+
+                    <!-- ✅ NUOVO: Nota esplicativa -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="ℹ️ Il saldo include il saldo iniziale del conto"
+                        android:textSize="10sp"
+                        android:textColor="#9E9E9E"
+                        android:gravity="center"
+                        android:layout_marginTop="8dp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -163,7 +173,7 @@
 
     </LinearLayout>
 
-    <!-- ✅ FAB per aggiungere movimento -->
+    <!-- FAB per aggiungere movimento -->
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/fabAggiungiMovimento"
         android:layout_width="wrap_content"
