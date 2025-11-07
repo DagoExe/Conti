@@ -5,21 +5,40 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/navigation_home">
 
+    <!-- ✅ NUOVO: Rate Fragment -->
+    <fragment
+        android:id="@+id/navigation_rate"
+        android:name="com.example.conti.ui.rate.RateFragment"
+        android:label="Rate"
+        tools:layout="@layout/fragment_rate" />
+
+    <fragment
+        android:id="@+id/navigation_conti"
+        android:name="com.example.conti.ui.conti.ContiFragment"
+        android:label="Conti"
+        tools:layout="@layout/fragment_conti">
+
+        <action
+            android:id="@+id/action_conti_to_movimenti"
+            app:destination="@id/navigation_movimenti"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/slide_out_right"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@android:anim/fade_out" />
+    </fragment>
+
     <fragment
         android:id="@+id/navigation_home"
         android:name="com.example.conti.ui.home.HomeFragment"
         android:label="Home"
         tools:layout="@layout/fragment_home" />
 
-    <!-- ✅ MovimentiFragment diventa una destinazione di DETTAGLIO,
-         non più una destinazione principale della bottom navigation -->
     <fragment
         android:id="@+id/navigation_movimenti"
         android:name="com.example.conti.ui.movimenti.MovimentiFragment"
         android:label="Movimenti"
         tools:layout="@layout/fragment_movimenti">
 
-        <!-- Argomenti per filtrare per conto -->
         <argument
             android:name="accountId"
             app:argType="string"
@@ -39,20 +58,11 @@
         android:label="Abbonamenti"
         tools:layout="@layout/fragment_abbonamenti" />
 
+    <!-- ✅ NUOVO: Debiti Fragment -->
     <fragment
-        android:id="@+id/navigation_conti"
-        android:name="com.example.conti.ui.conti.ContiFragment"
-        android:label="Conti"
-        tools:layout="@layout/fragment_conti">
-
-        <!-- ✅ Azione per navigare ai movimenti di un conto -->
-        <action
-            android:id="@+id/action_conti_to_movimenti"
-            app:destination="@id/navigation_movimenti"
-            app:enterAnim="@android:anim/slide_in_left"
-            app:exitAnim="@android:anim/slide_out_right"
-            app:popEnterAnim="@android:anim/fade_in"
-            app:popExitAnim="@android:anim/fade_out" />
-    </fragment>
+        android:id="@+id/navigation_debiti"
+        android:name="com.example.conti.ui.debiti.DebitiFragment"
+        android:label="Debiti"
+        tools:layout="@layout/fragment_debiti" />
 
 </navigation>

@@ -235,15 +235,9 @@ class MainActivity : AppCompatActivity() {
                 val currentDestination = navController.currentDestination?.id
 
                 when (item.itemId) {
-                    R.id.navigation_home -> {
-                        if (currentDestination != R.id.navigation_home) {
-                            navController.navigate(R.id.navigation_home)
-                        }
-                        true
-                    }
-                    R.id.navigation_abbonamenti -> {
-                        if (currentDestination != R.id.navigation_abbonamenti) {
-                            navController.navigate(R.id.navigation_abbonamenti)
+                    R.id.navigation_rate -> {
+                        if (currentDestination != R.id.navigation_rate) {
+                            navController.navigate(R.id.navigation_rate)
                         }
                         true
                     }
@@ -259,6 +253,24 @@ class MainActivity : AppCompatActivity() {
                         }
                         true
                     }
+                    R.id.navigation_home -> {
+                        if (currentDestination != R.id.navigation_home) {
+                            navController.navigate(R.id.navigation_home)
+                        }
+                        true
+                    }
+                    R.id.navigation_abbonamenti -> {
+                        if (currentDestination != R.id.navigation_abbonamenti) {
+                            navController.navigate(R.id.navigation_abbonamenti)
+                        }
+                        true
+                    }
+                    R.id.navigation_debiti -> {
+                        if (currentDestination != R.id.navigation_debiti) {
+                            navController.navigate(R.id.navigation_debiti)
+                        }
+                        true
+                    }
                     else -> false
                 }
             }
@@ -266,10 +278,12 @@ class MainActivity : AppCompatActivity() {
             // ✅ Listener per aggiornare il titolo della toolbar
             navController.addOnDestinationChangedListener { _, destination, _ ->
                 binding.toolbar.title = when (destination.id) {
-                    R.id.navigation_home -> "Home"
-                    R.id.navigation_movimenti -> "Movimenti"
-                    R.id.navigation_abbonamenti -> "Abbonamenti"
+                    R.id.navigation_rate -> "Rate"
                     R.id.navigation_conti -> "I Tuoi Conti"
+                    R.id.navigation_home -> "Home"
+                    R.id.navigation_abbonamenti -> "Abbonamenti"
+                    R.id.navigation_debiti -> "Debiti"
+                    R.id.navigation_movimenti -> "Movimenti"
                     else -> "Conti"
                 }
             }
