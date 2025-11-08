@@ -1,32 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    ✨ SCHERMATA LOGIN PREMIUM - Design da Figma "MONIO"
-
-    Questo layout replica fedelmente il design premium trovato su Figma:
-    - Background scuro zinc-950 (#09090B)
-    - Logo MONIO con gradiente dorato
-    - Pulsante Google Sign-In
-    - Form email/password minimale
-    - Pulsante principale con gradiente dorato
-
-    Corrisponde a: LoginScreen component del design Figma
+    ✨ SCHERMATA REGISTRAZIONE PREMIUM - Design da Figma "MONIO"
+    Complementare alla schermata login, mantiene lo stesso stile premium
 -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:background="@color/zinc_950">
+    android:background="@color/zinc_950"
+    tools:context=".auth.RegisterActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="24dp"
-        android:minHeight="?android:attr/listPreferredItemHeight">
+        android:padding="24dp">
 
-        <!-- ========== SEZIONE LOGO ========== -->
-
-        <!-- Logo/Brand MONIO con gradiente dorato (Figma) -->
+        <!-- Logo MONIO -->
         <TextView
             android:id="@+id/tvLogoMonio"
             android:layout_width="wrap_content"
@@ -42,12 +33,12 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="60dp" />
 
-        <!-- Sottotitolo premium (Figma) -->
+        <!-- Sottotitolo -->
         <TextView
             android:id="@+id/tvSubtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Premium Banking Experience"
+            android:text="Create your account"
             android:textSize="14sp"
             android:textColor="@color/text_tertiary"
             app:layout_constraintTop_toBottomOf="@id/tvLogoMonio"
@@ -55,9 +46,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="12dp" />
 
-        <!-- ========== FORM CONTAINER ========== -->
-
-        <!-- Container principale per il form (Figma card style) -->
+        <!-- Container del form -->
         <LinearLayout
             android:id="@+id/layoutFormContainer"
             android:layout_width="0dp"
@@ -67,71 +56,34 @@
             app:layout_constraintTop_toBottomOf="@id/tvSubtitle"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
             android:layout_marginTop="48dp">
 
-            <!-- ========== GOOGLE SIGN-IN (Figma) ========== -->
+            <!-- Input Nome Completo -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Full Name"
+                android:textSize="14sp"
+                android:textColor="@color/text_secondary"
+                android:layout_marginBottom="8dp" />
 
-            <!-- Pulsante Google Sign-In bianco -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnGoogleSignIn"
+            <EditText
+                android:id="@+id/etFullName"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:text="Sign in with Google"
-                android:textColor="@color/zinc_900"
+                android:hint="John Doe"
+                android:textColorHint="@color/text_tertiary"
+                android:textColor="@color/text_primary"
                 android:textSize="16sp"
-                android:textAllCaps="false"
-                android:fontFamily="sans-serif-medium"
-                app:icon="@drawable/ic_google"
-                app:iconGravity="textStart"
-                app:iconPadding="12dp"
-                app:iconTint="@null"
-                app:backgroundTint="@color/white"
-                app:cornerRadius="12dp"
-                app:strokeWidth="0dp"
-                android:elevation="0dp"
-                app:rippleColor="@color/zinc_200"
-                android:layout_marginBottom="24dp" />
+                android:inputType="textPersonName|textCapWords"
+                android:imeOptions="actionNext"
+                android:background="@drawable/bg_input_dark"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:layout_marginBottom="20dp" />
 
-            <!-- ========== DIVIDER "Or continue with email" (Figma) ========== -->
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="24dp">
-
-                <!-- Linea sinistra -->
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="1dp"
-                    android:layout_weight="1"
-                    android:background="@color/zinc_800" />
-
-                <!-- Testo centrale -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Or continue with email"
-                    android:textSize="12sp"
-                    android:textColor="@color/text_tertiary"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp" />
-
-                <!-- Linea destra -->
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="1dp"
-                    android:layout_weight="1"
-                    android:background="@color/zinc_800" />
-            </LinearLayout>
-
-            <!-- ========== INPUT EMAIL (Figma) ========== -->
-
-            <!-- Label Email -->
+            <!-- Input Email -->
             <TextView
-                android:id="@+id/tvLabelEmail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Email"
@@ -139,7 +91,6 @@
                 android:textColor="@color/text_secondary"
                 android:layout_marginBottom="8dp" />
 
-            <!-- Input Email -->
             <EditText
                 android:id="@+id/etEmail"
                 android:layout_width="match_parent"
@@ -155,11 +106,8 @@
                 android:paddingEnd="16dp"
                 android:layout_marginBottom="20dp" />
 
-            <!-- ========== INPUT PASSWORD (Figma) ========== -->
-
-            <!-- Label Password -->
+            <!-- Input Password -->
             <TextView
-                android:id="@+id/tvLabelPassword"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Password"
@@ -167,9 +115,32 @@
                 android:textColor="@color/text_secondary"
                 android:layout_marginBottom="8dp" />
 
-            <!-- Input Password -->
             <EditText
                 android:id="@+id/etPassword"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:hint="••••••••"
+                android:textColorHint="@color/text_tertiary"
+                android:textColor="@color/text_primary"
+                android:textSize="16sp"
+                android:inputType="textPassword"
+                android:imeOptions="actionNext"
+                android:background="@drawable/bg_input_dark"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:layout_marginBottom="20dp" />
+
+            <!-- Input Conferma Password -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Confirm Password"
+                android:textSize="14sp"
+                android:textColor="@color/text_secondary"
+                android:layout_marginBottom="8dp" />
+
+            <EditText
+                android:id="@+id/etConfirmPassword"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:hint="••••••••"
@@ -183,14 +154,12 @@
                 android:paddingEnd="16dp"
                 android:layout_marginBottom="28dp" />
 
-            <!-- ========== PULSANTE SIGN IN PRINCIPALE (Figma - gold gradient) ========== -->
-
-            <!-- Pulsante Sign In con gradiente dorato -->
+            <!-- Pulsante Create Account -->
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnSignIn"
+                android:id="@+id/btnCreateAccount"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:text="Sign In"
+                android:text="Create Account"
                 android:textColor="@color/zinc_950"
                 android:textSize="16sp"
                 android:textStyle="bold"
@@ -202,14 +171,12 @@
                 app:rippleColor="@color/gold_dark"
                 android:layout_marginBottom="24dp" />
 
-            <!-- ========== LINK REGISTRAZIONE (Figma) ========== -->
-
-            <!-- Link per registrazione -->
+            <!-- Link Login -->
             <TextView
-                android:id="@+id/tvSignUpLink"
+                android:id="@+id/tvSignInLink"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Don't have an account? Sign up"
+                android:text="Already have an account? Sign in"
                 android:textSize="14sp"
                 android:textColor="@color/text_tertiary"
                 android:layout_gravity="center"
@@ -217,14 +184,21 @@
                 android:focusable="true"
                 android:padding="8dp" />
 
-            <!-- Spaziatore bottom per evitare che il content sia troppo in basso -->
-            <Space
+            <!-- Privacy Policy -->
+            <TextView
+                android:id="@+id/tvPrivacy"
                 android:layout_width="match_parent"
-                android:layout_height="32dp" />
+                android:layout_height="wrap_content"
+                android:text="By creating an account, you agree to our Terms of Service and Privacy Policy"
+                android:textSize="11sp"
+                android:textColor="@color/zinc_600"
+                android:gravity="center"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="32dp" />
 
         </LinearLayout>
 
-        <!-- ProgressBar (nascosto di default, mostra durante il caricamento) -->
+        <!-- ProgressBar -->
         <ProgressBar
             android:id="@+id/progressBar"
             android:layout_width="wrap_content"

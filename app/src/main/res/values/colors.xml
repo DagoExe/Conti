@@ -1,5 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- ===== COLORI BASE ===== -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- ===== PALETTE PREMIUM MONIO (da Figma) ===== -->
+    <!-- Background Colors - Zinc Scale -->
+    <color name="zinc_950">#09090B</color>
+    <color name="zinc_900">#18181B</color>
+    <color name="zinc_800">#27272A</color>
+    <color name="zinc_700">#3F3F46</color>
+    <color name="zinc_600">#52525B</color>
+    <color name="zinc_500">#71717A</color>
+    <color name="zinc_400">#A1A1AA</color>
+    <color name="zinc_300">#D4D4D8</color>
+    <color name="zinc_200">#E4E4E7</color>
+    <color name="zinc_100">#F4F4F5</color>
+
+    <!-- Gold Gradient Colors -->
+    <color name="gold_primary">#BFA14A</color>
+    <color name="gold_light">#D4B86A</color>
+    <color name="gold_dark">#9A7D35</color>
+
+    <!-- Accent Colors -->
+    <color name="emerald_500">#10B981</color>
+    <color name="emerald_600">#059669</color>
+    <color name="violet_500">#8B5CF6</color>
+    <color name="red_500">#EF4444</color>
+
+    <!-- Text Colors -->
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#A1A1AA</color>
+    <color name="text_tertiary">#71717A</color>
+
+    <!-- Background Overlay -->
+    <color name="overlay_dark">#80000000</color>
 </resources>

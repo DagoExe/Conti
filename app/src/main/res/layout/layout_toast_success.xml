@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    ✨ TOAST PERSONALIZZATO - SUCCESSO
+    
+    Design premium per messaggi di successo:
+    - Background verde emerald scuro
+    - Icona check circle
+    - Testo bianco chiaro
+    - Border radius 12dp
+    - Elevation per profondità
+    
+    Usage: Mostrare feedback positivo (login riuscito, email inviata, etc.)
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@drawable/bg_toast_success"
+    android:paddingStart="20dp"
+    android:paddingEnd="20dp"
+    android:paddingTop="16dp"
+    android:paddingBottom="16dp"
+    android:gravity="center_vertical"
+    android:minWidth="280dp"
+    android:elevation="8dp">
+
+    <!-- Icona Check Circle -->
+    <ImageView
+        android:id="@+id/ivToastIcon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/ic_check_circle"
+        app:tint="@color/white"
+        android:contentDescription="Success icon"
+        android:layout_marginEnd="12dp" />
+
+    <!-- Testo del messaggio -->
+    <TextView
+        android:id="@+id/tvToastMessage"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Operation successful"
+        android:textColor="@color/white"
+        android:textSize="15sp"
+        android:fontFamily="sans-serif-medium"
+        android:maxLines="2"
+        android:ellipsize="end" />
+
+</LinearLayout>

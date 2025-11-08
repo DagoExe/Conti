@@ -37,6 +37,19 @@
             </intent-filter>
         </activity>
 
+        <!-- ✅ RegisterActivity - Activity di registrazione -->
+        <activity
+            android:name="com.example.conti.auth.RegisterActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Conti"
+            android:windowSoftInputMode="adjustResize"
+            android:parentActivityName="com.example.conti.auth.LoginActivity">
+            <!-- Meta-data per supporto navigazione back -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.conti.auth.LoginActivity" />
+        </activity>
+
         <!-- MainActivity - Activity principale (dopo login) -->
         <activity
             android:name="com.example.conti.MainActivity"
