@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Color selector per Bottom Navigation
+    - Selezionato: Gold Primary
+    - Non selezionato: Zinc 500
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="@color/gold_primary" android:state_checked="true" />
+    <item android:color="@color/gold_primary" android:state_selected="true" />
+    <item android:color="@color/zinc_500" />
+</selector>
