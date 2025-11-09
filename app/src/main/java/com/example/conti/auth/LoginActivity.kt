@@ -8,7 +8,6 @@ import android.view.View
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.TextView
-import android.widget.Toast
 import com.example.conti.utils.MessageHelper
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -27,7 +26,9 @@ import kotlinx.coroutines.launch
 /**
  * ✨ LoginActivity - versione aggiornata con dialog premium Figma (activity_login.xml)
  *
- * AGGIORNATO con dialog custom premium che seguono il design system MONIO
+ * AGGIORNATO con:
+ * - Dialog custom premium che seguono il design system MONIO
+ * - Toast posizionati nella parte INFERIORE dello schermo
  *
  * Features:
  * - Email/Password login
@@ -74,9 +75,9 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        Log.d(TAG, "╔════════════════════════════════════════╗")
+        Log.d(TAG, "╔═══════════════════════════════════════╗")
         Log.d(TAG, "   LOGIN ACTIVITY STARTED (PREMIUM UI)")
-        Log.d(TAG, "╚════════════════════════════════════════╝")
+        Log.d(TAG, "╚═══════════════════════════════════════╝")
 
         setupUI()
         checkIfAlreadyLoggedIn()
@@ -124,6 +125,7 @@ class LoginActivity : AppCompatActivity() {
                 .onSuccess { user ->
                     Log.d(TAG, "✅ Login riuscito per ${user.email}")
                     if (user.isEmailVerified) {
+                        // ✅ Toast SUCCESSO in basso
                         MessageHelper.showSuccess(this@LoginActivity, "Benvenuto!")
                         navigateToMain()
                     } else {
@@ -174,6 +176,7 @@ class LoginActivity : AppCompatActivity() {
         lifecycleScope.launch {
             authManager.signInWithGoogle(account)
                 .onSuccess { user ->
+                    // ✅ Toast SUCCESSO in basso
                     MessageHelper.showSuccess(
                         this@LoginActivity,
                         "Benvenuto ${user.displayName ?: ""}!"
@@ -214,7 +217,8 @@ class LoginActivity : AppCompatActivity() {
             onLogoutClick = {
                 // Logout
                 authManager.signOut()
-                Toast.makeText(this, "👋 Disconnesso", Toast.LENGTH_SHORT).show()
+                // ✅ Toast SUCCESSO in basso (sostituito Toast.makeText)
+                MessageHelper.showSuccess(this, "👋 Disconnesso")
             }
         )
     }
@@ -224,9 +228,11 @@ class LoginActivity : AppCompatActivity() {
         lifecycleScope.launch {
             authManager.reloadUser()
             if (authManager.isEmailVerified) {
+                // ✅ Toast SUCCESSO in basso
                 MessageHelper.showSuccess(this@LoginActivity, "Email verificata!")
                 navigateToMain()
             } else {
+                // ❌ Toast ERRORE in basso
                 MessageHelper.showError(
                     this@LoginActivity,
                     "Email non ancora verificata. Controlla la tua casella."
@@ -241,6 +247,7 @@ class LoginActivity : AppCompatActivity() {
         lifecycleScope.launch {
             authManager.sendEmailVerification()
                 .onSuccess {
+                    // ✅ Toast SUCCESSO in basso
                     MessageHelper.showSuccess(
                         this@LoginActivity,
                         "Email di verifica inviata. Controlla la tua casella."
@@ -257,6 +264,7 @@ class LoginActivity : AppCompatActivity() {
 
     private fun validateLoginInput(email: String, password: String): Boolean {
         if (email.isEmpty()) {
+            // ❌ Toast ERRORE in basso
             MessageHelper.showError(this, "Inserisci la tua email")
             return false
         }
@@ -285,6 +293,7 @@ class LoginActivity : AppCompatActivity() {
             else -> "Errore: ${exception.message ?: "Sconosciuto"}"
         }
 
+        // ❌ Toast ERRORE in basso
         MessageHelper.showError(this, message)
         Log.e(TAG, "Errore autenticazione: ${exception.message}", exception)
     }

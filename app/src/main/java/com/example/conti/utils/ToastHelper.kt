@@ -8,36 +8,28 @@ import android.widget.Toast
 import com.example.conti.R
 
 /**
- * ✨ MessageHelper - Wrapper per messaggi con toast posizionati in BASSO
+ * ✨ TOAST HELPER - Posizionamento Personalizzato
  *
- * Questa classe fornisce metodi semplici per mostrare messaggi di successo ed errore
- * utilizzando i layout personalizzati premium (design Figma MONIO).
+ * Questa classe gestisce la creazione e visualizzazione di toast personalizzati
+ * con posizionamento nella parte INFERIORE dello schermo.
  *
- * AGGIORNAMENTO: I toast ora appaiono nella parte INFERIORE dello schermo.
+ * Features:
+ * - Toast di successo (verde) e errore (rosso)
+ * - Posizionamento in basso con margine dal bordo
+ * - Layout personalizzati da Figma
+ * - Durata configurabile
  *
  * Usage:
- *   MessageHelper.showSuccess(context, "Operazione completata!")
- *   MessageHelper.showError(context, "Si è verificato un errore")
- *
- * Design Reference: Figma "MONIO" - Toast Components
+ *   ToastHelper.showSuccess(context, "Operazione completata!")
+ *   ToastHelper.showError(context, "Si è verificato un errore")
  */
-object MessageHelper {
+object ToastHelper {
 
     /**
-     * 🎯 MARGINE DAL BORDO INFERIORE
+     * Mostra un toast di SUCCESSO nella parte inferiore dello schermo
      *
-     * Modifica questo valore per cambiare la posizione dei toast:
-     * - 80dp: Ideale se hai una Bottom Navigation Bar
-     * - 120dp: Standard (consigliato)
-     * - 150dp: Più distante dal bordo
-     */
-    private const val BOTTOM_MARGIN_DP = 120
-
-    /**
-     * ✅ Mostra un messaggio di SUCCESSO nella parte inferiore dello schermo
-     *
-     * @param context Context dell'Activity o Fragment
-     * @param message Testo del messaggio da mostrare
+     * @param context Context dell'applicazione
+     * @param message Messaggio da mostrare
      * @param duration Toast.LENGTH_SHORT (default) o Toast.LENGTH_LONG
      */
     fun showSuccess(
@@ -54,10 +46,10 @@ object MessageHelper {
     }
 
     /**
-     * ❌ Mostra un messaggio di ERRORE nella parte inferiore dello schermo
+     * Mostra un toast di ERRORE nella parte inferiore dello schermo
      *
-     * @param context Context dell'Activity o Fragment
-     * @param message Testo del messaggio da mostrare
+     * @param context Context dell'applicazione
+     * @param message Messaggio da mostrare
      * @param duration Toast.LENGTH_SHORT (default) o Toast.LENGTH_LONG
      */
     fun showError(
@@ -74,17 +66,11 @@ object MessageHelper {
     }
 
     /**
-     * 🔧 Metodo interno per creare e mostrare toast personalizzati
-     *
-     * Questo metodo:
-     * 1. Infla il layout custom (success o error)
-     * 2. Imposta il messaggio
-     * 3. Posiziona il toast in BASSO con margine configurabile
-     * 4. Mostra il toast
+     * Metodo interno per creare e mostrare toast personalizzati
      *
      * @param context Context dell'applicazione
      * @param message Messaggio da mostrare
-     * @param layoutResId ID del layout custom (layout_toast_success o layout_toast_error)
+     * @param layoutResId ID del layout custom (toast_success o toast_error)
      * @param duration Durata del toast
      */
     private fun showCustomToast(
@@ -93,7 +79,7 @@ object MessageHelper {
         layoutResId: Int,
         duration: Int
     ) {
-        // Infla il layout personalizzato
+        // Inflater del layout personalizzato
         val inflater = LayoutInflater.from(context)
         val layout = inflater.inflate(layoutResId, null)
 
@@ -107,7 +93,7 @@ object MessageHelper {
             setGravity(
                 Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL,
                 0,  // offset X (0 = centrato orizzontalmente)
-                BOTTOM_MARGIN_DP  // offset Y (distanza dal bordo inferiore)
+                120 // offset Y (distanza dal bordo inferiore in dp - circa 120dp)
             )
             this.duration = duration
             view = layout
@@ -118,10 +104,7 @@ object MessageHelper {
     }
 
     /**
-     * ⚙️ Variante con margine personalizzabile
-     *
-     * Usa questo metodo se hai bisogno di un margine diverso da quello standard
-     * (es. per adattarti a una Bottom Navigation Bar)
+     * Variante con margine personalizzabile dal bordo inferiore
      *
      * @param context Context dell'applicazione
      * @param message Messaggio da mostrare
@@ -162,15 +145,8 @@ object MessageHelper {
     }
 
     /**
-     * 🧭 Mostra toast sopra la Bottom Navigation Bar
-     *
-     * Usa questo metodo se la tua app ha una Bottom Navigation Bar fissa
-     * e vuoi che il toast appaia sopra di essa (80dp dal bordo invece di 120dp)
-     *
-     * @param context Context dell'applicazione
-     * @param message Messaggio da mostrare
-     * @param isSuccess true per toast success, false per toast error
-     * @param duration Durata del toast
+     * Mostra toast sopra la Bottom Navigation Bar (circa 80dp dal bordo)
+     * Utile quando hai una bottom bar fissa
      */
     fun showAboveBottomNav(
         context: Context,
@@ -183,24 +159,7 @@ object MessageHelper {
             message = message,
             isSuccess = isSuccess,
             duration = duration,
-            bottomMarginDp = 80  // Più vicino al bordo per stare sopra la bottom nav
+            bottomMarginDp = 80 // Più vicino al bordo per stare sopra la bottom nav
         )
-    }
-
-    /**
-     * ℹ️ Mostra un messaggio informativo (usa stile success)
-     *
-     * @param context Context dell'applicazione
-     * @param message Messaggio da mostrare
-     * @param duration Durata del toast
-     */
-    fun showInfo(
-        context: Context,
-        message: String,
-        duration: Int = Toast.LENGTH_SHORT
-    ) {
-        // Per ora usiamo lo stile success per i messaggi informativi
-        // Se vuoi un terzo stile, crea layout_toast_info.xml
-        showSuccess(context, message, duration)
     }
 }
