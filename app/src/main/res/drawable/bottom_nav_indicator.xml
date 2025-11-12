@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Indicatore attivo per Bottom Navigation
+    - Background oro a forma di pill/capsule
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <!-- Background dorato -->
+    <solid android:color="@color/gold_primary" />
+
+    <!-- Forma arrotondata (pill) -->
+    <corners android:radius="32dp" />
+
+    <!-- Dimensioni -->
+    <size
+        android:width="56dp"
+        android:height="56dp" />
+
+</shape>

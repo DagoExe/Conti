@@ -227,53 +227,36 @@ class MainActivity : AppCompatActivity() {
 
             val navController = navHostFragment.navController
 
-            // ✅ Setup STANDARD della bottom navigation
-            binding.bottomNavigation.setupWithNavController(navController)
-
             // ✅ Listener personalizzato per gestire il "re-click" sulla stessa tab
             binding.bottomNavigation.setOnItemSelectedListener { item ->
-                val currentDestination = navController.currentDestination?.id
-
                 when (item.itemId) {
                     R.id.navigation_rate -> {
-                        if (currentDestination != R.id.navigation_rate) {
-                            navController.navigate(R.id.navigation_rate)
-                        }
+                        // Naviga a Rate
+                        navController.navigate(R.id.navigation_rate)
                         true
                     }
                     R.id.navigation_conti -> {
-                        if (currentDestination == R.id.navigation_conti) {
-                            android.util.Log.d("MainActivity", "👍 Già nella lista Conti")
-                        } else if (currentDestination == R.id.navigation_movimenti) {
-                            android.util.Log.d("MainActivity", "⬅️ Torna alla lista Conti da Movimenti")
-                            navController.popBackStack(R.id.navigation_conti, false)
-                        } else {
-                            android.util.Log.d("MainActivity", "➡️ Naviga a Conti")
-                            navController.navigate(R.id.navigation_conti)
-                        }
+                        navController.navigate(R.id.navigation_conti)
                         true
                     }
                     R.id.navigation_home -> {
-                        if (currentDestination != R.id.navigation_home) {
-                            navController.navigate(R.id.navigation_home)
-                        }
+                        navController.navigate(R.id.navigation_home)
                         true
                     }
                     R.id.navigation_abbonamenti -> {
-                        if (currentDestination != R.id.navigation_abbonamenti) {
-                            navController.navigate(R.id.navigation_abbonamenti)
-                        }
+                        navController.navigate(R.id.navigation_abbonamenti)
                         true
                     }
                     R.id.navigation_debiti -> {
-                        if (currentDestination != R.id.navigation_debiti) {
-                            navController.navigate(R.id.navigation_debiti)
-                        }
+                        navController.navigate(R.id.navigation_debiti)
                         true
                     }
                     else -> false
                 }
             }
+
+            // ✅ Setup STANDARD della bottom navigation
+            binding.bottomNavigation.setupWithNavController(navController)
 
             // ✅ Listener per aggiornare il titolo della toolbar
             navController.addOnDestinationChangedListener { _, destination, _ ->

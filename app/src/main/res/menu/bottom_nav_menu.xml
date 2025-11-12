@@ -1,29 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    ✨ BOTTOM NAVIGATION MENU - Design Premium MONIO
+
+    Icone personalizzate per:
+    - Rate (calendario pagamenti)
+    - Conti (portafoglio)
+    - Home (dashboard)
+    - Abbonamenti (ricorrenti)
+    - Debiti (scontrino/documenti)
+-->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
         android:id="@+id/navigation_rate"
-        android:icon="@android:drawable/ic_menu_sort_by_size"
-        android:title="Rate" />
+        android:icon="@drawable/ic_nav_rate"
+        android:title="Rate"
+        android:enabled="true" />
 
     <item
         android:id="@+id/navigation_conti"
-        android:icon="@android:drawable/ic_menu_manage"
-        android:title="Conti" />
+        android:icon="@drawable/ic_nav_conti"
+        android:title="Conti"
+        android:enabled="true" />
 
     <item
         android:id="@+id/navigation_home"
-        android:icon="@android:drawable/ic_menu_view"
-        android:title="Home" />
+        android:icon="@drawable/ic_nav_home"
+        android:title="Home"
+        android:enabled="true" />
 
     <item
         android:id="@+id/navigation_abbonamenti"
-        android:icon="@android:drawable/ic_menu_month"
-        android:title="Abbonamenti" />
+        android:icon="@drawable/ic_nav_abbonamenti"
+        android:title="Abbonamenti"
+        android:enabled="true" />
 
     <item
         android:id="@+id/navigation_debiti"
-        android:icon="@android:drawable/ic_menu_report_image"
-        android:title="Debiti" />
+        android:icon="@drawable/ic_nav_debiti"
+        android:title="Debiti"
+        android:enabled="true" />
 
 </menu>

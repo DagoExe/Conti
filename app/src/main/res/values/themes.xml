@@ -1,20 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    ✨ TEMA PREMIUM MONIO - Material Design 3
-
-    Design ispirato al Figma "MONIO":
-    - Background scuro zinc-950
-    - Accenti dorati (gold gradient)
-    - Card zinc-900 con bordi zinc-800
-    - Typography bianca con sfumature zinc
--->
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- ===== TEMA BASE - MONIO PREMIUM ===== -->
     <style name="Base.Theme.Conti" parent="Theme.Material3.DayNight.NoActionBar">
 
         <!-- ========== COLORI PRIMARI ========== -->
-        <!-- Colore primario - Gold Gradient -->
         <item name="colorPrimary">@color/gold_primary</item>
         <item name="colorPrimaryVariant">@color/gold_dark</item>
         <item name="colorOnPrimary">@color/zinc_950</item>
@@ -51,26 +41,6 @@
         <item name="android:textColorPrimary">@color/text_primary</item>
         <item name="android:textColorSecondary">@color/text_secondary</item>
         <item name="android:textColorTertiary">@color/text_tertiary</item>
-
-        <!-- ========== MATERIAL COMPONENTS ========== -->
-        <!-- Button -->
-        <item name="materialButtonStyle">@style/Widget.Monio.Button</item>
-        <item name="materialButtonOutlinedStyle">@style/Widget.Monio.Button.Outlined</item>
-
-        <!-- Card -->
-        <item name="materialCardViewStyle">@style/Widget.Monio.CardView</item>
-
-        <!-- TextInputLayout -->
-        <item name="textInputStyle">@style/Widget.Monio.TextInputLayout</item>
-
-        <!-- Bottom Navigation -->
-        <item name="bottomNavigationStyle">@style/Widget.Monio.BottomNavigationView</item>
-
-        <!-- Toolbar -->
-        <item name="toolbarStyle">@style/Widget.Monio.Toolbar</item>
-
-        <!-- FloatingActionButton -->
-        <item name="floatingActionButtonStyle">@style/Widget.Monio.FloatingActionButton</item>
 
     </style>
 
@@ -113,80 +83,40 @@
         <item name="strokeWidth">1dp</item>
     </style>
 
-    <!-- TextInputLayout Premium -->
-    <style name="Widget.Monio.TextInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
-        <item name="boxStrokeColor">@color/zinc_700</item>
-        <item name="boxStrokeWidth">1dp</item>
-        <item name="hintTextColor">@color/text_tertiary</item>
-        <item name="android:textColorHint">@color/text_tertiary</item>
-        <item name="boxBackgroundColor">@android:color/transparent</item>
-        <item name="shapeAppearance">@style/ShapeAppearance.Monio.SmallComponent</item>
-    </style>
-
-    <!-- Bottom Navigation Premium -->
+    <!-- Bottom Navigation Premium - Stile Figma -->
     <style name="Widget.Monio.BottomNavigationView" parent="Widget.Material3.BottomNavigationView">
-        <item name="backgroundTint">@color/zinc_900</item>
+        <item name="backgroundTint">@color/zinc_950</item>
         <item name="itemIconTint">@color/bottom_nav_color</item>
-        <item name="itemTextColor">@color/bottom_nav_color</item>
+        <item name="itemTextColor">@color/bottom_nav_text_color</item>
+        <item name="itemIconSize">24dp</item>
+        <item name="itemPaddingTop">8dp</item>
+        <item name="itemPaddingBottom">8dp</item>
+        <item name="labelVisibilityMode">labeled</item>
         <item name="itemActiveIndicatorStyle">@style/Widget.Monio.BottomNavigationView.ActiveIndicator</item>
         <item name="elevation">8dp</item>
     </style>
 
+    <!-- Indicatore Attivo con Background Oro -->
     <style name="Widget.Monio.BottomNavigationView.ActiveIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
-        <item name="android:color">@color/zinc_800</item>
+        <item name="android:color">@color/gold_primary</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.Monio.BottomNav.ActiveIndicator</item>
+        <item name="android:width">56dp</item>
+        <item name="android:height">32dp</item>
+        <item name="marginHorizontal">0dp</item>
+    </style>
+
+    <!-- Forma dell'Indicatore Attivo -->
+    <style name="ShapeAppearance.Monio.BottomNav.ActiveIndicator" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
     </style>
 
     <!-- Toolbar Premium -->
     <style name="Widget.Monio.Toolbar" parent="Widget.Material3.Toolbar">
-        <item name="titleTextColor">@color/text_primary</item>
+        <item name="titleTextColor">@color/gold_primary</item>
         <item name="subtitleTextColor">@color/text_secondary</item>
         <item name="android:background">@color/zinc_900</item>
         <item name="android:elevation">4dp</item>
     </style>
 
-    <!-- FloatingActionButton Premium -->
-    <style name="Widget.Monio.FloatingActionButton" parent="Widget.Material3.FloatingActionButton.Primary">
-        <item name="backgroundTint">@color/gold_primary</item>
-        <item name="tint">@color/zinc_950</item>
-        <item name="rippleColor">@color/gold_dark</item>
-        <item name="shapeAppearance">@style/ShapeAppearance.Monio.SmallComponent</item>
-    </style>
-
-    <!-- Shape Appearance per corner radius consistente -->
-    <style name="ShapeAppearance.Monio.SmallComponent" parent="">
-        <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">12dp</item>
-    </style>
-
-    <!-- ========== DIALOG THEME ========== -->
-    <style name="ThemeOverlay.Monio.Dialog" parent="ThemeOverlay.Material3.Dialog">
-        <item name="colorSurface">@color/zinc_900</item>
-        <item name="colorOnSurface">@color/text_primary</item>
-        <item name="android:backgroundDimAmount">0.7</item>
-    </style>
-
-    <!-- ========== TOOLBAR POPUP MENU ========== -->
-    <style name="ThemeOverlay.Monio.Toolbar.Popup" parent="ThemeOverlay.Material3.Dark">
-        <item name="colorSurface">@color/zinc_800</item>
-        <item name="colorOnSurface">@color/text_primary</item>
-    </style>
-
-    <!-- ========== TEXT STYLES ========== -->
-    <style name="TextAppearance.Monio.Headline" parent="TextAppearance.Material3.HeadlineMedium">
-        <item name="android:textColor">@color/text_primary</item>
-        <item name="fontFamily">sans-serif-medium</item>
-    </style>
-
-    <style name="TextAppearance.Monio.Title" parent="TextAppearance.Material3.TitleLarge">
-        <item name="android:textColor">@color/text_primary</item>
-        <item name="fontFamily">sans-serif-medium</item>
-    </style>
-
-    <style name="TextAppearance.Monio.Body" parent="TextAppearance.Material3.BodyLarge">
-        <item name="android:textColor">@color/text_secondary</item>
-    </style>
-
-    <style name="TextAppearance.Monio.Caption" parent="TextAppearance.Material3.BodySmall">
-        <item name="android:textColor">@color/text_tertiary</item>
-    </style>
 </resources>

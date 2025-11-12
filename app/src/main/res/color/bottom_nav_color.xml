@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Color selector per Bottom Navigation
-    - Selezionato: Gold Primary
-    - Non selezionato: Zinc 500
+    Color selector per Bottom Navigation Icons
+    - Selezionato: Scuro (zinc-950) per contrasto con background oro
+    - Non selezionato: Grigio chiaro (zinc-400)
 -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:color="@color/gold_primary" android:state_checked="true" />
-    <item android:color="@color/gold_primary" android:state_selected="true" />
-    <item android:color="@color/zinc_500" />
+    <!-- Stato selezionato - Scuro per contrasto con oro -->
+    <item android:color="@color/zinc_950" android:state_checked="true" />
+    <item android:color="@color/zinc_950" android:state_selected="true" />
+
+    <!-- Stato normale - Grigio chiaro -->
+    <item android:color="@color/zinc_400" />
 </selector>
