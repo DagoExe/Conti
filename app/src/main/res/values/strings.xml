@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Conti</string>
+    <string name="app_name">MONIO</string>
+    <string name="app_name_full">MONIO - Gestione Finanze</string>
 
     <!-- ✅ IMPORTANTE: Questo viene generato automaticamente da google-services.json -->
     <!-- Non modificarlo manualmente, verrà sovrascritto -->
