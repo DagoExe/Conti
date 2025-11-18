@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<!--
+    ✨ FRAGMENT HOME - Dashboard MONIO
+
+    REFACTORED:
+    - Card styles unificati
+    - Text appearance consistente
+    - Spacing standardizzato
+    - Color references
+--><ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -10,159 +18,155 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="@dimen/spacing_md">
 
         <!-- Card Riepilogo Totale -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:cardElevation="4dp"
-            app:cardCornerRadius="12dp"
-            app:cardBackgroundColor="#2196F3">
+            android:layout_marginBottom="@dimen/spacing_md"
+            app:cardBackgroundColor="@color/info_500"
+            app:cardElevation="@dimen/elevation_md"
+            app:cardCornerRadius="@dimen/corner_radius_md">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="20dp">
+                android:padding="@dimen/card_padding_large">
 
                 <TextView
+                    style="@style/TextAppearance.Monio.BodyLarge"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Saldo Totale"
-                    android:textColor="@android:color/white"
-                    android:textSize="16sp"
+                    android:textColor="@color/white"
                     android:alpha="0.9" />
 
                 <TextView
                     android:id="@+id/tvSaldoTotale"
+                    style="@style/TextAppearance.Monio.HeadlineMedium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="€ 0,00"
-                    android:textColor="@android:color/white"
-                    android:textSize="36sp"
-                    android:textStyle="bold"
-                    android:layout_marginTop="8dp" />
+                    android:textColor="@color/white"
+                    android:layout_marginTop="@dimen/spacing_xs" />
 
                 <TextView
                     android:id="@+id/tvNumeroConti"
+                    style="@style/TextAppearance.Monio.BodyMedium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="0 conti"
-                    android:textColor="@android:color/white"
-                    android:textSize="14sp"
+                    android:textColor="@color/white"
                     android:alpha="0.8"
-                    android:layout_marginTop="4dp" />
+                    android:layout_marginTop="@dimen/spacing_xxs" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
         <!-- Statistiche Mese Corrente -->
         <TextView
+            style="@style/TextAppearance.Monio.TitleMedium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Questo Mese"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="12dp"
-            android:textColor="#212121" />
+            android:layout_marginBottom="@dimen/spacing_sm"
+            android:textColor="@color/text_dark_primary" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginBottom="16dp">
+            android:layout_marginBottom="@dimen/spacing_md">
 
             <!-- Card Entrate -->
             <com.google.android.material.card.MaterialCardView
+                style="@style/Widget.Monio.CardView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginEnd="8dp"
-                app:cardElevation="2dp"
-                app:cardCornerRadius="8dp">
+                android:layout_marginEnd="@dimen/spacing_xs"
+                app:cardBackgroundColor="@color/surface_white">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="@dimen/card_padding">
 
                     <TextView
+                        style="@style/TextAppearance.Monio.BodyMedium"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="⬆️ Entrate"
-                        android:textSize="14sp"
-                        android:textColor="#757575" />
+                        android:textColor="@color/text_dark_secondary" />
 
                     <TextView
                         android:id="@+id/tvEntrateMese"
+                        style="@style/TextAppearance.Monio.TitleLarge"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="€ 0,00"
-                        android:textSize="20sp"
-                        android:textStyle="bold"
-                        android:textColor="#4CAF50"
-                        android:layout_marginTop="8dp" />
+                        android:textColor="@color/success_500"
+                        android:layout_marginTop="@dimen/spacing_xs" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <!-- Card Uscite -->
             <com.google.android.material.card.MaterialCardView
+                style="@style/Widget.Monio.CardView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                app:cardElevation="2dp"
-                app:cardCornerRadius="8dp">
+                android:layout_marginStart="@dimen/spacing_xs"
+                app:cardBackgroundColor="@color/surface_white">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="@dimen/card_padding">
 
                     <TextView
+                        style="@style/TextAppearance.Monio.BodyMedium"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="⬇️ Uscite"
-                        android:textSize="14sp"
-                        android:textColor="#757575" />
+                        android:textColor="@color/text_dark_secondary" />
 
                     <TextView
                         android:id="@+id/tvUsciteMese"
+                        style="@style/TextAppearance.Monio.TitleLarge"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="€ 0,00"
-                        android:textSize="20sp"
-                        android:textStyle="bold"
-                        android:textColor="#F44336"
-                        android:layout_marginTop="8dp" />
+                        android:textColor="@color/error_500"
+                        android:layout_marginTop="@dimen/spacing_xs" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
 
         <!-- Card Abbonamenti -->
         <com.google.android.material.card.MaterialCardView
+            style="@style/Widget.Monio.CardView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:cardElevation="2dp"
-            app:cardCornerRadius="8dp">
+            android:layout_marginBottom="@dimen/spacing_md"
+            app:cardBackgroundColor="@color/surface_white">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="@dimen/card_padding">
 
                 <TextView
+                    style="@style/TextAppearance.Monio.BodyLarge"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="📅 Abbonamenti Attivi"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="8dp" />
+                    android:textColor="@color/text_dark_primary"
+                    android:layout_marginBottom="@dimen/spacing_xs" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -176,20 +180,19 @@
                         android:orientation="vertical">
 
                         <TextView
+                            style="@style/TextAppearance.Monio.Caption"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Numero"
-                            android:textSize="12sp"
-                            android:textColor="#757575" />
+                            android:textColor="@color/text_dark_secondary" />
 
                         <TextView
                             android:id="@+id/tvNumeroAbbonamenti"
+                            style="@style/TextAppearance.Monio.DisplaySmall"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="0"
-                            android:textSize="24sp"
-                            android:textStyle="bold"
-                            android:textColor="#2196F3" />
+                            android:textColor="@color/info_500" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -199,20 +202,19 @@
                         android:orientation="vertical">
 
                         <TextView
+                            style="@style/TextAppearance.Monio.Caption"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Costo Mensile"
-                            android:textSize="12sp"
-                            android:textColor="#757575" />
+                            android:textColor="@color/text_dark_secondary" />
 
                         <TextView
                             android:id="@+id/tvCostoAbbonamenti"
+                            style="@style/TextAppearance.Monio.DisplaySmall"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="€ 0,00"
-                            android:textSize="24sp"
-                            android:textStyle="bold"
-                            android:textColor="#FF9800" />
+                            android:textColor="@color/warning_500" />
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
@@ -220,13 +222,12 @@
 
         <!-- Lista Conti -->
         <TextView
+            style="@style/TextAppearance.Monio.TitleMedium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="I Tuoi Conti"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="12dp"
-            android:textColor="#212121" />
+            android:layout_marginBottom="@dimen/spacing_sm"
+            android:textColor="@color/text_dark_primary" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvConti"
@@ -241,30 +242,30 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="center"
-            android:padding="32dp"
+            android:padding="@dimen/spacing_xxl"
             android:visibility="gone">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="📊"
-                android:textSize="48sp"
-                android:layout_marginBottom="16dp" />
+                android:textSize="@dimen/text_size_display_xlarge"
+                android:layout_marginBottom="@dimen/spacing_md" />
 
             <TextView
+                style="@style/TextAppearance.Monio.TitleMedium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Nessun conto configurato"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
+                android:textColor="@color/text_dark_primary"
+                android:layout_marginBottom="@dimen/spacing_xs" />
 
             <TextView
+                style="@style/TextAppearance.Monio.BodyMedium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Vai alla sezione Conti per aggiungerne uno"
-                android:textSize="14sp"
-                android:textColor="#757575"
+                android:textColor="@color/text_dark_secondary"
                 android:gravity="center" />
         </LinearLayout>
 

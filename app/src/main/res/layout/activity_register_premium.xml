@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    ✨ SCHERMATA REGISTRAZIONE PREMIUM - Design da Figma "MONIO"
-    Complementare alla schermata login, mantiene lo stesso stile premium
+    ✨ SCHERMATA REGISTRAZIONE PREMIUM - Design MONIO
+
+    REFACTORED:
+    - Dimensioni centralizzate
+    - TextAppearance unificato
+    - Spacing consistente
+    - Corner radius unificati
 -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -15,36 +20,31 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="24dp">
+        android:padding="@dimen/spacing_xl">
 
         <!-- Logo MONIO -->
         <TextView
             android:id="@+id/tvLogoMonio"
+            style="@style/TextAppearance.Monio.HeadlineLarge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="MONIO"
-            android:textSize="48sp"
-            android:textStyle="bold"
-            android:letterSpacing="0.1"
-            android:textColor="@color/gold_primary"
-            android:fontFamily="sans-serif-medium"
+            android:text="@string/app_name"
+            android:layout_marginTop="@dimen/logo_margin_top"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="60dp" />
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <!-- Sottotitolo -->
         <TextView
             android:id="@+id/tvSubtitle"
+            style="@style/TextAppearance.Monio.Subtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Create your account"
-            android:textSize="14sp"
-            android:textColor="@color/text_tertiary"
+            android:layout_marginTop="@dimen/spacing_sm"
             app:layout_constraintTop_toBottomOf="@id/tvLogoMonio"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="12dp" />
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <!-- Container del form -->
         <LinearLayout
@@ -52,149 +52,138 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingTop="32dp"
+            android:layout_marginTop="@dimen/spacing_xxxl"
+            android:paddingTop="@dimen/spacing_xxl"
             app:layout_constraintTop_toBottomOf="@id/tvSubtitle"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="48dp">
+            app:layout_constraintEnd_toEndOf="parent">
 
             <!-- Input Nome Completo -->
             <TextView
+                style="@style/TextAppearance.Monio.LabelMedium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Full Name"
-                android:textSize="14sp"
-                android:textColor="@color/text_secondary"
-                android:layout_marginBottom="8dp" />
+                android:layout_marginBottom="@dimen/spacing_xs" />
 
             <EditText
                 android:id="@+id/etFullName"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="@dimen/input_height"
                 android:hint="John Doe"
                 android:textColorHint="@color/text_tertiary"
                 android:textColor="@color/text_primary"
-                android:textSize="16sp"
+                android:textSize="@dimen/text_size_body_large"
                 android:inputType="textPersonName|textCapWords"
                 android:imeOptions="actionNext"
                 android:background="@drawable/bg_input_dark"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:layout_marginBottom="20dp" />
+                android:paddingStart="@dimen/input_padding_horizontal"
+                android:paddingEnd="@dimen/input_padding_horizontal"
+                android:layout_marginBottom="@dimen/spacing_lg" />
 
             <!-- Input Email -->
             <TextView
+                style="@style/TextAppearance.Monio.LabelMedium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Email"
-                android:textSize="14sp"
-                android:textColor="@color/text_secondary"
-                android:layout_marginBottom="8dp" />
+                android:layout_marginBottom="@dimen/spacing_xs" />
 
             <EditText
                 android:id="@+id/etEmail"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="@dimen/input_height"
                 android:hint="you@example.com"
                 android:textColorHint="@color/text_tertiary"
                 android:textColor="@color/text_primary"
-                android:textSize="16sp"
+                android:textSize="@dimen/text_size_body_large"
                 android:inputType="textEmailAddress"
                 android:imeOptions="actionNext"
                 android:background="@drawable/bg_input_dark"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:layout_marginBottom="20dp" />
+                android:paddingStart="@dimen/input_padding_horizontal"
+                android:paddingEnd="@dimen/input_padding_horizontal"
+                android:layout_marginBottom="@dimen/spacing_lg" />
 
             <!-- Input Password -->
             <TextView
+                style="@style/TextAppearance.Monio.LabelMedium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Password"
-                android:textSize="14sp"
-                android:textColor="@color/text_secondary"
-                android:layout_marginBottom="8dp" />
+                android:layout_marginBottom="@dimen/spacing_xs" />
 
             <EditText
                 android:id="@+id/etPassword"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="@dimen/input_height"
                 android:hint="••••••••"
                 android:textColorHint="@color/text_tertiary"
                 android:textColor="@color/text_primary"
-                android:textSize="16sp"
+                android:textSize="@dimen/text_size_body_large"
                 android:inputType="textPassword"
                 android:imeOptions="actionNext"
                 android:background="@drawable/bg_input_dark"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:layout_marginBottom="20dp" />
+                android:paddingStart="@dimen/input_padding_horizontal"
+                android:paddingEnd="@dimen/input_padding_horizontal"
+                android:layout_marginBottom="@dimen/spacing_lg" />
 
             <!-- Input Conferma Password -->
             <TextView
+                style="@style/TextAppearance.Monio.LabelMedium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Confirm Password"
-                android:textSize="14sp"
-                android:textColor="@color/text_secondary"
-                android:layout_marginBottom="8dp" />
+                android:layout_marginBottom="@dimen/spacing_xs" />
 
             <EditText
                 android:id="@+id/etConfirmPassword"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="@dimen/input_height"
                 android:hint="••••••••"
                 android:textColorHint="@color/text_tertiary"
                 android:textColor="@color/text_primary"
-                android:textSize="16sp"
+                android:textSize="@dimen/text_size_body_large"
                 android:inputType="textPassword"
                 android:imeOptions="actionDone"
                 android:background="@drawable/bg_input_dark"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:layout_marginBottom="28dp" />
+                android:paddingStart="@dimen/input_padding_horizontal"
+                android:paddingEnd="@dimen/input_padding_horizontal"
+                android:layout_marginBottom="@dimen/spacing_xl" />
 
             <!-- Pulsante Create Account -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnCreateAccount"
+                style="@style/Widget.Monio.Button"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="@dimen/button_height_large"
                 android:text="Create Account"
-                android:textColor="@color/zinc_950"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textAllCaps="false"
-                android:fontFamily="sans-serif-medium"
+                android:layout_marginBottom="@dimen/spacing_xl"
                 app:backgroundTint="@null"
-                android:background="@drawable/bg_gold_gradient"
-                app:cornerRadius="12dp"
-                app:rippleColor="@color/gold_dark"
-                android:layout_marginBottom="24dp" />
+                android:background="@drawable/bg_gold_gradient" />
 
             <!-- Link Login -->
             <TextView
                 android:id="@+id/tvSignInLink"
+                style="@style/TextAppearance.Monio.LabelMedium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Already have an account? Sign in"
-                android:textSize="14sp"
-                android:textColor="@color/text_tertiary"
                 android:layout_gravity="center"
                 android:clickable="true"
                 android:focusable="true"
-                android:padding="8dp" />
+                android:padding="@dimen/spacing_xs" />
 
             <!-- Privacy Policy -->
             <TextView
                 android:id="@+id/tvPrivacy"
+                style="@style/TextAppearance.Monio.Caption"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="By creating an account, you agree to our Terms of Service and Privacy Policy"
-                android:textSize="11sp"
                 android:textColor="@color/zinc_600"
                 android:gravity="center"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="32dp" />
+                android:layout_marginTop="@dimen/spacing_md"
+                android:layout_marginBottom="@dimen/spacing_xxl" />
 
         </LinearLayout>
 

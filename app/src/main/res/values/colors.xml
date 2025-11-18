@@ -25,14 +25,41 @@
     <!-- Accent Colors -->
     <color name="emerald_500">#10B981</color>
     <color name="emerald_600">#059669</color>
+    <color name="emerald_bright">#12B886</color>
     <color name="violet_500">#8B5CF6</color>
     <color name="red_500">#EF4444</color>
+
+    <!-- Success / Error / Warning Colors -->
+    <color name="success_500">#4CAF50</color>
+    <color name="success_600">#43A047</color>
+    <color name="error_500">#F44336</color>
+    <color name="error_600">#E53935</color>
+    <color name="warning_500">#FF9800</color>
+    <color name="info_500">#2196F3</color>
+    <color name="info_600">#1976D2</color>
 
     <!-- Text Colors -->
     <color name="text_primary">#FFFFFF</color>
     <color name="text_secondary">#A1A1AA</color>
     <color name="text_tertiary">#71717A</color>
+    <color name="text_dark_primary">#212121</color>
+    <color name="text_dark_secondary">#757575</color>
+    <color name="text_dark_tertiary">#9E9E9E</color>
+    <color name="text_disabled">#BDBDBD</color>
 
     <!-- Background Overlay -->
     <color name="overlay_dark">#80000000</color>
+    <color name="overlay_light">#26000000</color>
+
+    <!-- Surface Colors -->
+    <color name="surface_light">#F5F5F5</color>
+    <color name="surface_white">#FFFFFF</color>
+    <color name="surface_divider">#E0E0E0</color>
+
+    <!-- Badge Colors -->
+    <color name="badge_excel_bg">#E3F2FD</color>
+    <color name="badge_excel_text">#1976D2</color>
+
+    <!-- Transparent -->
+    <color name="transparent">#00000000</color>
 </resources>

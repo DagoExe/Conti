@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    ✨ DIALOG AGGIUNGI MOVIMENTO - Material Design 3
+
+    REFACTORED:
+    - TextAppearance styles applicati
+    - Dimensioni da @dimen
+    - Chip styling migliorato
+    - TextInputLayout consistente
+    - Spacing unificato
+-->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -8,68 +18,68 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:padding="@dimen/spacing_xl">
 
         <!-- Titolo -->
         <TextView
+            style="@style/TextAppearance.Monio.TitleLarge"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Nuovo Movimento"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="#212121"
-            android:layout_marginBottom="8dp" />
+            android:textColor="@color/text_dark_primary"
+            android:layout_marginBottom="@dimen/spacing_xs" />
 
+        <!-- Nome Conto -->
         <TextView
             android:id="@+id/tvNomeConto"
+            style="@style/TextAppearance.Monio.BodyMedium"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Conto: BuddyBank"
-            android:textSize="14sp"
-            android:textColor="#757575"
-            android:layout_marginBottom="24dp" />
+            android:textColor="@color/text_dark_secondary"
+            android:layout_marginBottom="@dimen/spacing_xl" />
 
         <!-- Tipo Movimento (Entrata/Uscita) -->
         <TextView
+            style="@style/TextAppearance.Monio.LabelMedium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Tipo di movimento"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp" />
+            android:textColor="@color/text_dark_primary"
+            android:layout_marginBottom="@dimen/spacing_xs" />
 
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/chipGroupTipo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="@dimen/spacing_md"
             app:singleSelection="true"
             app:checkedChip="@id/chipUscita">
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipEntrata"
+                style="@style/Widget.Material3.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="⬆️ Entrata"
-                style="@style/Widget.Material3.Chip.Filter" />
+                android:text="⬆️ Entrata" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipUscita"
+                style="@style/Widget.Material3.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="⬇️ Uscita"
-                android:checked="true"
-                style="@style/Widget.Material3.Chip.Filter" />
+                android:checked="true" />
         </com.google.android.material.chip.ChipGroup>
 
         <!-- Descrizione -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilDescrizione"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Descrizione *"
-            android:layout_marginBottom="16dp"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+            android:layout_marginBottom="@dimen/spacing_md">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etDescrizione"
@@ -83,13 +93,14 @@
         <!-- Importo -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilImporto"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Importo *"
-            android:layout_marginBottom="16dp"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_marginBottom="@dimen/spacing_md"
             app:prefixText="€ "
-            app:helperText="Inserisci solo il numero (es. 50.00)">
+            app:helperText="Inserisci solo il numero (es. 50.00)"
+            app:helperTextTextAppearance="@style/TextAppearance.Monio.Caption">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etImporto"
@@ -103,11 +114,11 @@
         <!-- Categoria -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilCategoria"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Categoria *"
-            android:layout_marginBottom="16dp"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+            android:layout_marginBottom="@dimen/spacing_md">
 
             <AutoCompleteTextView
                 android:id="@+id/actvCategoria"
@@ -119,11 +130,11 @@
         <!-- Data -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilData"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Data *"
-            android:layout_marginBottom="16dp"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+            android:layout_marginBottom="@dimen/spacing_md">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etData"
@@ -138,11 +149,11 @@
         <!-- Note (Opzionali) -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilNote"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Note (opzionale)"
-            android:layout_marginBottom="16dp"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+            android:layout_marginBottom="@dimen/spacing_md">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etNote"
@@ -153,15 +164,15 @@
                 android:imeOptions="actionDone" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Info aggiuntiva -->
+        <!-- Info campi obbligatori -->
         <TextView
+            style="@style/TextAppearance.Monio.Caption"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="* Campi obbligatori"
-            android:textSize="12sp"
-            android:textColor="#757575"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="24dp" />
+            android:textColor="@color/text_dark_secondary"
+            android:layout_marginTop="@dimen/spacing_xs"
+            android:layout_marginBottom="@dimen/spacing_xl" />
 
         <!-- Pulsanti -->
         <LinearLayout
@@ -172,16 +183,18 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAnnulla"
+                style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/button_height_medium"
                 android:text="Annulla"
-                style="?attr/materialButtonOutlinedStyle"
-                android:layout_marginEnd="8dp" />
+                android:textColor="@color/text_dark_secondary"
+                android:layout_marginEnd="@dimen/spacing_xs" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSalva"
+                style="@style/Widget.Material3.Button"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/button_height_medium"
                 android:text="Salva Movimento" />
         </LinearLayout>
 

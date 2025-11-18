@@ -1,29 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    ✨ ITEM CONTO - RecyclerView
+
+    REFACTORED:
+    - Card style applicato
+    - Dimensioni standardizzate
+    - TextAppearance unificato
+    - Badge style applicato
+-->
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/Widget.Monio.CardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="12dp"
-    app:cardElevation="2dp"
-    app:cardCornerRadius="8dp"
+    android:layout_marginBottom="@dimen/spacing_sm"
     android:clickable="true"
     android:focusable="true"
-    android:foreground="?attr/selectableItemBackground">
+    android:foreground="?attr/selectableItemBackground"
+    app:cardBackgroundColor="@color/surface_white">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="16dp">
+        android:padding="@dimen/card_padding">
 
         <!-- Indicatore Colore -->
         <View
             android:id="@+id/viewColore"
-            android:layout_width="4dp"
+            android:layout_width="@dimen/spacing_xxs"
             android:layout_height="match_parent"
-            android:layout_marginEnd="12dp"
-            android:background="#4CAF50" />
+            android:layout_marginEnd="@dimen/spacing_sm"
+            android:background="@color/success_500" />
 
         <!-- Informazioni Conto -->
         <LinearLayout
@@ -40,52 +49,46 @@
 
                 <TextView
                     android:id="@+id/tvNomeConto"
+                    style="@style/TextAppearance.Monio.BodyLarge"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Nome Conto"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="#212121" />
+                    android:textColor="@color/text_dark_primary" />
 
                 <!-- Badge Excel -->
                 <TextView
                     android:id="@+id/badgeExcel"
+                    style="@style/Widget.Monio.Badge"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="📊 Excel"
-                    android:textSize="10sp"
-                    android:background="#E3F2FD"
-                    android:textColor="#1976D2"
-                    android:paddingStart="6dp"
-                    android:paddingEnd="6dp"
-                    android:paddingTop="2dp"
-                    android:paddingBottom="2dp"
-                    android:layout_marginStart="8dp"
+                    android:background="@color/badge_excel_bg"
+                    android:textColor="@color/badge_excel_text"
+                    android:layout_marginStart="@dimen/spacing_xs"
                     android:visibility="gone" />
             </LinearLayout>
 
             <TextView
                 android:id="@+id/tvIstituto"
+                style="@style/TextAppearance.Monio.BodyMedium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Istituto Bancario"
-                android:textSize="14sp"
-                android:textColor="#757575"
-                android:layout_marginTop="4dp" />
+                android:textColor="@color/text_dark_secondary"
+                android:layout_marginTop="@dimen/spacing_xxs" />
         </LinearLayout>
 
         <!-- Saldo -->
         <TextView
             android:id="@+id/tvSaldo"
+            style="@style/TextAppearance.Monio.AmountPositive"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="€ 0,00"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="#4CAF50"
+            android:textSize="@dimen/text_size_title_medium"
             android:layout_gravity="center_vertical"
-            android:layout_marginStart="16dp" />
+            android:layout_marginStart="@dimen/spacing_md" />
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

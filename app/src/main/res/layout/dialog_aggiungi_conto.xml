@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    ✨ DIALOG AGGIUNGI CONTO - Material Design 3
+
+    REFACTORED:
+    - TextAppearance styles applicati
+    - Dimensioni da @dimen
+    - Spacing consistente
+    - Material Components style
+    - Helper text ottimizzato
+-->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -8,34 +18,34 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:padding="@dimen/spacing_xl">
 
         <!-- Titolo -->
         <TextView
+            style="@style/TextAppearance.Monio.TitleLarge"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Aggiungi Nuovo Conto"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="#212121"
-            android:layout_marginBottom="8dp" />
+            android:textColor="@color/text_dark_primary"
+            android:layout_marginBottom="@dimen/spacing_xs" />
 
+        <!-- Sottotitolo -->
         <TextView
+            style="@style/TextAppearance.Monio.BodyMedium"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Inserisci i dettagli del tuo conto bancario"
-            android:textSize="14sp"
-            android:textColor="#757575"
-            android:layout_marginBottom="24dp" />
+            android:textColor="@color/text_dark_secondary"
+            android:layout_marginBottom="@dimen/spacing_xl" />
 
         <!-- Nome Conto -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilNomeConto"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Nome del conto"
-            android:layout_marginBottom="16dp"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+            android:layout_marginBottom="@dimen/spacing_md">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etNomeConto"
@@ -49,11 +59,11 @@
         <!-- Tipo Conto (Dropdown) -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilTipoConto"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Tipo di conto"
-            android:layout_marginBottom="16dp"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+            android:layout_marginBottom="@dimen/spacing_md">
 
             <AutoCompleteTextView
                 android:id="@+id/actvTipoConto"
@@ -67,13 +77,14 @@
         <!-- Saldo Iniziale -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilSaldoIniziale"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Saldo iniziale (€)"
-            android:layout_marginBottom="16dp"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_marginBottom="@dimen/spacing_md"
             app:prefixText="€ "
-            app:helperText="Inserisci il saldo attuale del conto">
+            app:helperText="Inserisci il saldo attuale del conto"
+            app:helperTextTextAppearance="@style/TextAppearance.Monio.Caption">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etSaldoIniziale"
@@ -88,12 +99,13 @@
         <!-- IBAN (Opzionale) -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilIban"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="IBAN (opzionale)"
-            android:layout_marginBottom="16dp"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-            app:helperText="Es: IT60X0347901600000000000000">
+            android:layout_marginBottom="@dimen/spacing_md"
+            app:helperText="Es: IT60X0347901600000000000000"
+            app:helperTextTextAppearance="@style/TextAppearance.Monio.Caption">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etIban"
@@ -106,13 +118,13 @@
 
         <!-- Info aggiuntiva -->
         <TextView
+            style="@style/TextAppearance.Monio.Caption"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="💡 Potrai modificare questi dati in qualsiasi momento"
-            android:textSize="12sp"
-            android:textColor="#757575"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="24dp" />
+            android:textColor="@color/text_dark_secondary"
+            android:layout_marginTop="@dimen/spacing_xs"
+            android:layout_marginBottom="@dimen/spacing_xl" />
 
         <!-- Pulsanti -->
         <LinearLayout
@@ -123,16 +135,18 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAnnulla"
+                style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/button_height_medium"
                 android:text="Annulla"
-                style="?attr/materialButtonOutlinedStyle"
-                android:layout_marginEnd="8dp" />
+                android:textColor="@color/text_dark_secondary"
+                android:layout_marginEnd="@dimen/spacing_xs" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSalva"
+                style="@style/Widget.Material3.Button"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/button_height_medium"
                 android:text="Salva Conto" />
         </LinearLayout>
 

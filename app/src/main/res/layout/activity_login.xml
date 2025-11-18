@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    ✨ SCHERMATA LOGIN PREMIUM - Design da Figma "MONIO"
+    ✨ SCHERMATA LOGIN PREMIUM - Design MONIO
 
-    Questo layout replica fedelmente il design premium trovato su Figma:
-    - Background scuro zinc-950 (#09090B)
-    - Logo MONIO con gradiente dorato
-    - Pulsante Google Sign-In
-    - Form email/password minimale
-    - Pulsante principale con gradiente dorato
-
-    Corrisponde a: LoginScreen component del design Figma
+    REFACTORED:
+    - Dimensioni centralizzate in @dimen
+    - Colori da @color
+    - TextAppearance styles applicati
+    - Spacing consistente (4dp grid)
+    - Corner radius unificati
 -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -21,210 +19,189 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="24dp"
+        android:padding="@dimen/spacing_xl"
         android:minHeight="?android:attr/listPreferredItemHeight">
 
         <!-- ========== SEZIONE LOGO ========== -->
 
-        <!-- Logo/Brand MONIO con gradiente dorato (Figma) -->
+        <!-- Logo MONIO con gradiente dorato -->
         <TextView
             android:id="@+id/tvLogoMonio"
+            style="@style/TextAppearance.Monio.HeadlineLarge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="MONIO"
-            android:textSize="48sp"
-            android:textStyle="bold"
-            android:letterSpacing="0.1"
-            android:textColor="@color/gold_primary"
-            android:fontFamily="sans-serif-medium"
+            android:text="@string/app_name"
+            android:layout_marginTop="@dimen/logo_margin_top"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="60dp" />
+            app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- Sottotitolo premium (Figma) -->
+        <!-- Sottotitolo premium -->
         <TextView
             android:id="@+id/tvSubtitle"
+            style="@style/TextAppearance.Monio.Subtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Premium Banking Experience"
-            android:textSize="14sp"
-            android:textColor="@color/text_tertiary"
+            android:layout_marginTop="@dimen/spacing_sm"
             app:layout_constraintTop_toBottomOf="@id/tvLogoMonio"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="12dp" />
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <!-- ========== FORM CONTAINER ========== -->
 
-        <!-- Container principale per il form (Figma card style) -->
         <LinearLayout
             android:id="@+id/layoutFormContainer"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingTop="32dp"
+            android:layout_marginTop="@dimen/spacing_xxxl"
+            android:paddingTop="@dimen/spacing_xxl"
             app:layout_constraintTop_toBottomOf="@id/tvSubtitle"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginTop="48dp">
+            app:layout_constraintBottom_toBottomOf="parent">
 
-            <!-- ========== GOOGLE SIGN-IN (Figma) ========== -->
+            <!-- ========== GOOGLE SIGN-IN ========== -->
 
-            <!-- Pulsante Google Sign-In bianco -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnGoogleSignIn"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="@dimen/button_height_large"
                 android:text="Sign in with Google"
                 android:textColor="@color/zinc_900"
-                android:textSize="16sp"
+                android:textSize="@dimen/text_size_body_large"
                 android:textAllCaps="false"
                 android:fontFamily="sans-serif-medium"
+                android:layout_marginBottom="@dimen/spacing_xl"
                 app:icon="@drawable/ic_google"
                 app:iconGravity="textStart"
-                app:iconPadding="12dp"
+                app:iconPadding="@dimen/spacing_sm"
                 app:iconTint="@null"
                 app:backgroundTint="@color/white"
-                app:cornerRadius="12dp"
+                app:cornerRadius="@dimen/corner_radius_md"
                 app:strokeWidth="0dp"
-                android:elevation="0dp"
                 app:rippleColor="@color/zinc_200"
-                android:layout_marginBottom="24dp" />
+                android:elevation="@dimen/elevation_none" />
 
-            <!-- ========== DIVIDER "Or continue with email" (Figma) ========== -->
+            <!-- ========== DIVIDER "Or continue with email" ========== -->
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:layout_marginBottom="24dp">
+                android:layout_marginBottom="@dimen/spacing_xl">
 
                 <!-- Linea sinistra -->
                 <View
+                    style="@style/Widget.Monio.Divider"
                     android:layout_width="0dp"
-                    android:layout_height="1dp"
-                    android:layout_weight="1"
-                    android:background="@color/zinc_800" />
+                    android:layout_weight="1" />
 
                 <!-- Testo centrale -->
                 <TextView
+                    style="@style/TextAppearance.Monio.Caption"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Or continue with email"
-                    android:textSize="12sp"
-                    android:textColor="@color/text_tertiary"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp" />
+                    android:paddingStart="@dimen/spacing_md"
+                    android:paddingEnd="@dimen/spacing_md" />
 
                 <!-- Linea destra -->
                 <View
+                    style="@style/Widget.Monio.Divider"
                     android:layout_width="0dp"
-                    android:layout_height="1dp"
-                    android:layout_weight="1"
-                    android:background="@color/zinc_800" />
+                    android:layout_weight="1" />
             </LinearLayout>
 
-            <!-- ========== INPUT EMAIL (Figma) ========== -->
+            <!-- ========== INPUT EMAIL ========== -->
 
             <!-- Label Email -->
             <TextView
                 android:id="@+id/tvLabelEmail"
+                style="@style/TextAppearance.Monio.LabelMedium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Email"
-                android:textSize="14sp"
-                android:textColor="@color/text_secondary"
-                android:layout_marginBottom="8dp" />
+                android:layout_marginBottom="@dimen/spacing_xs" />
 
             <!-- Input Email -->
             <EditText
                 android:id="@+id/etEmail"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="@dimen/input_height"
                 android:hint="you@example.com"
                 android:textColorHint="@color/text_tertiary"
                 android:textColor="@color/text_primary"
-                android:textSize="16sp"
+                android:textSize="@dimen/text_size_body_large"
                 android:inputType="textEmailAddress"
                 android:imeOptions="actionNext"
                 android:background="@drawable/bg_input_dark"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:layout_marginBottom="20dp" />
+                android:paddingStart="@dimen/input_padding_horizontal"
+                android:paddingEnd="@dimen/input_padding_horizontal"
+                android:layout_marginBottom="@dimen/spacing_lg" />
 
-            <!-- ========== INPUT PASSWORD (Figma) ========== -->
+            <!-- ========== INPUT PASSWORD ========== -->
 
             <!-- Label Password -->
             <TextView
                 android:id="@+id/tvLabelPassword"
+                style="@style/TextAppearance.Monio.LabelMedium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Password"
-                android:textSize="14sp"
-                android:textColor="@color/text_secondary"
-                android:layout_marginBottom="8dp" />
+                android:layout_marginBottom="@dimen/spacing_xs" />
 
             <!-- Input Password -->
             <EditText
                 android:id="@+id/etPassword"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="@dimen/input_height"
                 android:hint="••••••••"
                 android:textColorHint="@color/text_tertiary"
                 android:textColor="@color/text_primary"
-                android:textSize="16sp"
+                android:textSize="@dimen/text_size_body_large"
                 android:inputType="textPassword"
                 android:imeOptions="actionDone"
                 android:background="@drawable/bg_input_dark"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:layout_marginBottom="28dp" />
+                android:paddingStart="@dimen/input_padding_horizontal"
+                android:paddingEnd="@dimen/input_padding_horizontal"
+                android:layout_marginBottom="@dimen/spacing_xl" />
 
-            <!-- ========== PULSANTE SIGN IN PRINCIPALE (Figma - gold gradient) ========== -->
+            <!-- ========== PULSANTE SIGN IN PRINCIPALE ========== -->
 
-            <!-- Pulsante Sign In con gradiente dorato -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSignIn"
+                style="@style/Widget.Monio.Button"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="@dimen/button_height_large"
                 android:text="Sign In"
-                android:textColor="@color/zinc_950"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textAllCaps="false"
-                android:fontFamily="sans-serif-medium"
+                android:layout_marginBottom="@dimen/spacing_xl"
                 app:backgroundTint="@null"
-                android:background="@drawable/bg_gold_gradient"
-                app:cornerRadius="12dp"
-                app:rippleColor="@color/gold_dark"
-                android:layout_marginBottom="24dp" />
+                android:background="@drawable/bg_gold_gradient" />
 
-            <!-- ========== LINK REGISTRAZIONE (Figma) ========== -->
+            <!-- ========== LINK REGISTRAZIONE ========== -->
 
-            <!-- Link per registrazione -->
             <TextView
                 android:id="@+id/tvSignUpLink"
+                style="@style/TextAppearance.Monio.LabelMedium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Don't have an account? Sign up"
-                android:textSize="14sp"
-                android:textColor="@color/text_tertiary"
                 android:layout_gravity="center"
                 android:clickable="true"
                 android:focusable="true"
-                android:padding="8dp" />
+                android:padding="@dimen/spacing_xs" />
 
-            <!-- Spaziatore bottom per evitare che il content sia troppo in basso -->
+            <!-- Spaziatore bottom -->
             <Space
                 android:layout_width="match_parent"
-                android:layout_height="32dp" />
+                android:layout_height="@dimen/spacing_xxl" />
 
         </LinearLayout>
 
-        <!-- ProgressBar (nascosto di default, mostra durante il caricamento) -->
+        <!-- ProgressBar -->
         <ProgressBar
             android:id="@+id/progressBar"
             android:layout_width="wrap_content"
