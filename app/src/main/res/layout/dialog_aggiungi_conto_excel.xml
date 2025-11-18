@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    ✨ DIALOG AGGIUNGI CONTO EXCEL - Dropbox Integration
+    ✨ DIALOG AGGIUNGI CONTO EXCEL - Dropbox Integration DARK MODE
 
-    REFACTORED:
-    - TextAppearance styles applicati
-    - Dimensioni da @dimen
-    - Spacing consistente
-    - Helper text migliorato
+    UPDATED:
+    - Background dark (zinc_900)
+    - Text colors dark theme
+    - Input fields dark
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
+    android:background="@color/zinc_900"
     android:padding="@dimen/spacing_xl">
 
     <!-- Info -->
@@ -21,7 +21,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Configura un conto collegato a un file Excel di Dropbox. I movimenti verranno importati automaticamente."
-        android:textColor="@color/text_dark_secondary"
+        android:textColor="@color/text_secondary"
         android:layout_marginBottom="@dimen/spacing_xl" />
 
     <!-- Nome Conto -->
@@ -31,12 +31,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Nome del conto"
+        app:boxStrokeColor="@color/gold_primary"
+        app:hintTextColor="@color/gold_primary"
         android:layout_marginBottom="@dimen/spacing_md">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etNomeConto"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textColor="@color/text_primary"
             android:inputType="text"
             android:maxLines="1" />
     </com.google.android.material.textfield.TextInputLayout>
@@ -48,12 +51,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Istituto bancario"
+        app:boxStrokeColor="@color/gold_primary"
+        app:hintTextColor="@color/gold_primary"
         android:layout_marginBottom="@dimen/spacing_md">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etIstituto"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textColor="@color/text_primary"
             android:inputType="text"
             android:maxLines="1" />
     </com.google.android.material.textfield.TextInputLayout>
@@ -65,6 +71,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Saldo iniziale (€)"
+        app:boxStrokeColor="@color/gold_primary"
+        app:hintTextColor="@color/gold_primary"
         android:layout_marginBottom="@dimen/spacing_md"
         app:prefixText="€ ">
 
@@ -72,6 +80,7 @@
             android:id="@+id/etSaldoIniziale"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textColor="@color/text_primary"
             android:inputType="numberDecimal"
             android:maxLines="1"
             android:text="0" />
@@ -83,7 +92,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="💡 Al prossimo passaggio potrai selezionare il file Excel da importare."
-        android:textColor="@color/text_dark_secondary"
+        android:textColor="@color/text_secondary"
         android:layout_marginTop="@dimen/spacing_xs" />
 
 </LinearLayout>

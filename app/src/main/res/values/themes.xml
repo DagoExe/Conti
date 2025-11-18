@@ -61,7 +61,33 @@
     <!-- Tema applicato all'app -->
     <style name="Theme.Conti" parent="Base.Theme.Conti" />
 
+    <!-- ========== WIDGET BASE MONIO ========== -->
+    <!-- ⚠️ CRITICAL: Style base per tutti i Widget.Monio.* -->
+    <style name="Widget.Monio" parent="" />
+
     <!-- ========== TEXT APPEARANCE STYLES ========== -->
+
+    <!-- Display Text (per numeri grandi, statistiche) -->
+    <style name="TextAppearance.Monio.DisplaySmall" parent="TextAppearance.Material3.DisplaySmall">
+        <item name="android:textSize">@dimen/text_size_display_small</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.Monio.DisplayMedium" parent="TextAppearance.Material3.DisplayMedium">
+        <item name="android:textSize">@dimen/text_size_display_medium</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.Monio.DisplayLarge" parent="TextAppearance.Material3.DisplayLarge">
+        <item name="android:textSize">@dimen/text_size_display_large</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">bold</item>
+    </style>
 
     <!-- Headline / Display Text (Hero, Logo, etc.) -->
     <style name="TextAppearance.Monio.HeadlineLarge" parent="TextAppearance.Material3.HeadlineLarge">

@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    ✨ ITEM CONTO VERTICAL - Card Premium
+    ✨ ITEM CONTO VERTICAL - Card Premium DARK MODE
 
-    REFACTORED:
-    - Card style elevato applicato
-    - TextAppearance hierarchy corretta
-    - Icon size standardizzato
-    - Spacing consistente
-    - Divider style applicato
-    - Layout verticale ottimizzato
+    UPDATED:
+    - Background dark (zinc_900)
+    - Text colors dark theme
+    - Divider zinc_800
 -->
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -22,7 +19,7 @@
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground"
-    app:cardBackgroundColor="@color/surface_white">
+    app:cardBackgroundColor="@color/zinc_900">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -62,7 +59,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="BuddyBank"
-                    android:textColor="@color/text_dark_secondary"
+                    android:textColor="@color/gold_primary"
                     android:textStyle="bold" />
 
                 <TextView
@@ -71,7 +68,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Conto Principale"
-                    android:textColor="@color/text_dark_primary"
+                    android:textColor="@color/text_primary"
                     android:layout_marginTop="@dimen/spacing_xxs" />
             </LinearLayout>
         </LinearLayout>
@@ -79,7 +76,7 @@
         <!-- Divider -->
         <View
             style="@style/Widget.Monio.Divider"
-            android:background="@color/surface_divider"
+            android:background="@color/zinc_800"
             android:layout_marginBottom="@dimen/spacing_md" />
 
         <!-- Saldo -->
@@ -88,7 +85,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Saldo Disponibile"
-            android:textColor="@color/text_dark_secondary"
+            android:textColor="@color/text_secondary"
             android:layout_marginBottom="@dimen/spacing_xxs" />
 
         <TextView
@@ -107,7 +104,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="IT60 X034 7901 6000 0000 0000 000"
-            android:textColor="@color/text_dark_tertiary"
+            android:textColor="@color/text_tertiary"
             android:fontFamily="monospace"
             android:visibility="gone" />
 
@@ -124,7 +121,7 @@
         <!-- Divider -->
         <View
             style="@style/Widget.Monio.Divider"
-            android:background="@color/surface_divider"
+            android:background="@color/zinc_800"
             android:layout_marginTop="@dimen/spacing_md"
             android:layout_marginBottom="@dimen/spacing_sm" />
 
@@ -134,7 +131,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="👉 Tocca per vedere i movimenti"
-            android:textColor="@color/info_500"
+            android:textColor="@color/gold_primary"
             android:textStyle="bold"
             android:gravity="center" />
 

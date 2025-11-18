@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    ✨ ITEM CONTO - RecyclerView
+    ✨ ITEM CONTO - RecyclerView DARK MODE
 
-    REFACTORED:
-    - Card style applicato
-    - Dimensioni standardizzate
-    - TextAppearance unificato
-    - Badge style applicato
+    UPDATED:
+    - Background dark (zinc_900)
+    - Text colors dark theme
+    - Border zinc_800
 -->
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -18,7 +17,7 @@
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground"
-    app:cardBackgroundColor="@color/surface_white">
+    app:cardBackgroundColor="@color/zinc_900">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -32,7 +31,7 @@
             android:layout_width="@dimen/spacing_xxs"
             android:layout_height="match_parent"
             android:layout_marginEnd="@dimen/spacing_sm"
-            android:background="@color/success_500" />
+            android:background="@color/gold_primary" />
 
         <!-- Informazioni Conto -->
         <LinearLayout
@@ -54,7 +53,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Nome Conto"
-                    android:textColor="@color/text_dark_primary" />
+                    android:textColor="@color/text_primary" />
 
                 <!-- Badge Excel -->
                 <TextView
@@ -63,8 +62,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="📊 Excel"
-                    android:background="@color/badge_excel_bg"
-                    android:textColor="@color/badge_excel_text"
+                    android:background="@drawable/bg_badge_excel_dark"
+                    android:textColor="@color/info_500"
                     android:layout_marginStart="@dimen/spacing_xs"
                     android:visibility="gone" />
             </LinearLayout>
@@ -75,7 +74,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Istituto Bancario"
-                android:textColor="@color/text_dark_secondary"
+                android:textColor="@color/text_secondary"
                 android:layout_marginTop="@dimen/spacing_xxs" />
         </LinearLayout>
 

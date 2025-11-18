@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    ✨ ITEM TRANSACTION - RecyclerView Movimenti
+    ✨ ITEM TRANSACTION - RecyclerView Movimenti DARK MODE
 
-    REFACTORED:
-    - Card style applicato
-    - TextAppearance consistente
-    - Icon size standardizzato
-    - Spacing unificato
+    UPDATED:
+    - Background dark (zinc_900)
+    - Text colors dark theme
 -->
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -18,7 +16,7 @@
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground"
-    app:cardBackgroundColor="@color/surface_white">
+    app:cardBackgroundColor="@color/zinc_900">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -51,7 +49,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Descrizione movimento"
-                android:textColor="@color/text_dark_primary"
+                android:textColor="@color/text_primary"
                 android:maxLines="1"
                 android:ellipsize="end" />
 
@@ -61,7 +59,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="🛒 Categoria"
-                android:textColor="@color/text_dark_secondary"
+                android:textColor="@color/text_secondary"
                 android:layout_marginTop="@dimen/spacing_xxs" />
 
             <TextView

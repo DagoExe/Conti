@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    ✨ FRAGMENT MOVIMENTI - Lista Transazioni DARK MODE
+
+    UPDATED:
+    - Background dark
+    - Card statistiche dark
+    - Text colors aggiornati
+-->
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -9,20 +17,19 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:background="#F5F5F5">
+        android:background="@color/zinc_950">
 
         <!-- Titolo sezione -->
         <TextView
             android:id="@+id/tvTitoloSezione"
+            style="@style/TextAppearance.Monio.TitleLarge"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Movimenti"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="#212121"
-            android:padding="16dp"
-            android:background="@android:color/white"
-            android:elevation="2dp" />
+            android:textColor="@color/text_primary"
+            android:padding="@dimen/spacing_md"
+            android:background="@color/zinc_900"
+            android:elevation="@dimen/elevation_sm" />
 
         <!-- Content Layout (statistiche + lista) -->
         <LinearLayout
@@ -34,25 +41,25 @@
 
             <!-- Card Statistiche -->
             <com.google.android.material.card.MaterialCardView
+                style="@style/Widget.Monio.CardView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                app:cardElevation="4dp"
-                app:cardCornerRadius="12dp">
+                android:layout_margin="@dimen/spacing_md"
+                app:cardBackgroundColor="@color/zinc_900">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="@dimen/card_padding_large">
 
                     <TextView
+                        style="@style/TextAppearance.Monio.BodyLarge"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="📊 Riepilogo"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="12dp" />
+                        android:textColor="@color/text_primary"
+                        android:layout_marginBottom="@dimen/spacing_sm" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -68,21 +75,20 @@
                             android:gravity="center">
 
                             <TextView
+                                style="@style/TextAppearance.Monio.Caption"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="⬆️ Entrate"
-                                android:textSize="12sp"
-                                android:textColor="#757575" />
+                                android:textColor="@color/text_secondary" />
 
                             <TextView
                                 android:id="@+id/tvTotaleEntrate"
+                                style="@style/TextAppearance.Monio.AmountPositive"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="€ 0,00"
-                                android:textSize="20sp"
-                                android:textStyle="bold"
-                                android:textColor="#4CAF50"
-                                android:layout_marginTop="4dp" />
+                                android:textSize="@dimen/text_size_title_large"
+                                android:layout_marginTop="@dimen/spacing_xxs" />
                         </LinearLayout>
 
                         <!-- Uscite -->
@@ -94,24 +100,23 @@
                             android:gravity="center">
 
                             <TextView
+                                style="@style/TextAppearance.Monio.Caption"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="⬇️ Uscite"
-                                android:textSize="12sp"
-                                android:textColor="#757575" />
+                                android:textColor="@color/text_secondary" />
 
                             <TextView
                                 android:id="@+id/tvTotaleUscite"
+                                style="@style/TextAppearance.Monio.AmountNegative"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="€ 0,00"
-                                android:textSize="20sp"
-                                android:textStyle="bold"
-                                android:textColor="#F44336"
-                                android:layout_marginTop="4dp" />
+                                android:textSize="@dimen/text_size_title_large"
+                                android:layout_marginTop="@dimen/spacing_xxs" />
                         </LinearLayout>
 
-                        <!-- Saldo Corrente (✅ ETICHETTA AGGIORNATA) -->
+                        <!-- Saldo Corrente -->
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -120,33 +125,32 @@
                             android:gravity="center">
 
                             <TextView
+                                style="@style/TextAppearance.Monio.Caption"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="💰 Saldo"
-                                android:textSize="12sp"
-                                android:textColor="#757575" />
+                                android:textColor="@color/text_secondary" />
 
                             <TextView
                                 android:id="@+id/tvBilancio"
+                                style="@style/TextAppearance.Monio.AmountNeutral"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="€ 0,00"
-                                android:textSize="20sp"
-                                android:textStyle="bold"
-                                android:textColor="#2196F3"
-                                android:layout_marginTop="4dp" />
+                                android:textSize="@dimen/text_size_title_large"
+                                android:layout_marginTop="@dimen/spacing_xxs" />
                         </LinearLayout>
                     </LinearLayout>
 
-                    <!-- ✅ NUOVO: Nota esplicativa -->
+                    <!-- Nota esplicativa -->
                     <TextView
+                        style="@style/TextAppearance.Monio.Caption"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="ℹ️ Il saldo include il saldo iniziale del conto"
-                        android:textSize="10sp"
-                        android:textColor="#9E9E9E"
+                        android:textColor="@color/text_disabled"
                         android:gravity="center"
-                        android:layout_marginTop="8dp" />
+                        android:layout_marginTop="@dimen/spacing_sm" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -155,20 +159,20 @@
                 android:id="@+id/rvMovimenti"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="8dp"
+                android:padding="@dimen/spacing_xs"
                 android:clipToPadding="false" />
         </LinearLayout>
 
         <!-- Placeholder (quando empty o loading) -->
         <TextView
             android:id="@+id/tvPlaceholder"
+            style="@style/TextAppearance.Monio.BodyLarge"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="⏳ Caricamento..."
-            android:textSize="16sp"
-            android:textColor="#757575"
+            android:textColor="@color/text_secondary"
             android:gravity="center"
-            android:padding="32dp"
+            android:padding="@dimen/spacing_xxxl"
             android:visibility="visible" />
 
     </LinearLayout>
@@ -179,9 +183,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
+        android:layout_margin="@dimen/fab_margin"
         android:text="Aggiungi"
+        android:textColor="@color/zinc_950"
         app:icon="@android:drawable/ic_input_add"
+        app:iconTint="@color/zinc_950"
+        app:backgroundTint="@color/gold_primary"
         android:visibility="gone" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

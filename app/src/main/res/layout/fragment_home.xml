@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    ✨ FRAGMENT HOME - Dashboard MONIO
+    ✨ FRAGMENT HOME - Dashboard MONIO DARK MODE
 
-    REFACTORED:
-    - Card styles unificati
-    - Text appearance consistente
-    - Spacing standardizzato
-    - Color references
---><ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    UPDATED:
+    - Tutte le card su background dark
+    - Text colors aggiornati
+    - Surface colors dark
+-->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -71,7 +71,7 @@
             android:layout_height="wrap_content"
             android:text="Questo Mese"
             android:layout_marginBottom="@dimen/spacing_sm"
-            android:textColor="@color/text_dark_primary" />
+            android:textColor="@color/text_primary" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -86,7 +86,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginEnd="@dimen/spacing_xs"
-                app:cardBackgroundColor="@color/surface_white">
+                app:cardBackgroundColor="@color/zinc_900">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -99,7 +99,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="⬆️ Entrate"
-                        android:textColor="@color/text_dark_secondary" />
+                        android:textColor="@color/text_secondary" />
 
                     <TextView
                         android:id="@+id/tvEntrateMese"
@@ -119,7 +119,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginStart="@dimen/spacing_xs"
-                app:cardBackgroundColor="@color/surface_white">
+                app:cardBackgroundColor="@color/zinc_900">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -132,7 +132,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="⬇️ Uscite"
-                        android:textColor="@color/text_dark_secondary" />
+                        android:textColor="@color/text_secondary" />
 
                     <TextView
                         android:id="@+id/tvUsciteMese"
@@ -152,7 +152,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/spacing_md"
-            app:cardBackgroundColor="@color/surface_white">
+            app:cardBackgroundColor="@color/zinc_900">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -165,7 +165,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="📅 Abbonamenti Attivi"
-                    android:textColor="@color/text_dark_primary"
+                    android:textColor="@color/text_primary"
                     android:layout_marginBottom="@dimen/spacing_xs" />
 
                 <LinearLayout
@@ -184,7 +184,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Numero"
-                            android:textColor="@color/text_dark_secondary" />
+                            android:textColor="@color/text_secondary" />
 
                         <TextView
                             android:id="@+id/tvNumeroAbbonamenti"
@@ -206,7 +206,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Costo Mensile"
-                            android:textColor="@color/text_dark_secondary" />
+                            android:textColor="@color/text_secondary" />
 
                         <TextView
                             android:id="@+id/tvCostoAbbonamenti"
@@ -227,7 +227,7 @@
             android:layout_height="wrap_content"
             android:text="I Tuoi Conti"
             android:layout_marginBottom="@dimen/spacing_sm"
-            android:textColor="@color/text_dark_primary" />
+            android:textColor="@color/text_primary" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvConti"
@@ -257,7 +257,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Nessun conto configurato"
-                android:textColor="@color/text_dark_primary"
+                android:textColor="@color/text_primary"
                 android:layout_marginBottom="@dimen/spacing_xs" />
 
             <TextView
@@ -265,7 +265,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Vai alla sezione Conti per aggiungerne uno"
-                android:textColor="@color/text_dark_secondary"
+                android:textColor="@color/text_secondary"
                 android:gravity="center" />
         </LinearLayout>
 

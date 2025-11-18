@@ -2,14 +2,10 @@
 <!--
     ✨ TOAST PERSONALIZZATO - SUCCESSO
     
-    Design premium per messaggi di successo:
-    - Background verde emerald scuro
-    - Icona check circle
-    - Testo bianco chiaro
-    - Border radius 12dp
-    - Elevation per profondità
-    
-    Usage: Mostrare feedback positivo (login riuscito, email inviata, etc.)
+    REFACTORED:
+    - Dimensioni da @dimen
+    - Spacing standardizzato
+    - TextAppearance style applicato
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -17,34 +13,33 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:background="@drawable/bg_toast_success"
-    android:paddingStart="20dp"
-    android:paddingEnd="20dp"
-    android:paddingTop="16dp"
-    android:paddingBottom="16dp"
+    android:paddingStart="@dimen/toast_padding_horizontal"
+    android:paddingEnd="@dimen/toast_padding_horizontal"
+    android:paddingTop="@dimen/toast_padding_vertical"
+    android:paddingBottom="@dimen/toast_padding_vertical"
     android:gravity="center_vertical"
-    android:minWidth="280dp"
-    android:elevation="8dp">
+    android:minWidth="@dimen/toast_min_width"
+    android:elevation="@dimen/elevation_lg">
 
     <!-- Icona Check Circle -->
     <ImageView
         android:id="@+id/ivToastIcon"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
+        android:layout_width="@dimen/toast_icon_size"
+        android:layout_height="@dimen/toast_icon_size"
         android:src="@drawable/ic_check_circle"
         app:tint="@color/white"
-        android:contentDescription="Success icon"
-        android:layout_marginEnd="12dp" />
+        android:contentDescription="@null"
+        android:layout_marginEnd="@dimen/toast_icon_margin_end" />
 
     <!-- Testo del messaggio -->
     <TextView
         android:id="@+id/tvToastMessage"
+        style="@style/TextAppearance.Monio.BodyMedium"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="Operation successful"
         android:textColor="@color/white"
-        android:textSize="15sp"
-        android:fontFamily="sans-serif-medium"
         android:maxLines="2"
         android:ellipsize="end" />
 

@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    ✨ DIALOG AGGIUNGI MOVIMENTO - Material Design 3
+    ✨ DIALOG AGGIUNGI MOVIMENTO - Material Design 3 DARK MODE
 
-    REFACTORED:
-    - TextAppearance styles applicati
-    - Dimensioni da @dimen
-    - Chip styling migliorato
-    - TextInputLayout consistente
-    - Spacing unificato
+    UPDATED:
+    - Background dark (zinc_900)
+    - Text colors dark theme
+    - Input fields dark
+    - Chips dark themed
 -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@color/zinc_900">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -26,7 +26,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Nuovo Movimento"
-            android:textColor="@color/text_dark_primary"
+            android:textColor="@color/text_primary"
             android:layout_marginBottom="@dimen/spacing_xs" />
 
         <!-- Nome Conto -->
@@ -36,7 +36,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Conto: BuddyBank"
-            android:textColor="@color/text_dark_secondary"
+            android:textColor="@color/text_secondary"
             android:layout_marginBottom="@dimen/spacing_xl" />
 
         <!-- Tipo Movimento (Entrata/Uscita) -->
@@ -45,7 +45,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Tipo di movimento"
-            android:textColor="@color/text_dark_primary"
+            android:textColor="@color/text_primary"
             android:layout_marginBottom="@dimen/spacing_xs" />
 
         <com.google.android.material.chip.ChipGroup
@@ -61,7 +61,9 @@
                 style="@style/Widget.Material3.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="⬆️ Entrata" />
+                android:text="⬆️ Entrata"
+                android:textColor="@color/text_primary"
+                app:chipBackgroundColor="@color/zinc_800" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipUscita"
@@ -69,6 +71,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="⬇️ Uscita"
+                android:textColor="@color/text_primary"
+                app:chipBackgroundColor="@color/zinc_800"
                 android:checked="true" />
         </com.google.android.material.chip.ChipGroup>
 
@@ -79,12 +83,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Descrizione *"
+            app:boxStrokeColor="@color/gold_primary"
+            app:hintTextColor="@color/gold_primary"
             android:layout_marginBottom="@dimen/spacing_md">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etDescrizione"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="@color/text_primary"
                 android:inputType="textCapSentences"
                 android:maxLines="2"
                 android:imeOptions="actionNext" />
@@ -97,15 +104,19 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Importo *"
+            app:boxStrokeColor="@color/gold_primary"
+            app:hintTextColor="@color/gold_primary"
             android:layout_marginBottom="@dimen/spacing_md"
             app:prefixText="€ "
             app:helperText="Inserisci solo il numero (es. 50.00)"
+            app:helperTextTextColor="@color/text_tertiary"
             app:helperTextTextAppearance="@style/TextAppearance.Monio.Caption">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etImporto"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="@color/text_primary"
                 android:inputType="numberDecimal"
                 android:maxLines="1"
                 android:imeOptions="actionNext" />
@@ -118,12 +129,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Categoria *"
+            app:boxStrokeColor="@color/gold_primary"
+            app:hintTextColor="@color/gold_primary"
             android:layout_marginBottom="@dimen/spacing_md">
 
             <AutoCompleteTextView
                 android:id="@+id/actvCategoria"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="@color/text_primary"
                 android:inputType="none" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -134,12 +148,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Data *"
+            app:boxStrokeColor="@color/gold_primary"
+            app:hintTextColor="@color/gold_primary"
             android:layout_marginBottom="@dimen/spacing_md">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etData"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="@color/text_primary"
                 android:inputType="none"
                 android:focusable="false"
                 android:clickable="true"
@@ -153,12 +170,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Note (opzionale)"
+            app:boxStrokeColor="@color/gold_primary"
+            app:hintTextColor="@color/gold_primary"
             android:layout_marginBottom="@dimen/spacing_md">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etNote"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="@color/text_primary"
                 android:inputType="textCapSentences|textMultiLine"
                 android:maxLines="3"
                 android:imeOptions="actionDone" />
@@ -170,7 +190,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="* Campi obbligatori"
-            android:textColor="@color/text_dark_secondary"
+            android:textColor="@color/text_secondary"
             android:layout_marginTop="@dimen/spacing_xs"
             android:layout_marginBottom="@dimen/spacing_xl" />
 
@@ -183,19 +203,21 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAnnulla"
-                style="@style/Widget.Material3.Button.OutlinedButton"
+                style="@style/Widget.Monio.Button.Outlined"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/button_height_medium"
                 android:text="Annulla"
-                android:textColor="@color/text_dark_secondary"
+                android:textColor="@color/text_secondary"
                 android:layout_marginEnd="@dimen/spacing_xs" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSalva"
-                style="@style/Widget.Material3.Button"
+                style="@style/Widget.Monio.Button"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/button_height_medium"
-                android:text="Salva Movimento" />
+                android:text="Salva Movimento"
+                app:backgroundTint="@null"
+                android:background="@drawable/bg_gold_gradient" />
         </LinearLayout>
 
     </LinearLayout>
