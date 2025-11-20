@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    ✨ DIALOG PREMIUM - Informazioni Profilo
+
+    Design coerente con il tema MONIO dark premium
+-->
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/Widget.Monio.CardView.Elevated"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/dialog_margin_horizontal"
+    android:layout_marginEnd="@dimen/dialog_margin_horizontal">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/dialog_padding">
+
+        <!-- ========== ICONA PROFILO ========== -->
+
+        <FrameLayout
+            android:layout_width="@dimen/dialog_icon_circle_size"
+            android:layout_height="@dimen/dialog_icon_circle_size"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/bg_icon_circle_gold">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="👤"
+                android:textSize="@dimen/text_size_display_large"
+                android:gravity="center" />
+        </FrameLayout>
+
+        <!-- ========== TITOLO ========== -->
+
+        <TextView
+            style="@style/TextAppearance.Monio.TitleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/spacing_lg"
+            android:text="👤 Profilo Utente"
+            android:textColor="@color/text_primary" />
+
+        <!-- ========== DIVIDER ========== -->
+
+        <View
+            style="@style/Widget.Monio.Divider"
+            android:layout_marginTop="@dimen/spacing_xl"
+            android:layout_marginBottom="@dimen/spacing_lg" />
+
+        <!-- ========== EMAIL ========== -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="@dimen/spacing_md">
+
+            <TextView
+                style="@style/TextAppearance.Monio.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Email"
+                android:textColor="@color/text_tertiary"
+                android:layout_marginBottom="@dimen/spacing_xxxs" />
+
+            <TextView
+                android:id="@+id/tvProfileEmail"
+                style="@style/TextAppearance.Monio.BodyLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="user@example.com"
+                android:textColor="@color/text_primary"
+                android:textIsSelectable="true" />
+        </LinearLayout>
+
+        <!-- ========== USER ID ========== -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="@dimen/spacing_lg">
+
+            <TextView
+                style="@style/TextAppearance.Monio.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="User ID"
+                android:textColor="@color/text_tertiary"
+                android:layout_marginBottom="@dimen/spacing_xxxs" />
+
+            <TextView
+                android:id="@+id/tvProfileUid"
+                style="@style/TextAppearance.Monio.BodyMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="abc123xyz789"
+                android:textColor="@color/text_secondary"
+                android:fontFamily="monospace"
+                android:textIsSelectable="true" />
+        </LinearLayout>
+
+        <!-- ========== DIVIDER ========== -->
+
+        <View
+            style="@style/Widget.Monio.Divider"
+            android:layout_marginTop="@dimen/spacing_sm"
+            android:layout_marginBottom="@dimen/spacing_lg" />
+
+        <!-- ========== PULSANTE OK ========== -->
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnProfileOk"
+            style="@style/Widget.Monio.Button"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height_large"
+            android:text="OK"
+            app:backgroundTint="@null"
+            android:background="@drawable/bg_gold_gradient" />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

@@ -367,4 +367,23 @@
         <item name="android:listSelector">@drawable/selector_menu_item_dark</item>
     </style>
 
+    <!-- ========== THEME OVERLAYS ========== -->
+
+    <!-- Theme Overlay per Popup Menu (menu overflow toolbar) -->
+    <style name="ThemeOverlay.Monio.PopupMenu" parent="ThemeOverlay.Material3.Dark">
+        <item name="android:colorBackground">@color/zinc_900</item>
+        <item name="colorSurface">@color/zinc_900</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+        <item name="popupMenuBackground">@drawable/bg_popup_menu_dark</item>
+        <item name="actionOverflowMenuStyle">@style/Widget.Monio.PopupMenu.Overflow</item>
+    </style>
+
+    <!-- Stile per il menu overflow -->
+    <style name="Widget.Monio.PopupMenu.Overflow" parent="Widget.Material3.PopupMenu.Overflow">
+        <item name="android:popupBackground">@drawable/bg_popup_menu_dark</item>
+        <item name="android:popupElevation">@dimen/elevation_lg</item>
+        <item name="android:dropDownVerticalOffset">@dimen/spacing_xxs</item>
+    </style>
 </resources>

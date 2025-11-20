@@ -8,6 +8,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.conti.auth.AuthManager
 import com.example.conti.auth.LoginActivity
+import com.example.conti.auth.PremiumDialogHelper
 import com.example.conti.data.repository.FirestoreRepository
 import com.example.conti.databinding.ActivityMainBinding
 import com.example.conti.utils.FirebaseDiagnostic
@@ -166,17 +167,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Mostra dialog di conferma logout
+     * Mostra dialog di conferma logout premium
      */
     private fun showLogoutDialog() {
-        MaterialAlertDialogBuilder(this)
-            .setTitle("Logout")
-            .setMessage("Sei sicuro di voler uscire?")
-            .setPositiveButton("Sì, esci") { _, _ ->
+        PremiumDialogHelper.showLogoutConfirmDialog(
+            context = this,
+            onConfirm = {
                 performLogout()
+            },
+            onCancel = {
+                // Dialog annullato
+                android.util.Log.d("MainActivity", "Logout annullato")
             }
-            .setNegativeButton("Annulla", null)
-            .show()
+        )
     }
 
     /**
@@ -193,18 +196,23 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Mostra informazioni profilo
+     * Mostra informazioni profilo con dialog premium
      */
     private fun showProfileInfo() {
         val user = authManager.currentUser
         val email = user?.email ?: "Utente anonimo"
         val uid = user?.uid ?: "N/A"
 
-        MaterialAlertDialogBuilder(this)
-            .setTitle("👤 Profilo Utente")
-            .setMessage("Email: $email\n\nUser ID: $uid")
-            .setPositiveButton("OK", null)
-            .show()
+        // ✅ USA IL DIALOG PREMIUM
+        PremiumDialogHelper.showProfileInfoDialog(
+            context = this,
+            email = email,
+            uid = uid,
+            onOkClick = {
+                // Dialog chiuso
+                android.util.Log.d("MainActivity", "Dialog profilo chiuso")
+            }
+        )
     }
 
     /**
