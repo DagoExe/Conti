@@ -168,9 +168,9 @@ class MovimentiFragment : Fragment() {
         binding.tvPlaceholder.visibility = View.VISIBLE
 
         val hintText = if (accountId != null) {
-            "Nessun movimento per questo conto.\n\n💡 Tocca il pulsante + per aggiungere il primo movimento!"
+            "💡 Tocca il pulsante + per aggiungere il primo movimento!"
         } else {
-            "Nessun movimento presente.\n\n💡 Vai alla sezione Conti per aggiungere movimenti."
+            "💡 Vai alla sezione Conti per aggiungere movimenti."
         }
 
         binding.tvPlaceholder.text = """

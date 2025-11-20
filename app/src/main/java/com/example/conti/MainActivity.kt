@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.conti.auth.AuthManager
@@ -30,6 +31,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var authManager: AuthManager
     private val firestoreRepository = FirestoreRepository()
+
+    private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -233,38 +236,63 @@ class MainActivity : AppCompatActivity() {
             val navHostFragment = supportFragmentManager
                 .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
 
-            val navController = navHostFragment.navController
+            navController = navHostFragment.navController
 
             // ✅ Listener personalizzato per gestire il "re-click" sulla stessa tab
             binding.bottomNavigation.setOnItemSelectedListener { item ->
-                when (item.itemId) {
-                    R.id.navigation_rate -> {
-                        // Naviga a Rate
-                        navController.navigate(R.id.navigation_rate)
-                        true
+
+                // Controlla se siamo già nella tab selezionata
+                val currentId = navController.currentDestination?.id
+                val targetId = item.itemId
+
+                // Se clicchiamo sulla tab Conti e siamo in un fragment figlio (es. Movimenti),
+                // torniamo indietro fino a ContiFragment
+                if (targetId == R.id.navigation_conti && currentId == R.id.navigation_movimenti) {
+                    navController.popBackStack(R.id.navigation_conti, false)
+                    return@setOnItemSelectedListener true
+                }
+
+                // Per gli altri casi, comportamento standard
+                if (item.itemId != binding.bottomNavigation.selectedItemId) {
+                    when (item.itemId) {
+                        R.id.navigation_rate -> {
+                            navController.navigate(R.id.navigation_rate)
+                            true
+                        }
+                        R.id.navigation_conti -> {
+                            // Quando si passa a Conti, puliamo lo stack fino a Conti
+                            // per assicurare di vedere la lista conti e non i movimenti
+                            navController.popBackStack(R.id.navigation_conti, true)
+                            navController.navigate(R.id.navigation_conti)
+                            true
+                        }
+                        R.id.navigation_home -> {
+                            navController.navigate(R.id.navigation_home)
+                            true
+                        }
+                        R.id.navigation_abbonamenti -> {
+                            navController.navigate(R.id.navigation_abbonamenti)
+                            true
+                        }
+                        R.id.navigation_debiti -> {
+                            navController.navigate(R.id.navigation_debiti)
+                            true
+                        }
+                        else -> false
                     }
-                    R.id.navigation_conti -> {
-                        navController.navigate(R.id.navigation_conti)
-                        true
-                    }
-                    R.id.navigation_home -> {
-                        navController.navigate(R.id.navigation_home)
-                        true
-                    }
-                    R.id.navigation_abbonamenti -> {
-                        navController.navigate(R.id.navigation_abbonamenti)
-                        true
-                    }
-                    R.id.navigation_debiti -> {
-                        navController.navigate(R.id.navigation_debiti)
-                        true
-                    }
-                    else -> false
+                } else {
+                    // Re-click sulla stessa tab: resetta lo stack alla root di quella tab
+                    // Utile per tornare alla lista principale se si è dentro un dettaglio
+                    navController.popBackStack(item.itemId, false)
+                    true
                 }
             }
 
-            // ✅ Setup STANDARD della bottom navigation
-            binding.bottomNavigation.setupWithNavController(navController)
+            // Sincronizza lo stato iniziale del menu
+            binding.bottomNavigation.setOnItemReselectedListener { item ->
+                // Se l'utente clicca di nuovo sulla tab attiva, torna alla root di quella sezione
+                navController.popBackStack(item.itemId, false)
+            }
 
             // ✅ Listener per aggiornare il titolo della toolbar
             navController.addOnDestinationChangedListener { _, destination, _ ->
@@ -276,6 +304,16 @@ class MainActivity : AppCompatActivity() {
                     R.id.navigation_debiti -> "Debiti"
                     R.id.navigation_movimenti -> "Movimenti"
                     else -> "Conti"
+                }
+
+                // Aggiorna selezione bottom navigation se necessario
+                // (utile quando si naviga programmaticamente o tramite back button)
+                when (destination.id) {
+                    R.id.navigation_rate -> binding.bottomNavigation.menu.findItem(R.id.navigation_rate).isChecked = true
+                    R.id.navigation_conti, R.id.navigation_movimenti -> binding.bottomNavigation.menu.findItem(R.id.navigation_conti).isChecked = true
+                    R.id.navigation_home -> binding.bottomNavigation.menu.findItem(R.id.navigation_home).isChecked = true
+                    R.id.navigation_abbonamenti -> binding.bottomNavigation.menu.findItem(R.id.navigation_abbonamenti).isChecked = true
+                    R.id.navigation_debiti -> binding.bottomNavigation.menu.findItem(R.id.navigation_debiti).isChecked = true
                 }
             }
 
