@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    ✨ DROPDOWN MENU ITEM - Dark Theme
+
+    Layout custom per item nei menu dropdown
+    utilizzato da AutoCompleteTextView e Spinner
+-->
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@android:id/text1"
+    style="@style/TextAppearance.Monio.Menu"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="@dimen/button_height_medium"
+    android:paddingStart="@dimen/spacing_md"
+    android:paddingEnd="@dimen/spacing_md"
+    android:paddingTop="@dimen/spacing_sm"
+    android:paddingBottom="@dimen/spacing_sm"
+    android:gravity="center_vertical"
+    android:textColor="@color/selector_menu_item_text_color"
+    android:background="@drawable/selector_menu_item_dark"
+    android:ellipsize="end"
+    android:maxLines="1" />

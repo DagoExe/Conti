@@ -6,21 +6,29 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
+import com.example.conti.R
 import com.example.conti.data.repository.FirestoreRepository
 import com.example.conti.databinding.DialogAggiungiMovimentoBinding
 import com.example.conti.models.Transaction
 import com.example.conti.utils.Constants
 import com.example.conti.utils.CurrencyUtils
+import com.example.conti.utils.MessageHelper
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
 /**
- * DialogFragment per aggiungere un nuovo movimento.
+ * ✨ DialogFragment per aggiungere un nuovo movimento - DARK MODE PREMIUM
+ *
+ * AGGIORNATO con:
+ * - ChipGroup per Entrata/Uscita (invece di chip singoli)
+ * - Tema dark premium MONIO
+ * - Dropdown con layout personalizzato
+ * - Toast posizionati in basso
+ * - Helper text
  *
  * UTILIZZO:
  * ```
@@ -47,7 +55,8 @@ class AddTransactionDialogFragment : DialogFragment() {
 
         // Recupera argomenti
         arguments?.let {
-            accountId = it.getString(ARG_ACCOUNT_ID) ?: throw IllegalArgumentException("accountId mancante")
+            accountId = it.getString(ARG_ACCOUNT_ID)
+                ?: throw IllegalArgumentException("accountId mancante")
             accountName = it.getString(ARG_ACCOUNT_NAME) ?: "Conto"
         }
     }
@@ -88,19 +97,25 @@ class AddTransactionDialogFragment : DialogFragment() {
 
         // Imposta data corrente
         updateDateField()
+
+        // ✅ IMPORTANTE: ChipGroup con singleSelection
+        // Il chip "Uscita" è già selezionato di default nel XML (android:checked="true")
+        // Ma possiamo forzarlo per sicurezza:
+        binding.chipGroupTipo.check(R.id.chipUscita)
     }
 
     /**
-     * Setup dropdown categorie
+     * ✅ Setup dropdown categorie con layout personalizzato per dark theme
      */
     private fun setupCategoryDropdown() {
         val categorie = Constants.CATEGORIE_DEFAULT.map { categoria ->
             getCategoryIcon(categoria) + " " + categoria
         }
 
+        // ✅ Usa layout personalizzato per dropdown dark theme
         val adapter = ArrayAdapter(
             requireContext(),
-            android.R.layout.simple_dropdown_item_1line,
+            R.layout.item_dropdown_menu,  // Layout personalizzato dark
             categorie
         )
 
@@ -159,7 +174,7 @@ class AddTransactionDialogFragment : DialogFragment() {
     }
 
     /**
-     * Valida e salva il movimento
+     * ✅ Valida e salva il movimento con toast in basso
      */
     private fun salvaMovimento() {
         // === VALIDAZIONE CAMPI ===
@@ -195,8 +210,8 @@ class AddTransactionDialogFragment : DialogFragment() {
         // Note (opzionali)
         val note = binding.etNote.text.toString().trim().takeIf { it.isNotBlank() }
 
-        // Tipo (Entrata/Uscita)
-        val isEntrata = binding.chipEntrata.isChecked
+        // ✅ IMPORTANTE: Usa ChipGroup invece di chip individuali
+        val isEntrata = binding.chipGroupTipo.checkedChipId == R.id.chipEntrata
         val importoFinale = if (isEntrata) importo else -importo
         val tipo = if (isEntrata) "income" else "expense"
 
@@ -221,31 +236,31 @@ class AddTransactionDialogFragment : DialogFragment() {
                     .onSuccess {
                         android.util.Log.d(TAG, "✅ Movimento salvato con successo")
 
-                        Toast.makeText(
+                        // ✅ Toast SUCCESS in basso
+                        MessageHelper.showSuccess(
                             requireContext(),
-                            "✅ Movimento aggiunto",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                            "✅ Movimento aggiunto"
+                        )
 
                         dismiss()
                     }
                     .onFailure { e ->
                         android.util.Log.e(TAG, "❌ Errore salvataggio movimento", e)
 
-                        Toast.makeText(
+                        // ✅ Toast ERROR in basso
+                        MessageHelper.showError(
                             requireContext(),
-                            "❌ Errore: ${e.message}",
-                            Toast.LENGTH_LONG
-                        ).show()
+                            "❌ Errore: ${e.message}"
+                        )
                     }
             } catch (e: Exception) {
                 android.util.Log.e(TAG, "❌ Eccezione durante salvataggio", e)
 
-                Toast.makeText(
+                // ✅ Toast ERROR in basso
+                MessageHelper.showError(
                     requireContext(),
-                    "❌ Errore: ${e.message}",
-                    Toast.LENGTH_LONG
-                ).show()
+                    "❌ Errore: ${e.message}"
+                )
             }
         }
     }

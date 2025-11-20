@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    ✨ MENU ITEM SELECTOR - Dark Theme
+
+    Selector per item dei menu dropdown
+    - Stato premuto: gold con trasparenza
+    - Stato selected: zinc_800
+    - Stato normale: trasparente
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Stato premuto -->
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <solid android:color="#33BFA14A" />
+            <corners android:radius="@dimen/corner_radius_xs" />
+        </shape>
+    </item>
+
+    <!-- Stato focused/selezionato -->
+    <item android:state_focused="true">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/zinc_800" />
+            <corners android:radius="@dimen/corner_radius_xs" />
+        </shape>
+    </item>
+
+    <!-- Stato attivato (per ExposedDropdownMenu) -->
+    <item android:state_activated="true">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/zinc_800" />
+            <corners android:radius="@dimen/corner_radius_xs" />
+        </shape>
+    </item>
+
+    <!-- Stato normale -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/transparent" />
+            <corners android:radius="@dimen/corner_radius_xs" />
+        </shape>
+    </item>
+
+</selector>

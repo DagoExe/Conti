@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -15,11 +14,19 @@ import com.example.conti.models.Account
 import com.example.conti.models.AccountType
 import com.example.conti.ui.account.AccountsViewModel
 import com.example.conti.utils.CurrencyUtils
+import com.example.conti.utils.MessageHelper
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.launch
 
 /**
- * DialogFragment per aggiungere un nuovo conto.
+ * ✨ DialogFragment per aggiungere un nuovo conto - DARK MODE PREMIUM
+ *
+ * AGGIORNATO con:
+ * - Tema dark premium MONIO
+ * - Dropdown con layout personalizzato
+ * - Toast posizionati in basso
+ * - Validazione IBAN migliorata
+ * - Helper text
  */
 class AddAccountDialogFragment : DialogFragment() {
 
@@ -54,7 +61,7 @@ class AddAccountDialogFragment : DialogFragment() {
     }
 
     /**
-     * Setup del dropdown per selezionare il tipo di conto
+     * ✅ Setup del dropdown con layout personalizzato per dark theme
      */
     private fun setupDropdown() {
         val tipiConto = listOf(
@@ -63,9 +70,10 @@ class AddAccountDialogFragment : DialogFragment() {
             "🏛️ Altro Conto"
         )
 
+        // ✅ Usa layout personalizzato per dropdown dark theme
         val adapter = ArrayAdapter(
             requireContext(),
-            android.R.layout.simple_dropdown_item_1line,
+            R.layout.item_dropdown_menu,  // Layout personalizzato dark
             tipiConto
         )
 
@@ -89,10 +97,12 @@ class AddAccountDialogFragment : DialogFragment() {
     }
 
     /**
-     * Valida e salva il nuovo account
+     * ✅ Valida e salva il nuovo account con toast in basso
      */
     private fun salvaAccount() {
-        // Valida i campi
+        // === VALIDAZIONE CAMPI ===
+
+        // Nome Conto
         val nomeConto = binding.etNomeConto.text.toString().trim()
         if (nomeConto.isBlank()) {
             binding.tilNomeConto.error = "Inserisci il nome del conto"
@@ -100,6 +110,7 @@ class AddAccountDialogFragment : DialogFragment() {
         }
         binding.tilNomeConto.error = null
 
+        // Tipo Conto
         val tipoContoSelezionato = binding.actvTipoConto.text.toString()
         val accountType = when {
             tipoContoSelezionato.contains("BuddyBank") -> AccountType.BUDDYBANK
@@ -107,6 +118,7 @@ class AddAccountDialogFragment : DialogFragment() {
             else -> AccountType.OTHER
         }
 
+        // Saldo Iniziale
         val saldoString = binding.etSaldoIniziale.text.toString().trim()
         val saldo = CurrencyUtils.parseImporto(saldoString)
         if (saldo == null) {
@@ -115,6 +127,7 @@ class AddAccountDialogFragment : DialogFragment() {
         }
         binding.tilSaldoIniziale.error = null
 
+        // IBAN (opzionale)
         val iban = binding.etIban.text.toString().trim().uppercase()
             .takeIf { it.isNotBlank() }
 
@@ -125,10 +138,10 @@ class AddAccountDialogFragment : DialogFragment() {
         }
         binding.tilIban.error = null
 
-        // Genera un ID unico per il conto
+        // === CREA ACCOUNT ===
+
         val accountId = generateAccountId(nomeConto)
 
-        // Crea l'account
         val account = Account(
             accountId = accountId,
             accountName = nomeConto,
@@ -139,15 +152,16 @@ class AddAccountDialogFragment : DialogFragment() {
             lastUpdated = Timestamp.now()
         )
 
-        // Salva l'account tramite il ViewModel
+        // === SALVA TRAMITE VIEWMODEL ===
+
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.saveAccount(account)
 
-            Toast.makeText(
+            // ✅ Toast SUCCESS in basso
+            MessageHelper.showSuccess(
                 requireContext(),
-                "✅ Conto \"$nomeConto\" creato con successo",
-                Toast.LENGTH_SHORT
-            ).show()
+                "✅ Conto \"$nomeConto\" creato con successo"
+            )
 
             dismiss()
         }
@@ -167,8 +181,8 @@ class AddAccountDialogFragment : DialogFragment() {
     }
 
     /**
-    * Validazione IBAN completa con checksum
-    */
+     * ✅ Validazione IBAN completa con checksum MOD-97
+     */
     private fun isIbanValid(iban: String): Boolean {
         val cleanIban = iban.replace(" ", "").uppercase()
 

@@ -56,6 +56,16 @@
         <item name="textAppearanceLabelMedium">@style/TextAppearance.Monio.LabelMedium</item>
         <item name="textAppearanceLabelSmall">@style/TextAppearance.Monio.LabelSmall</item>
 
+        <!-- ========== MENU & DROPDOWN ========== -->
+        <item name="popupMenuStyle">@style/Widget.Monio.PopupMenu</item>
+        <item name="listPopupWindowStyle">@style/Widget.Monio.ListPopupWindow</item>
+        <item name="autoCompleteTextViewStyle">@style/Widget.Monio.AutoCompleteTextView</item>
+        <item name="dropDownListViewStyle">@style/Widget.Monio.ListView.DropDown</item>
+
+        <!-- Text appearance per menu items -->
+        <item name="textAppearanceLargePopupMenu">@style/TextAppearance.Monio.Menu</item>
+        <item name="textAppearanceSmallPopupMenu">@style/TextAppearance.Monio.Menu</item>
+
     </style>
 
     <!-- Tema applicato all'app -->
@@ -313,6 +323,48 @@
     <style name="TextAppearance.Monio.AmountNeutral" parent="TextAppearance.Monio.BodyLarge">
         <item name="android:textColor">@color/info_500</item>
         <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- ========== MENU & DROPDOWN STYLES ========== -->
+
+    <!-- Popup Menu Style (per dropdown, context menu, etc.) -->
+    <style name="Widget.Monio.PopupMenu" parent="Widget.Material3.PopupMenu">
+        <item name="android:popupBackground">@drawable/bg_popup_menu_dark</item>
+        <item name="android:popupElevation">@dimen/elevation_lg</item>
+    </style>
+
+    <style name="Widget.Monio.ListPopupWindow" parent="">
+        <item name="android:popupBackground">@drawable/bg_popup_menu_dark</item>
+        <item name="android:dropDownVerticalOffset">@dimen/spacing_xxs</item>
+        <item name="android:dropDownHorizontalOffset">0dp</item>
+    </style>
+
+    <!-- AutoCompleteTextView Style -->
+    <style name="Widget.Monio.AutoCompleteTextView" parent="Widget.Material3.AutoCompleteTextView.OutlinedBox">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textColorHint">@color/text_tertiary</item>
+        <item name="android:popupBackground">@drawable/bg_popup_menu_dark</item>
+        <item name="android:dropDownSelector">@drawable/selector_menu_item_dark</item>
+    </style>
+
+    <!-- Menu Item Text Appearance -->
+    <style name="TextAppearance.Monio.Menu" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:textSize">@dimen/text_size_body_large</item>
+        <item name="android:textColor">@color/text_primary</item>
+    </style>
+
+    <!-- Spinner Style (se usato) -->
+    <style name="Widget.Monio.Spinner" parent="Widget.Material3.CompoundButton.Switch">
+        <item name="android:background">@drawable/bg_popup_menu_dark</item>
+        <item name="android:popupBackground">@drawable/bg_popup_menu_dark</item>
+        <item name="android:dropDownSelector">@drawable/selector_menu_item_dark</item>
+    </style>
+
+    <style name="Widget.Monio.ListView.DropDown" parent="android:Widget">
+        <item name="android:background">@color/zinc_900</item>
+        <item name="android:divider">@color/zinc_800</item>
+        <item name="android:dividerHeight">@dimen/divider_height</item>
+        <item name="android:listSelector">@drawable/selector_menu_item_dark</item>
     </style>
 
 </resources>

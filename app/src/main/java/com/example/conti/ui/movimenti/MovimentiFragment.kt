@@ -12,6 +12,7 @@ import com.example.conti.databinding.FragmentMovimentiBinding
 import com.example.conti.models.Transaction
 import com.example.conti.ui.adapters.TransactionAdapter
 import com.example.conti.utils.CurrencyUtils
+import com.example.conti.utils.MessageHelper
 import kotlinx.coroutines.launch
 
 /**
@@ -97,7 +98,11 @@ class MovimentiFragment : Fragment() {
      */
     private fun showAddTransactionDialog() {
         if (accountId == null) {
-            android.util.Log.w("MovimentiFragment", "⚠️ Impossibile aggiungere movimento senza accountId")
+            // ✅ Toast ERROR in basso
+            MessageHelper.showError(
+                requireContext(),
+                "Seleziona prima un conto"
+            )
             return
         }
 

@@ -71,12 +71,15 @@
 
             <AutoCompleteTextView
                 android:id="@+id/actvTipoConto"
+                style="@style/Widget.Monio.AutoCompleteTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@color/text_primary"
                 android:inputType="none"
                 android:focusable="false"
-                android:cursorVisible="false" />
+                android:cursorVisible="false"
+                android:dropDownHeight="wrap_content"
+                android:popupBackground="@drawable/bg_popup_menu_dark" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Saldo Iniziale -->

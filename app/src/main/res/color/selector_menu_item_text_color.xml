@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    ✨ MENU ITEM TEXT COLOR - Dark Theme
+
+    Colore testo per item menu dropdown
+    - Selezionato/Attivo: Gold
+    - Disabled: Text disabled
+    - Normale: Text primary
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Stato disabilitato -->
+    <item android:color="@color/text_disabled" android:state_enabled="false" />
+
+    <!-- Stato premuto -->
+    <item android:color="@color/gold_primary" android:state_pressed="true" />
+
+    <!-- Stato focused -->
+    <item android:color="@color/gold_primary" android:state_focused="true" />
+
+    <!-- Stato attivato -->
+    <item android:color="@color/gold_primary" android:state_activated="true" />
+
+    <!-- Stato selected -->
+    <item android:color="@color/gold_primary" android:state_selected="true" />
+
+    <!-- Stato normale -->
+    <item android:color="@color/text_primary" />
+
+</selector>
