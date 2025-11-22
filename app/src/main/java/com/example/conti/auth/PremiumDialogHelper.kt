@@ -166,13 +166,15 @@ object PremiumDialogHelper {
      * @param email Email dell'utente
      * @param uid User ID Firebase
      * @param onOkClick Callback quando l'utente clicca "OK"
+     * @param onLogoutClick Callback opzionale per logout dal dialog del profilo
      * @return Dialog configurato (già mostrato)
      */
     fun showProfileInfoDialog(
         context: Context,
         email: String,
         uid: String,
-        onOkClick: () -> Unit
+        onOkClick: () -> Unit,
+        onLogoutClick: (() -> Unit)? = null
     ): Dialog {
         // Crea il dialog con layout custom
         val dialog = Dialog(context)
@@ -191,6 +193,18 @@ object PremiumDialogHelper {
         val tvEmail = view.findViewById<TextView>(R.id.tvProfileEmail)
         val tvUid = view.findViewById<TextView>(R.id.tvProfileUid)
         val btnOk = view.findViewById<MaterialButton>(R.id.btnProfileOk)
+        
+        // Se presente un pulsante di logout nel layout del dialog, configuralo
+        val btnLogout = view.findViewById<MaterialButton>(R.id.btnProfileLogout)
+        if (btnLogout != null && onLogoutClick != null) {
+            btnLogout.visibility = android.view.View.VISIBLE
+            btnLogout.setOnClickListener {
+                dialog.dismiss()
+                onLogoutClick()
+            }
+        } else if (btnLogout != null) {
+            btnLogout.visibility = android.view.View.GONE
+        }
 
         tvEmail.text = email
         tvUid.text = uid

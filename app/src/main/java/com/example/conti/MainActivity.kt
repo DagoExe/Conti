@@ -1,12 +1,19 @@
 package com.example.conti
 
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.LinearGradient
+import android.graphics.Shader
 import android.os.Bundle
+import android.view.View
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
+import com.bumptech.glide.Glide
 import com.example.conti.auth.AuthManager
 import com.example.conti.auth.LoginActivity
 import com.example.conti.auth.PremiumDialogHelper
@@ -25,6 +32,7 @@ import kotlinx.coroutines.launch
  * - Controllo autenticazione ritardato per permettere init Firebase
  * - Migliore gestione degli stati di caricamento
  * - Diagnostica Firebase integrata
+ * - Immagine profilo nella toolbar
  */
 class MainActivity : AppCompatActivity() {
 
@@ -134,6 +142,7 @@ class MainActivity : AppCompatActivity() {
         // Setup UI
         setupNavigation()
         setupToolbarMenu()
+        setupToolbarTitleGradient() // ✅ Aggiunta chiamata per il gradiente
         android.util.Log.d("MainActivity", "✅ Navigation setup")
 
         // Setup profilo utente
@@ -146,27 +155,115 @@ class MainActivity : AppCompatActivity() {
         android.util.Log.d("MainActivity", "   SETUP COMPLETED")
         android.util.Log.d("MainActivity", "═══════════════════════════════════════")
     }
+    
+    /**
+     * Applica il gradiente oro al titolo della toolbar
+     */
+    private fun setupToolbarTitleGradient() {
+        try {
+            // Un modo per ottenere la TextView del titolo della toolbar è iterare sui child
+            // oppure usare reflection, ma spesso basta cercare un TextView diretto se il titolo è settato
+            
+            // Poiché MaterialToolbar non espone direttamente la TextView del titolo,
+            // useremo un piccolo trucco: postiamo un runnable che cerca la TextView dopo che il layout è completato
+            binding.toolbar.post {
+                val toolbar = binding.toolbar
+                for (i in 0 until toolbar.childCount) {
+                    val child = toolbar.getChildAt(i)
+                    if (child is TextView) {
+                        // Verifica se è il titolo (potrebbe esserci anche il sottotitolo)
+                        // Generalmente il titolo ha il testo che abbiamo impostato
+                        if (child.text == "MONIO") {
+                            applyGoldGradientToTextView(child)
+                            break
+                        }
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("MainActivity", "Errore applicazione gradiente titolo", e)
+        }
+    }
+    
+    private fun applyGoldGradientToTextView(textView: TextView) {
+        val paint = textView.paint
+        val width = paint.measureText(textView.text.toString())
+        
+        // Colori del gradiente oro (presi da colors.xml: gold_light, gold_primary, gold_dark)
+        // #D4B86A, #BFA14A, #9A7D35
+        val textShader = LinearGradient(
+            0f, 0f, width, textView.textSize,
+            intArrayOf(
+                Color.parseColor("#D4B86A"), // gold_light
+                Color.parseColor("#BFA14A"), // gold_primary
+                Color.parseColor("#9A7D35")  // gold_dark
+            ),
+            null,
+            Shader.TileMode.CLAMP
+        )
+        textView.paint.shader = textShader
+    }
 
     /**
-     * Setup menu toolbar con pulsante logout
+     * Setup menu toolbar con pulsante logout e immagine profilo
      */
     private fun setupToolbarMenu() {
+        // Infla il menu
+        binding.toolbar.inflateMenu(R.menu.toolbar_menu)
+
+        // ✅ Setup dell'action layout per l'immagine del profilo
+        val profileItem = binding.toolbar.menu.findItem(R.id.action_user_avatar)
+        val actionView = profileItem.actionView
+        
+        if (actionView != null) {
+            // Configura il click listener sull'action view
+            actionView.setOnClickListener {
+                showProfileInfo()
+            }
+
+            // Carica l'immagine del profilo
+            val userAvatar = actionView.findViewById<ImageView>(R.id.iv_user_avatar)
+            loadUserAvatar(userAvatar)
+        }
+        
+        // Listener per gli altri elementi del menu (se ce ne fossero)
         binding.toolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
-                R.id.action_logout -> {
-                    showLogoutDialog()
-                    true
-                }
-                R.id.action_profile -> {
+                // Non più necessario se usiamo l'actionLayout cliccabile, ma manteniamo per sicurezza
+                R.id.action_user_avatar -> {
                     showProfileInfo()
                     true
                 }
                 else -> false
             }
         }
+    }
 
-        // Infla il menu
-        binding.toolbar.inflateMenu(R.menu.toolbar_menu)
+    /**
+     * Carica l'immagine profilo dell'utente (Google o default)
+     */
+    private fun loadUserAvatar(imageView: ImageView) {
+        val user = authManager.currentUser
+        val photoUrl = user?.photoUrl
+
+        if (photoUrl != null) {
+            // Carica immagine da URL usando Glide
+            try {
+                Glide.with(this)
+                    .load(photoUrl)
+                    .placeholder(R.drawable.ic_default_avatar)
+                    .error(R.drawable.ic_default_avatar)
+                    .circleCrop()
+                    .into(imageView)
+            } catch (e: Exception) {
+                // Fallback in caso di errore (es. Glide non inizializzato o dipendenza mancante)
+                android.util.Log.e("MainActivity", "Errore caricamento immagine profilo", e)
+                imageView.setImageResource(R.drawable.ic_default_avatar)
+            }
+        } else {
+            // Immagine di default
+            imageView.setImageResource(R.drawable.ic_default_avatar)
+        }
     }
 
     /**
@@ -206,14 +303,17 @@ class MainActivity : AppCompatActivity() {
         val email = user?.email ?: "Utente anonimo"
         val uid = user?.uid ?: "N/A"
 
-        // ✅ USA IL DIALOG PREMIUM
+        // ✅ USA IL DIALOG PREMIUM CON OPZIONE LOGOUT
         PremiumDialogHelper.showProfileInfoDialog(
             context = this,
             email = email,
             uid = uid,
             onOkClick = {
                 // Dialog chiuso
-                android.util.Log.d("MainActivity", "Dialog profilo chiuso")
+            },
+            // Aggiungiamo un pulsante di logout nel dialog del profilo
+            onLogoutClick = {
+                showLogoutDialog()
             }
         )
     }
@@ -296,15 +396,12 @@ class MainActivity : AppCompatActivity() {
 
             // ✅ Listener per aggiornare il titolo della toolbar
             navController.addOnDestinationChangedListener { _, destination, _ ->
-                binding.toolbar.title = when (destination.id) {
-                    R.id.navigation_rate -> "Rate"
-                    R.id.navigation_conti -> "I Tuoi Conti"
-                    R.id.navigation_home -> "Home"
-                    R.id.navigation_abbonamenti -> "Abbonamenti"
-                    R.id.navigation_debiti -> "Debiti"
-                    R.id.navigation_movimenti -> "Movimenti"
-                    else -> "Conti"
-                }
+                // 🔥 MODIFICATO: Imposta sempre "MONIO" come titolo, indipendentemente dalla destinazione
+                binding.toolbar.title = "MONIO"
+                
+                // Riapplica il gradiente ogni volta che cambia destinazione per sicurezza
+                // (a volte la toolbar potrebbe ricreare la TextView)
+                setupToolbarTitleGradient()
 
                 // Aggiorna selezione bottom navigation se necessario
                 // (utile quando si naviga programmaticamente o tramite back button)

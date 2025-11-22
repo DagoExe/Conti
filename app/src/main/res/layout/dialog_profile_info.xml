@@ -112,6 +112,21 @@
             android:layout_marginTop="@dimen/spacing_sm"
             android:layout_marginBottom="@dimen/spacing_lg" />
 
+        <!-- ========== PULSANTE LOGOUT ========== -->
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnProfileLogout"
+            style="@style/Widget.Monio.Button.Outlined"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height_large"
+            android:text="Logout"
+            android:textColor="@color/error_500"
+            app:strokeColor="@color/error_500"
+            android:layout_marginBottom="@dimen/spacing_sm"
+            android:visibility="gone"
+            tools:visibility="visible"
+            xmlns:tools="http://schemas.android.com/tools" />
+
         <!-- ========== PULSANTE OK ========== -->
 
         <com.google.android.material.button.MaterialButton

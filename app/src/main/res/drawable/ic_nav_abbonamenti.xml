@@ -1,12 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="24dp"
-    android:height="24dp"
-    android:viewportWidth="24"
-    android:viewportHeight="24">
-
-    <!-- Repeat/Sync icon -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M12,6v3l4,-4 -4,-4v3c-4.42,0 -8,3.58 -8,8 0,1.57 0.46,3.03 1.24,4.26L6.7,14.8c-0.45,-0.83 -0.7,-1.79 -0.7,-2.8 0,-3.31 2.69,-6 6,-6zM18.76,7.74L17.3,9.2c0.44,0.84 0.7,1.79 0.7,2.8 0,3.31 -2.69,6 -6,6v-3l-4,4 4,4v-3c4.42,0 8,-3.58 8,-8 0,-1.57 -0.46,-3.03 -1.24,-4.26z"/>
-</vector>
+<selector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt">
+    <!-- Selected -->
+    <item android:state_checked="true">
+        <vector android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
+            <path android:pathData="M4 12a8 8 0 1 1 2 5" android:strokeWidth="2" android:strokeLineCap="round" android:strokeLineJoin="round">
+                <aapt:attr name="android:strokeColor">
+                    <gradient android:startX="0" android:startY="0" android:endX="24" android:endY="0" android:type="linear">
+                        <item android:offset="0.0" android:color="#bfa14a"/>
+                        <item android:offset="0.3" android:color="#f7e18e"/>
+                        <item android:offset="0.5" android:color="#fff4d6"/>
+                        <item android:offset="0.7" android:color="#d6ad60"/>
+                        <item android:offset="1.0" android:color="#b58c34"/>
+                    </gradient>
+                </aapt:attr>
+            </path>
+            <path android:pathData="M4 16 4 12 8 12" android:strokeWidth="2" android:strokeLineCap="round" android:strokeLineJoin="round">
+                <aapt:attr name="android:strokeColor">
+                    <gradient android:startX="0" android:startY="0" android:endX="24" android:endY="0" android:type="linear">
+                        <item android:offset="0.0" android:color="#bfa14a"/>
+                        <item android:offset="0.3" android:color="#f7e18e"/>
+                        <item android:offset="0.5" android:color="#fff4d6"/>
+                        <item android:offset="0.7" android:color="#d6ad60"/>
+                        <item android:offset="1.0" android:color="#b58c34"/>
+                    </gradient>
+                </aapt:attr>
+            </path>
+        </vector>
+    </item>
+    <!-- Unselected -->
+    <item>
+        <vector android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
+            <path android:pathData="M4 12a8 8 0 1 1 2 5" android:strokeColor="#8A8A8A" android:strokeWidth="2" android:strokeLineCap="round" android:strokeLineJoin="round"/>
+            <path android:pathData="M4 16 4 12 8 12" android:strokeColor="#8A8A8A" android:strokeWidth="2" android:strokeLineCap="round" android:strokeLineJoin="round"/>
+        </vector>
+    </item>
+</selector>

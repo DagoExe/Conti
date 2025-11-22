@@ -251,22 +251,26 @@
 
     <!-- Bottom Navigation Premium - Stile Figma -->
     <style name="Widget.Monio.BottomNavigationView" parent="Widget.Material3.BottomNavigationView">
-        <item name="backgroundTint">@color/zinc_950</item>
-        <item name="itemIconTint">@color/bottom_nav_color</item>
+        <item name="android:background">@drawable/bg_bottom_nav</item>
+        <item name="backgroundTint">@null</item>
+        
+        <!-- DISABILITO IL TINT AUTOMATICO PER USARE I COLORI DEI VETTORI -->
+        <item name="itemIconTint">@null</item>
+        
         <item name="itemTextColor">@color/bottom_nav_text_color</item>
         <item name="itemIconSize">@dimen/bottom_nav_icon_size</item>
         <item name="itemPaddingTop">@dimen/bottom_nav_padding_vertical</item>
         <item name="itemPaddingBottom">@dimen/bottom_nav_padding_vertical</item>
-        <item name="labelVisibilityMode">labeled</item>
+        <item name="labelVisibilityMode">unlabeled</item>
         <item name="itemActiveIndicatorStyle">@style/Widget.Monio.BottomNavigationView.ActiveIndicator</item>
         <item name="elevation">@dimen/elevation_lg</item>
     </style>
 
     <!-- Indicatore Attivo con Background Oro -->
     <style name="Widget.Monio.BottomNavigationView.ActiveIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
-        <item name="android:color">@color/gold_primary</item>
+        <item name="android:color">@android:color/transparent</item>
         <item name="shapeAppearance">@style/ShapeAppearance.Monio.BottomNav.ActiveIndicator</item>
-        <item name="android:width">@dimen/bottom_nav_indicator_width</item>
+        <item name="android:width">@dimen/bottom_nav_indicator_height</item>
         <item name="android:height">@dimen/bottom_nav_indicator_height</item>
         <item name="marginHorizontal">0dp</item>
     </style>
@@ -274,15 +278,24 @@
     <!-- Forma dell'Indicatore Attivo -->
     <style name="ShapeAppearance.Monio.BottomNav.ActiveIndicator" parent="">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">50%</item>
+        <item name="cornerSize">@dimen/corner_radius_sm</item>
     </style>
 
     <!-- Toolbar Premium -->
     <style name="Widget.Monio.Toolbar" parent="Widget.Material3.Toolbar">
-        <item name="titleTextColor">@color/gold_primary</item>
+        <item name="titleTextAppearance">@style/TextAppearance.Monio.ToolbarTitle</item>
         <item name="subtitleTextColor">@color/text_secondary</item>
-        <item name="android:background">@color/zinc_900</item>
+        <item name="android:background">@drawable/bg_toolbar</item>
         <item name="android:elevation">@dimen/elevation_md</item>
+    </style>
+
+    <!-- Toolbar Title Appearance -->
+    <style name="TextAppearance.Monio.ToolbarTitle" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textColor">@color/gold_primary</item>
+        <item name="fontFamily">serif</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0.05</item>
     </style>
 
     <!-- TextInputLayout Style -->
