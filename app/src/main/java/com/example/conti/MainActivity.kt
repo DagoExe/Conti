@@ -347,7 +347,7 @@ class MainActivity : AppCompatActivity() {
 
                 // Se clicchiamo sulla tab Conti e siamo in un fragment figlio (es. Movimenti),
                 // torniamo indietro fino a ContiFragment
-                if (targetId == R.id.navigation_conti && currentId == R.id.navigation_movimenti) {
+                if (targetId == R.id.navigation_conti && (currentId == R.id.navigation_movimenti /* || currentId == R.id.navigation_add_account */)) {
                     navController.popBackStack(R.id.navigation_conti, false)
                     return@setOnItemSelectedListener true
                 }
@@ -399,6 +399,17 @@ class MainActivity : AppCompatActivity() {
                 // 🔥 MODIFICATO: Imposta sempre "MONIO" come titolo, indipendentemente dalla destinazione
                 binding.toolbar.title = "MONIO"
                 
+                // Gestione visibilità BottomBar
+                // FIX: Rimosso riferimento a navigation_add_account per evitare problemi di build
+                /*
+                if(destination.id == R.id.navigation_add_account) {
+                    binding.bottomNavigation.visibility = View.GONE
+                } else {
+                    binding.bottomNavigation.visibility = View.VISIBLE
+                }
+                */
+                binding.bottomNavigation.visibility = View.VISIBLE
+
                 // Riapplica il gradiente ogni volta che cambia destinazione per sicurezza
                 // (a volte la toolbar potrebbe ricreare la TextView)
                 setupToolbarTitleGradient()
@@ -407,7 +418,7 @@ class MainActivity : AppCompatActivity() {
                 // (utile quando si naviga programmaticamente o tramite back button)
                 when (destination.id) {
                     R.id.navigation_rate -> binding.bottomNavigation.menu.findItem(R.id.navigation_rate).isChecked = true
-                    R.id.navigation_conti, R.id.navigation_movimenti -> binding.bottomNavigation.menu.findItem(R.id.navigation_conti).isChecked = true
+                    R.id.navigation_conti, R.id.navigation_movimenti /*, R.id.navigation_add_account */ -> binding.bottomNavigation.menu.findItem(R.id.navigation_conti).isChecked = true
                     R.id.navigation_home -> binding.bottomNavigation.menu.findItem(R.id.navigation_home).isChecked = true
                     R.id.navigation_abbonamenti -> binding.bottomNavigation.menu.findItem(R.id.navigation_abbonamenti).isChecked = true
                     R.id.navigation_debiti -> binding.bottomNavigation.menu.findItem(R.id.navigation_debiti).isChecked = true

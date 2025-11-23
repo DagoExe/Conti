@@ -177,18 +177,20 @@
 
     </LinearLayout>
 
-    <!-- FAB per aggiungere movimento -->
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+    <!-- Pulsante per aggiungere movimento (Custom FAB con gradiente) -->
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/fabAggiungiMovimento"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        android:text="Aggiungi"
-        android:textColor="@color/zinc_950"
-        app:icon="@android:drawable/ic_input_add"
-        app:iconTint="@color/zinc_950"
-        app:backgroundTint="@color/gold_primary"
+        android:background="@drawable/bg_gold_gradient"
+        android:contentDescription="Aggiungi Movimento"
+        android:elevation="6dp"
+        android:padding="16dp"
+        android:scaleType="fitCenter"
+        app:srcCompat="@android:drawable/ic_input_add"
+        app:tint="@color/zinc_950"
         android:visibility="gone" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

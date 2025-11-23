@@ -16,13 +16,17 @@ import com.example.conti.models.Account
 import com.example.conti.ui.account.AccountsUiState
 import com.example.conti.ui.account.AccountsViewModel
 import com.example.conti.ui.adapters.ContiVerticalAdapter
+import com.example.conti.ui.movimenti.MovimentiFragment
+import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.launch
 
 /**
  * Fragment per la sezione Conti.
  *
- * ✅ Visualizza i conti come card verticali
- * ✅ Click su card → naviga ai movimenti di quel conto
+ * ✅ ORA SUPPORTA:
+ * - Tab "Conti": visualizza elenco conti
+ * - Tab "Movimenti": visualizza elenco TUTTI i movimenti
+ * - Navigazione a movimenti specifici di un conto
  */
 class ContiFragment : Fragment() {
 
@@ -31,6 +35,9 @@ class ContiFragment : Fragment() {
 
     private val viewModel: AccountsViewModel by viewModels()
     private lateinit var contiAdapter: ContiVerticalAdapter
+
+    // Riferimento al fragment dei movimenti
+    private var movimentiFragment: MovimentiFragment? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,8 +52,63 @@ class ContiFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupRecyclerView()
+        setupTabs()
         setupUI()
         observeViewModel()
+
+        // Inizialmente mostra la tab Conti (indice 0)
+        showTabContent(0)
+    }
+
+    private fun setupTabs() {
+        binding.tabLayout.visibility = View.VISIBLE
+        binding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                showTabContent(tab?.position ?: 0)
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {}
+            override fun onTabReselected(tab: TabLayout.Tab?) {}
+        })
+    }
+
+    private fun showTabContent(position: Int) {
+        if (position == 0) {
+            // TAB CONTI
+            binding.rvConti.visibility = View.VISIBLE
+            binding.fabAggiungi.visibility = View.VISIBLE
+            binding.containerMovimenti.visibility = View.GONE
+            
+            // Nasconde eventuale fragment movimenti
+            if (movimentiFragment != null) {
+                childFragmentManager.beginTransaction()
+                    .hide(movimentiFragment!!)
+                    .commit()
+            }
+
+            // Gestione empty state per conti
+            viewModel.retry() // Ricarica conti per aggiornare stato
+            
+        } else {
+            // TAB MOVIMENTI
+            binding.rvConti.visibility = View.GONE
+            binding.layoutEmpty.visibility = View.GONE // Nascondi empty state conti
+            binding.fabAggiungi.visibility = View.GONE
+            binding.containerMovimenti.visibility = View.VISIBLE
+            
+            // Carica/Mostra MovimentiFragment
+            if (movimentiFragment == null) {
+                movimentiFragment = MovimentiFragment()
+                // Nessun argomento = tutti i movimenti
+                childFragmentManager.beginTransaction()
+                    .replace(R.id.containerMovimenti, movimentiFragment!!)
+                    .commit()
+            } else {
+                childFragmentManager.beginTransaction()
+                    .show(movimentiFragment!!)
+                    .commit()
+            }
+        }
     }
 
     private fun setupRecyclerView() {
@@ -61,9 +123,6 @@ class ContiFragment : Fragment() {
     }
 
     private fun setupUI() {
-        // Nascondi tab layout per ora
-        binding.tabLayout.visibility = View.GONE
-
         // FAB per aggiungere conto
         binding.fabAggiungi.setOnClickListener {
             showAddAccountDialog()
@@ -81,21 +140,24 @@ class ContiFragment : Fragment() {
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.uiState.collect { state ->
-                when (state) {
-                    is AccountsUiState.Loading -> {
-                        showLoading(true)
-                    }
-                    is AccountsUiState.Empty -> {
-                        showLoading(false)
-                        showEmptyState()
-                    }
-                    is AccountsUiState.Success -> {
-                        showLoading(false)
-                        showAccounts(state.accounts)
-                    }
-                    is AccountsUiState.Error -> {
-                        showLoading(false)
-                        showError(state.message)
+                // Aggiorna UI solo se siamo nella tab conti
+                if (binding.tabLayout.selectedTabPosition == 0) {
+                    when (state) {
+                        is AccountsUiState.Loading -> {
+                            showLoading(true)
+                        }
+                        is AccountsUiState.Empty -> {
+                            showLoading(false)
+                            showEmptyState()
+                        }
+                        is AccountsUiState.Success -> {
+                            showLoading(false)
+                            showAccounts(state.accounts)
+                        }
+                        is AccountsUiState.Error -> {
+                            showLoading(false)
+                            showError(state.message)
+                        }
                     }
                 }
             }
