@@ -125,16 +125,15 @@ class ContiFragment : Fragment() {
     private fun setupUI() {
         // FAB per aggiungere conto
         binding.fabAggiungi.setOnClickListener {
-            showAddAccountDialog()
+            showAddAccountPage()
         }
     }
 
     /**
-     * Mostra il dialog per aggiungere un nuovo conto
+     * Naviga alla pagina per aggiungere un nuovo conto
      */
-    private fun showAddAccountDialog() {
-        val dialog = AddAccountDialogFragment.newInstance()
-        dialog.show(childFragmentManager, AddAccountDialogFragment.TAG)
+    private fun showAddAccountPage() {
+        findNavController().navigate(R.id.action_conti_to_add_account)
     }
 
     private fun observeViewModel() {

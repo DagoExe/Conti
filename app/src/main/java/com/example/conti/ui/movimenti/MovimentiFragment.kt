@@ -4,10 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.conti.R
 import com.example.conti.databinding.FragmentMovimentiBinding
 import com.example.conti.models.Transaction
 import com.example.conti.ui.adapters.TransactionAdapter
@@ -21,6 +24,7 @@ import kotlinx.coroutines.launch
  * ✅ VERSIONE AGGIORNATA:
  * - Mostra il saldo corrente dell'account (che include il saldo iniziale)
  * - Il bilancio NON è più calcolato come entrate - uscite, ma è il balance dell'account
+ * - Supporta navigazione a pagina intera per aggiungere movimenti
  */
 class MovimentiFragment : Fragment() {
 
@@ -86,7 +90,7 @@ class MovimentiFragment : Fragment() {
             binding.fabAggiungiMovimento.visibility = View.VISIBLE
 
             binding.fabAggiungiMovimento.setOnClickListener {
-                showAddTransactionDialog()
+                showAddTransactionPage()
             }
         } else {
             binding.fabAggiungiMovimento.visibility = View.GONE
@@ -94,9 +98,9 @@ class MovimentiFragment : Fragment() {
     }
 
     /**
-     * Mostra dialog per aggiungere movimento
+     * Naviga alla pagina per aggiungere movimento
      */
-    private fun showAddTransactionDialog() {
+    private fun showAddTransactionPage() {
         if (accountId == null) {
             // ✅ Toast ERROR in basso
             MessageHelper.showError(
@@ -106,12 +110,12 @@ class MovimentiFragment : Fragment() {
             return
         }
 
-        val dialog = AddTransactionDialogFragment.newInstance(
-            accountId = accountId!!,
-            accountName = accountName ?: "Conto"
+        val bundle = bundleOf(
+            AddTransactionFragment.ARG_ACCOUNT_ID to accountId,
+            AddTransactionFragment.ARG_ACCOUNT_NAME to (accountName ?: "Conto")
         )
 
-        dialog.show(childFragmentManager, AddTransactionDialogFragment.TAG)
+        findNavController().navigate(R.id.action_movimenti_to_add_transaction, bundle)
     }
 
     private fun observeViewModel() {

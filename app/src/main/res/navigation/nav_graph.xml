@@ -25,7 +25,23 @@
             app:exitAnim="@android:anim/slide_out_right"
             app:popEnterAnim="@android:anim/fade_in"
             app:popExitAnim="@android:anim/fade_out" />
+
+        <!-- Action per navigare alla pagina di aggiunta conto -->
+        <action
+            android:id="@+id/action_conti_to_add_account"
+            app:destination="@id/navigation_add_account"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/slide_out_right"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@android:anim/fade_out" />
     </fragment>
+
+    <!-- Nuova destinazione: Aggiungi Conto -->
+    <fragment
+        android:id="@+id/navigation_add_account"
+        android:name="com.example.conti.ui.conti.AddAccountFragment"
+        android:label="Aggiungi Conto"
+        tools:layout="@layout/fragment_add_account" />
 
     <fragment
         android:id="@+id/navigation_home"
@@ -50,6 +66,31 @@
             app:argType="string"
             app:nullable="true"
             android:defaultValue="@null" />
+            
+        <!-- Action per navigare alla pagina di aggiunta movimento -->
+        <action
+            android:id="@+id/action_movimenti_to_add_transaction"
+            app:destination="@id/navigation_add_transaction"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/slide_out_right"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@android:anim/fade_out" />
+    </fragment>
+
+    <!-- Nuova destinazione: Aggiungi Movimento -->
+    <fragment
+        android:id="@+id/navigation_add_transaction"
+        android:name="com.example.conti.ui.movimenti.AddTransactionFragment"
+        android:label="Aggiungi Movimento"
+        tools:layout="@layout/fragment_add_transaction">
+        
+        <argument
+            android:name="account_id"
+            app:argType="string" />
+            
+        <argument
+            android:name="account_name"
+            app:argType="string" />
     </fragment>
 
     <fragment

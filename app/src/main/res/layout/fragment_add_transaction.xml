@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    ✨ FRAGMENT AGGIUNGI MOVIMENTO - Material Design 3 DARK MODE
+-->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@color/zinc_900">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/spacing_xl">
+
+        <!-- Header con pulsante indietro -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="@dimen/spacing_md">
+            
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_arrow_back"
+                android:layout_marginEnd="@dimen/spacing_sm"
+                app:tint="@color/text_primary"
+                android:contentDescription="Torna indietro" />
+
+            <TextView
+                style="@style/TextAppearance.Monio.TitleLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nuovo Movimento"
+                android:textColor="@color/text_primary" />
+        </LinearLayout>
+
+        <!-- Nome Conto -->
+        <TextView
+            android:id="@+id/tvNomeConto"
+            style="@style/TextAppearance.Monio.BodyMedium"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Conto: BuddyBank"
+            android:textColor="@color/text_secondary"
+            android:layout_marginBottom="@dimen/spacing_xl" />
+
+        <!-- Tipo Movimento (Entrata/Uscita) -->
+        <TextView
+            style="@style/TextAppearance.Monio.LabelMedium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tipo di movimento"
+            android:textColor="@color/text_primary"
+            android:layout_marginBottom="@dimen/spacing_xs" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroupTipo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_md"
+            app:singleSelection="true"
+            app:checkedChip="@id/chipUscita">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipEntrata"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="⬆️ Entrata"
+                android:textColor="@color/text_primary"
+                app:chipBackgroundColor="@color/zinc_800" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipUscita"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="⬇️ Uscita"
+                android:textColor="@color/text_primary"
+                app:chipBackgroundColor="@color/zinc_800"
+                android:checked="true" />
+        </com.google.android.material.chip.ChipGroup>
+
+        <!-- Descrizione -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilDescrizione"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Descrizione *"
+            app:boxStrokeColor="@color/gold_primary"
+            app:hintTextColor="@color/gold_primary"
+            android:layout_marginBottom="@dimen/spacing_md">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etDescrizione"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_primary"
+                android:inputType="textCapSentences"
+                android:maxLines="2"
+                android:imeOptions="actionNext" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Importo -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilImporto"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Importo *"
+            app:boxStrokeColor="@color/gold_primary"
+            app:hintTextColor="@color/gold_primary"
+            android:layout_marginBottom="@dimen/spacing_md"
+            app:prefixText="€ "
+            app:helperText="Inserisci solo il numero (es. 50.00)"
+            app:helperTextTextColor="@color/text_tertiary"
+            app:helperTextTextAppearance="@style/TextAppearance.Monio.Caption">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etImporto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_primary"
+                android:inputType="numberDecimal"
+                android:maxLines="1"
+                android:imeOptions="actionNext" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Categoria -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilCategoria"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Categoria *"
+            app:boxStrokeColor="@color/gold_primary"
+            app:hintTextColor="@color/gold_primary"
+            android:layout_marginBottom="@dimen/spacing_md">
+
+            <AutoCompleteTextView
+                android:id="@+id/actvCategoria"
+                style="@style/Widget.Monio.AutoCompleteTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_primary"
+                android:inputType="none"
+                android:dropDownHeight="wrap_content"
+                android:popupBackground="@drawable/bg_popup_menu_dark" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Data -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilData"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Data *"
+            app:boxStrokeColor="@color/gold_primary"
+            app:hintTextColor="@color/gold_primary"
+            android:layout_marginBottom="@dimen/spacing_md">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etData"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_primary"
+                android:inputType="none"
+                android:focusable="false"
+                android:clickable="true"
+                android:drawableEnd="@android:drawable/ic_menu_my_calendar" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Note (Opzionali) -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilNote"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Note (opzionale)"
+            app:boxStrokeColor="@color/gold_primary"
+            app:hintTextColor="@color/gold_primary"
+            android:layout_marginBottom="@dimen/spacing_md">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etNote"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_primary"
+                android:inputType="textCapSentences|textMultiLine"
+                android:maxLines="3"
+                android:imeOptions="actionDone" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Info campi obbligatori -->
+        <TextView
+            style="@style/TextAppearance.Monio.Caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="* Campi obbligatori"
+            android:textColor="@color/text_secondary"
+            android:layout_marginTop="@dimen/spacing_xs"
+            android:layout_marginBottom="@dimen/spacing_xl" />
+
+        <!-- Spazio vuoto -->
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="24dp" />
+
+        <!-- Pulsante Salva (Full Width) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSalva"
+            style="@style/Widget.Monio.Button"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height_large"
+            android:text="Salva Movimento"
+            app:backgroundTint="@null"
+            android:background="@drawable/bg_gold_gradient" />
+        
+        <!-- Pulsante Annulla (Text button) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAnnulla"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Annulla"
+            android:textColor="@color/text_secondary"
+            android:layout_marginTop="@dimen/spacing_sm" />
+
+    </LinearLayout>
+</ScrollView>
