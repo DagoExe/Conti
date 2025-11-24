@@ -2,6 +2,7 @@ package com.example.conti.models
 
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentId
+import com.google.firebase.firestore.PropertyName
 import com.google.firebase.firestore.ServerTimestamp
 
 /**
@@ -19,6 +20,7 @@ data class Transaction(
     val notes: String? = null,
     val date: Timestamp = Timestamp.now(),
     val type: String = "", // "income" o "expense"
+    @PropertyName("recurring")
     val isRecurring: Boolean = false,
     val subscriptionId: String? = null,
     @ServerTimestamp
@@ -52,6 +54,7 @@ data class Subscription(
     val startDate: Timestamp = Timestamp.now(),
     val nextRenewalDate: Timestamp = Timestamp.now(),
     val endDate: Timestamp? = null,
+    @PropertyName("active")
     val isActive: Boolean = true,
     val notes: String? = null,
     @ServerTimestamp

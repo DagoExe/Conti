@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    app:cardBackgroundColor="@color/zinc_900"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="0dp"
+    app:strokeWidth="0dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <!-- Indicatore Attivo/Inattivo -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/indicatorActive"
+            android:layout_width="4dp"
+            android:layout_height="0dp"
+            app:cardBackgroundColor="@color/gold_primary"
+            app:cardCornerRadius="2dp"
+            app:cardElevation="0dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <!-- Icona Abbonamento -->
+        <TextView
+            android:id="@+id/tvIconaAbbonamento"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:gravity="center"
+            android:text="📅"
+            android:textSize="28sp"
+            android:layout_marginStart="12dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@id/indicatorActive"/>
+
+        <!-- Nome Abbonamento -->
+        <TextView
+            android:id="@+id/tvNomeAbbonamento"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Netflix"
+            android:textColor="@color/text_primary"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:layout_marginStart="12dp"
+            app:layout_constraintTop_toTopOf="@id/tvIconaAbbonamento"
+            app:layout_constraintStart_toEndOf="@id/tvIconaAbbonamento"
+            app:layout_constraintEnd_toStartOf="@id/tvCostoAbbonamento"/>
+
+        <!-- Descrizione (opzionale) -->
+        <TextView
+            android:id="@+id/tvDescrizioneAbbonamento"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Piano Premium"
+            android:textColor="@color/text_secondary"
+            android:textSize="13sp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:visibility="gone"
+            tools:visibility="visible"
+            app:layout_constraintTop_toBottomOf="@id/tvNomeAbbonamento"
+            app:layout_constraintStart_toStartOf="@id/tvNomeAbbonamento"
+            app:layout_constraintEnd_toEndOf="@id/tvNomeAbbonamento"/>
+
+        <!-- Costo Abbonamento -->
+        <TextView
+            android:id="@+id/tvCostoAbbonamento"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="€ 9,99"
+            android:textColor="@color/gold_primary"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="@id/tvNomeAbbonamento"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <!-- Costo Mensile Equivalente (se non mensile) -->
+        <TextView
+            android:id="@+id/tvCostoMensile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="€ 3,33/mese"
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp"
+            android:visibility="gone"
+            tools:visibility="visible"
+            app:layout_constraintTop_toBottomOf="@id/tvCostoAbbonamento"
+            app:layout_constraintEnd_toEndOf="@id/tvCostoAbbonamento"/>
+
+        <!-- Badge Frequenza -->
+        <com.google.android.material.chip.Chip
+            android:id="@+id/tvFrequenza"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="📅 Mensile"
+            android:textColor="@color/text_secondary"
+            android:textSize="11sp"
+            app:chipBackgroundColor="@color/zinc_800"
+            app:chipMinHeight="24dp"
+            app:chipStrokeWidth="0dp"
+            android:layout_marginTop="8dp"
+            style="@style/Widget.Material3.Chip.Assist"
+            app:layout_constraintTop_toBottomOf="@id/tvIconaAbbonamento"
+            app:layout_constraintStart_toStartOf="@id/tvIconaAbbonamento"/>
+
+        <!-- Badge Scadenza (solo se in scadenza) -->
+        <com.google.android.material.chip.Chip
+            android:id="@+id/badgeScadenza"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="⚠️ In scadenza"
+            android:textColor="@color/white"
+            android:textSize="11sp"
+            app:chipBackgroundColor="#F44336"
+            app:chipMinHeight="24dp"
+            app:chipStrokeWidth="0dp"
+            android:visibility="gone"
+            tools:visibility="visible"
+            style="@style/Widget.Material3.Chip.Assist"
+            app:layout_constraintTop_toTopOf="@id/tvFrequenza"
+            app:layout_constraintStart_toEndOf="@id/tvFrequenza"
+            android:layout_marginStart="8dp"/>
+
+        <!-- Prossimo Rinnovo -->
+        <TextView
+            android:id="@+id/tvProssimoRinnovo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Rinnovo: 15 Feb 2025"
+            android:textColor="@color/text_secondary"
+            android:textSize="13sp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@id/tvFrequenza"
+            app:layout_constraintStart_toStartOf="@id/tvFrequenza"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <!-- Conto Associato -->
+        <TextView
+            android:id="@+id/tvContoAssociato"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="💳 Hype Card"
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp"
+            android:layout_marginTop="4dp"
+            app:layout_constraintTop_toBottomOf="@id/tvProssimoRinnovo"
+            app:layout_constraintStart_toStartOf="@id/tvProssimoRinnovo"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

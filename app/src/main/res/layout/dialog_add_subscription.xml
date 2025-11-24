@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/zinc_900"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <!-- Titolo -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="📅 Nuovo Abbonamento"
+            android:textColor="@color/text_primary"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="24dp"/>
+
+        <!-- Nome Abbonamento -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilNomeAbbonamento"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nome (es. Netflix, Spotify)"
+            app:boxBackgroundColor="@color/zinc_800"
+            app:boxStrokeColor="@color/gold_primary"
+            app:hintTextColor="@color/text_secondary"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etNomeAbbonamento"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textCapWords"
+                android:textColor="@color/text_primary"
+                android:maxLines="1"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Descrizione (opzionale) -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilDescrizione"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:hint="Descrizione (opzionale)"
+            app:boxBackgroundColor="@color/zinc_800"
+            app:boxStrokeColor="@color/gold_primary"
+            app:hintTextColor="@color/text_secondary"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etDescrizione"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textCapSentences"
+                android:textColor="@color/text_primary"
+                android:maxLines="2"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Importo -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilImporto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:hint="Importo (€)"
+            app:boxBackgroundColor="@color/zinc_800"
+            app:boxStrokeColor="@color/gold_primary"
+            app:hintTextColor="@color/text_secondary"
+            app:prefixText="€ "
+            app:prefixTextColor="@color/text_secondary"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etImporto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:textColor="@color/text_primary"
+                android:maxLines="1"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Frequenza -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilFrequenza"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:hint="Frequenza di pagamento"
+            app:boxBackgroundColor="@color/zinc_800"
+            app:boxStrokeColor="@color/gold_primary"
+            app:hintTextColor="@color/text_secondary"
+            app:endIconMode="dropdown_menu"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+
+            <AutoCompleteTextView
+                android:id="@+id/actvFrequenza"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                android:textColor="@color/text_primary"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Conto Associato -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilConto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:hint="Conto per il pagamento"
+            app:boxBackgroundColor="@color/zinc_800"
+            app:boxStrokeColor="@color/gold_primary"
+            app:hintTextColor="@color/text_secondary"
+            app:endIconMode="dropdown_menu"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+
+            <AutoCompleteTextView
+                android:id="@+id/actvConto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                android:textColor="@color/text_primary"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Data Primo Pagamento -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilDataPrimoPagamento"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:hint="Data primo pagamento"
+            app:boxBackgroundColor="@color/zinc_800"
+            app:boxStrokeColor="@color/gold_primary"
+            app:hintTextColor="@color/text_secondary"
+            app:endIconMode="custom"
+            app:endIconDrawable="@android:drawable/ic_menu_my_calendar"
+            app:endIconTint="@color/gold_primary"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etDataPrimoPagamento"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                android:focusable="false"
+                android:textColor="@color/text_primary"
+                android:maxLines="1"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Note (opzionali) -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilNote"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:hint="Note (opzionali)"
+            app:boxBackgroundColor="@color/zinc_800"
+            app:boxStrokeColor="@color/gold_primary"
+            app:hintTextColor="@color/text_secondary"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etNote"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textMultiLine"
+                android:textColor="@color/text_primary"
+                android:maxLines="3"
+                android:gravity="top|start"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Pulsanti -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="24dp"
+            android:gravity="end">
+
+            <!-- Pulsante Annulla -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAnnulla"
+                android:layout_width="wrap_content"
+                android:layout_height="56dp"
+                android:text="Annulla"
+                android:textColor="@color/text_secondary"
+                android:layout_marginEnd="12dp"
+                app:backgroundTint="@color/zinc_800"
+                style="@style/Widget.Material3.Button.OutlinedButton"/>
+
+            <!-- Pulsante Salva -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSalva"
+                android:layout_width="wrap_content"
+                android:layout_height="56dp"
+                android:text="Salva"
+                android:textColor="@color/zinc_950"
+                app:backgroundTint="@color/gold_primary"
+                style="@style/Widget.Material3.Button"/>
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

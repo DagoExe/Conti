@@ -10,7 +10,6 @@ import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 import java.util.Calendar
 
@@ -54,18 +53,6 @@ class FirestoreRepository {
         }
         return user.uid
     }
-
-    /**
-     * Riferimento alla collezione interna dell'utente autenticato.
-     */
-    private fun userCollection(path: String) =
-        db.collection("users").document(requireUser()).collection(path)
-
-    /**
-     * Riferimento al documento del profilo dell'utente autenticato.
-     */
-    private fun userProfileRef() =
-        db.collection("users").document(requireUser()).collection("profile")
 
     // ========================================
     // PROFILO UTENTE
@@ -407,53 +394,272 @@ class FirestoreRepository {
     /**
      * ✅ CORRETTO: Restituisce Flow vuoto se utente non autenticato
      */
-    fun getAllSubscriptions(activeOnly: Boolean = false): Flow<List<Subscription>> = callbackFlow {
-        val userId = getUserIdSafely()
+    fun getAllSubscriptions(activeOnly: Boolean = true): Flow<List<Subscription>> = callbackFlow {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
 
         if (userId == null) {
-            Log.w("FirestoreRepository", "⚠️ getAllSubscriptions: utente non autenticato")
+            android.util.Log.e("FirestoreRepo", "❌ User non autenticato")
             trySend(emptyList())
-            awaitClose { }
+            close()
             return@callbackFlow
         }
 
-        var query: Query = db.collection("users")
-            .document(userId)
-            .collection("subscriptions")
+        android.util.Log.d("FirestoreRepo", "📡 Ascolto abbonamenti (activeOnly=$activeOnly) per user $userId")
 
-        if (activeOnly) query = query.whereEqualTo("isActive", true)
+        // ✅ FIX: Rimosso .orderBy("name") dalla query quando si usa whereEqualTo("active", true)
+        // Questo evita l'errore di "Missing Index" di Firestore per query composite.
+        // L'ordinamento viene ora effettuato in memoria sulla lista risultante.
+        val query = if (activeOnly) {
+            db.collection("users")
+                .document(userId)
+                .collection("subscriptions")
+                .whereEqualTo("active", true)
+        } else {
+            db.collection("users")
+                .document(userId)
+                .collection("subscriptions")
+                .orderBy("name", Query.Direction.ASCENDING)
+        }
 
         val listener = query.addSnapshotListener { snapshot, error ->
             if (error != null) {
-                close(error)
+                android.util.Log.e("FirestoreRepo", "❌ Errore listener abbonamenti", error)
+                trySend(emptyList())
                 return@addSnapshotListener
             }
 
-            val subs = snapshot?.documents?.mapNotNull {
-                it.toObject(Subscription::class.java)
-            } ?: emptyList()
+            if (snapshot == null || snapshot.isEmpty) {
+                android.util.Log.d("FirestoreRepo", "📭 Nessun abbonamento trovato")
+                trySend(emptyList())
+                return@addSnapshotListener
+            }
 
-            trySend(subs)
+            val subscriptions = snapshot.documents.mapNotNull { doc ->
+                try {
+                    doc.toObject(Subscription::class.java)?.copy(id = doc.id)
+                } catch (e: Exception) {
+                    android.util.Log.e("FirestoreRepo", "❌ Errore parsing abbonamento ${doc.id}", e)
+                    null
+                }
+            }.sortedBy { it.name.lowercase() } // Ordinamento in memoria
+
+            android.util.Log.d("FirestoreRepo", "✅ Caricati ${subscriptions.size} abbonamenti")
+            subscriptions.forEachIndexed { index, sub ->
+                android.util.Log.d("FirestoreRepo", "   [$index] ${sub.name} - €${sub.amount} - ${if (sub.isActive) "ATTIVO" else "INATTIVO"}")
+            }
+
+            trySend(subscriptions)
         }
 
-        awaitClose { listener.remove() }
+        awaitClose {
+            android.util.Log.d("FirestoreRepo", "🔌 Chiuso listener abbonamenti")
+            listener.remove()
+        }
     }
 
     suspend fun createSubscription(subscription: Subscription): Result<String> {
         return try {
-            val userId = requireUser()
+            val userId = FirebaseAuth.getInstance().currentUser?.uid
+            if (userId == null) {
+                android.util.Log.e("FirestoreRepo", "❌ User non autenticato")
+                return Result.failure(Exception("Utente non autenticato"))
+            }
+
+            android.util.Log.d("FirestoreRepo", "💾 Creazione abbonamento: ${subscription.name}")
+            
             val docRef = db.collection("users")
                 .document(userId)
                 .collection("subscriptions")
                 .document()
-            val s = subscription.copy(
+
+            val subscriptionWithId = subscription.copy(
                 id = docRef.id,
                 createdAt = Timestamp.now(),
                 lastUpdated = Timestamp.now()
             )
-            docRef.set(s).await()
+
+            docRef.set(subscriptionWithId).await()
+
+            android.util.Log.d("FirestoreRepo", "✅ Abbonamento creato con ID: ${docRef.id}")
             Result.success(docRef.id)
         } catch (e: Exception) {
+            android.util.Log.e("FirestoreRepo", "❌ Errore creazione abbonamento", e)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun updateSubscription(subscription: Subscription): Result<Unit> {
+        return try {
+            val userId = FirebaseAuth.getInstance().currentUser?.uid
+            if (userId == null) {
+                return Result.failure(Exception("Utente non autenticato"))
+            }
+
+            android.util.Log.d("FirestoreRepo", "📝 Aggiornamento abbonamento: ${subscription.id}")
+
+            val updatedSubscription = subscription.copy(
+                lastUpdated = Timestamp.now()
+            )
+
+            db.collection("users")
+                .document(userId)
+                .collection("subscriptions")
+                .document(subscription.id)
+                .set(updatedSubscription)
+                .await()
+
+            android.util.Log.d("FirestoreRepo", "✅ Abbonamento aggiornato")
+            Result.success(Unit)
+        } catch (e: Exception) {
+            android.util.Log.e("FirestoreRepo", "❌ Errore aggiornamento abbonamento", e)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun deleteSubscription(subscriptionId: String): Result<Unit> {
+        return try {
+            val userId = FirebaseAuth.getInstance().currentUser?.uid
+            if (userId == null) {
+                return Result.failure(Exception("Utente non autenticato"))
+            }
+
+            android.util.Log.d("FirestoreRepo", "🗑️ Eliminazione abbonamento: $subscriptionId")
+
+            db.collection("users")
+                .document(userId)
+                .collection("subscriptions")
+                .document(subscriptionId)
+                .delete()
+                .await()
+
+            android.util.Log.d("FirestoreRepo", "✅ Abbonamento eliminato")
+            Result.success(Unit)
+        } catch (e: Exception) {
+            android.util.Log.e("FirestoreRepo", "❌ Errore eliminazione abbonamento", e)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun deactivateSubscription(subscriptionId: String): Result<Unit> {
+        return try {
+            val userId = FirebaseAuth.getInstance().currentUser?.uid
+            if (userId == null) {
+                return Result.failure(Exception("Utente non autenticato"))
+            }
+
+            android.util.Log.d("FirestoreRepo", "⏸️ Disattivazione abbonamento: $subscriptionId")
+
+            db.collection("users")
+                .document(userId)
+                .collection("subscriptions")
+                .document(subscriptionId)
+                .update(
+                    mapOf(
+                        "active" to false,
+                        "lastUpdated" to Timestamp.now()
+                    )
+                )
+                .await()
+
+            android.util.Log.d("FirestoreRepo", "✅ Abbonamento disattivato")
+            Result.success(Unit)
+        } catch (e: Exception) {
+            android.util.Log.e("FirestoreRepo", "❌ Errore disattivazione abbonamento", e)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun reactivateSubscription(subscriptionId: String): Result<Unit> {
+        return try {
+            val userId = FirebaseAuth.getInstance().currentUser?.uid
+            if (userId == null) {
+                return Result.failure(Exception("Utente non autenticato"))
+            }
+
+            android.util.Log.d("FirestoreRepo", "▶️ Riattivazione abbonamento: $subscriptionId")
+
+            db.collection("users")
+                .document(userId)
+                .collection("subscriptions")
+                .document(subscriptionId)
+                .update(
+                    mapOf(
+                        "active" to true,
+                        "lastUpdated" to Timestamp.now()
+                    )
+                )
+                .await()
+
+            android.util.Log.d("FirestoreRepo", "✅ Abbonamento riattivato")
+            Result.success(Unit)
+        } catch (e: Exception) {
+            android.util.Log.e("FirestoreRepo", "❌ Errore riattivazione abbonamento", e)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getSubscription(subscriptionId: String): Result<Subscription?> {
+        return try {
+            val userId = FirebaseAuth.getInstance().currentUser?.uid
+            if (userId == null) {
+                return Result.failure(Exception("Utente non autenticato"))
+            }
+
+            android.util.Log.d("FirestoreRepo", "🔍 Recupero abbonamento: $subscriptionId")
+
+            val doc = db.collection("users")
+                .document(userId)
+                .collection("subscriptions")
+                .document(subscriptionId)
+                .get()
+                .await()
+
+            val subscription = doc.toObject(Subscription::class.java)?.copy(id = doc.id)
+
+            if (subscription != null) {
+                android.util.Log.d("FirestoreRepo", "✅ Abbonamento trovato: ${subscription.name}")
+            } else {
+                android.util.Log.d("FirestoreRepo", "📭 Abbonamento non trovato")
+            }
+
+            Result.success(subscription)
+        } catch (e: Exception) {
+            android.util.Log.e("FirestoreRepo", "❌ Errore recupero abbonamento", e)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getExpiringSubscriptions(daysThreshold: Int = 7): Result<List<Subscription>> {
+        return try {
+            val userId = FirebaseAuth.getInstance().currentUser?.uid
+            if (userId == null) {
+                return Result.failure(Exception("Utente non autenticato"))
+            }
+
+            android.util.Log.d("FirestoreRepo", "⚠️ Recupero abbonamenti in scadenza (entro $daysThreshold giorni)")
+
+            val now = java.util.Calendar.getInstance()
+            val threshold = java.util.Calendar.getInstance().apply {
+                add(java.util.Calendar.DAY_OF_YEAR, daysThreshold)
+            }
+
+            val snapshot = db.collection("users")
+                .document(userId)
+                .collection("subscriptions")
+                .whereEqualTo("active", true)
+                .whereLessThanOrEqualTo("nextRenewalDate", Timestamp(threshold.time))
+                .whereGreaterThanOrEqualTo("nextRenewalDate", Timestamp(now.time))
+                .get()
+                .await()
+
+            val subscriptions = snapshot.documents.mapNotNull { doc ->
+                doc.toObject(Subscription::class.java)?.copy(id = doc.id)
+            }
+
+            android.util.Log.d("FirestoreRepo", "✅ Trovati ${subscriptions.size} abbonamenti in scadenza")
+            Result.success(subscriptions)
+        } catch (e: Exception) {
+            android.util.Log.e("FirestoreRepo", "❌ Errore recupero abbonamenti in scadenza", e)
             Result.failure(e)
         }
     }
@@ -464,7 +670,7 @@ class FirestoreRepository {
             val snapshot = db.collection("users")
                 .document(userId)
                 .collection("subscriptions")
-                .whereEqualTo("isActive", true)
+                .whereEqualTo("active", true)
                 .get()
                 .await()
 
@@ -509,6 +715,36 @@ class FirestoreRepository {
             c.set(Calendar.SECOND, 59)
             c.set(Calendar.MILLISECOND, 999)
             return Timestamp(c.time)
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // HELPER FUNCTIONS
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    /**
+     * Calcola costo mensile di un abbonamento
+     */
+    fun Subscription.getMonthlyCost(): Double {
+        return when (frequency) {
+            "MONTHLY" -> amount
+            "QUARTERLY" -> amount / 3.0
+            "SEMIANNUAL" -> amount / 6.0
+            "ANNUAL" -> amount / 12.0
+            else -> amount
+        }
+    }
+
+    /**
+     * Calcola costo annuale di un abbonamento
+     */
+    fun Subscription.getAnnualCost(): Double {
+        return when (frequency) {
+            "MONTHLY" -> amount * 12
+            "QUARTERLY" -> amount * 4
+            "SEMIANNUAL" -> amount * 2
+            "ANNUAL" -> amount
+            else -> amount * 12
         }
     }
 }

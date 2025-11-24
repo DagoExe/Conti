@@ -1,37 +1,211 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    ✨ FRAGMENT ABBONAMENTI - Placeholder Dinamico
-
-    UPDATED:
-    - Aggiunto tvPlaceholder con ID
-    - TextAppearance consistente
-    - Spacing standardizzato
--->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:padding="@dimen/spacing_xxxl"
     android:background="@color/zinc_950">
 
-    <!-- Icon -->
-    <TextView
+    <!-- NestedScrollView per scrollare tutto il contenuto -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="80dp">
+
+            <!-- Card Statistiche -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/layoutStats"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                app:cardBackgroundColor="@color/zinc_900"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <!-- Titolo Statistiche -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="📊 Riepilogo Costi"
+                        android:textColor="@color/text_primary"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="16dp"/>
+
+                    <!-- Grid Statistiche -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:weightSum="3">
+
+                        <!-- Costo Mensile -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="📅 Mensile"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="12sp"/>
+
+                            <TextView
+                                android:id="@+id/tvCostoMensile"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="€ 0,00"
+                                android:textColor="@color/gold_primary"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                android:layout_marginTop="4dp"/>
+                        </LinearLayout>
+
+                        <!-- Costo Annuale -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="📆 Annuale"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="12sp"/>
+
+                            <TextView
+                                android:id="@+id/tvCostoAnnuale"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="€ 0,00"
+                                android:textColor="@color/gold_primary"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                android:layout_marginTop="4dp"/>
+                        </LinearLayout>
+
+                        <!-- Numero Abbonamenti -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="✅ Attivi"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="12sp"/>
+
+                            <TextView
+                                android:id="@+id/tvNumeroAbbonamenti"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textColor="@color/gold_primary"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                android:layout_marginTop="4dp"/>
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Chip Filtro -->
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipFiltroAttivi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:text="✅ Solo Attivi"
+                android:checkable="true"
+                android:checked="true"
+                app:chipBackgroundColor="@color/chip_background_selector"
+                app:chipStrokeColor="@color/gold_primary"
+                app:chipStrokeWidth="1dp"
+                style="@style/Widget.Material3.Chip.Filter"/>
+
+            <!-- RecyclerView Abbonamenti -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvAbbonamenti"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="16dp"
+                android:clipToPadding="false"
+                tools:listitem="@layout/item_subscription"
+                tools:itemCount="5"/>
+
+            <!-- Layout Empty State -->
+            <LinearLayout
+                android:id="@+id/layoutEmpty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="60dp"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="32dp"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <TextView
+                    android:id="@+id/tvEmptyMessage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Nessun abbonamento presente"
+                    android:textColor="@color/text_primary"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:gravity="center"/>
+
+                <TextView
+                    android:id="@+id/tvEmptyDescription"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Tocca + per aggiungere il tuo primo abbonamento"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp"
+                    android:gravity="center"/>
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- FAB per aggiungere abbonamento -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAggiungiAbbonamento"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="🔄"
-        android:textSize="@dimen/text_size_hero"
-        android:layout_marginBottom="@dimen/spacing_md" />
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:contentDescription="Aggiungi abbonamento"
+        android:src="@android:drawable/ic_input_add"
+        app:tint="@color/zinc_950"
+        app:backgroundTint="@color/gold_primary"/>
 
-    <!-- Messaggio Principale (dinamico) -->
-    <TextView
-        android:id="@+id/tvPlaceholder"
-        style="@style/TextAppearance.Monio.BodyLarge"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Abbonamenti\n\nGestione abbonamenti ricorrenti\n\nComing Soon"
-        android:textColor="@color/text_primary"
-        android:gravity="center"
-        android:lineSpacingExtra="@dimen/spacing_xxs" />
-
-</LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
