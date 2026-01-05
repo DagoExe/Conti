@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    ✅ Selector TESTATO per testo Chip
+    - Checked: Bianco #FFFFFF
+    - Unchecked: Grigio chiaro #A1A1AA
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_checked="true" android:color="#FFFFFF" />
+    <item android:color="#A1A1AA" />
+</selector>

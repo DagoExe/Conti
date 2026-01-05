@@ -24,7 +24,10 @@ import java.util.*
 /**
  * ✨ Fragment per aggiungere un nuovo movimento - PAGE VERSION
  *
- * Trasformato da Dialog a Fragment a pagina intera.
+ * AGGIORNATO:
+ * - ChipGroup per selezione Entrata/Uscita
+ * - Colori distintivi (verde/rosso)
+ * - Versione robusta testata
  */
 class AddTransactionFragment : Fragment() {
 
@@ -79,10 +82,8 @@ class AddTransactionFragment : Fragment() {
         // Imposta data corrente
         updateDateField()
 
-        // ✅ IMPORTANTE: ChipGroup con singleSelection
-        // Il chip "Uscita" è già selezionato di default nel XML (android:checked="true")
-        // Ma possiamo forzarlo per sicurezza:
-        binding.chipGroupTipo.check(R.id.chipUscita)
+        // ✅ ChipGroup gestisce automaticamente singleSelection
+        // "Uscita" è già selezionato di default nel XML (app:checkedChip="@id/chipUscita")
     }
 
     /**
@@ -195,7 +196,7 @@ class AddTransactionFragment : Fragment() {
         // Note (opzionali)
         val note = binding.etNote.text.toString().trim().takeIf { it.isNotBlank() }
 
-        // ✅ IMPORTANTE: Usa ChipGroup invece di chip individuali
+        // ✅ Usa ChipGroup per determinare il tipo
         val isEntrata = binding.chipGroupTipo.checkedChipId == R.id.chipEntrata
         val importoFinale = if (isEntrata) importo else -importo
         val tipo = if (isEntrata) "income" else "expense"

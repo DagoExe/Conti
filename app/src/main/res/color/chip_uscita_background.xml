@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    ✅ Selector TESTATO per Chip Uscita
+    - Checked: Rosso #E53935 (error_600)
+    - Unchecked: Grigio scuro #27272A (zinc_800)
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_checked="true" android:color="#E53935" />
+    <item android:color="#27272A" />
+</selector>

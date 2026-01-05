@@ -2,11 +2,12 @@
 <!--
     ✨ DIALOG AGGIUNGI MOVIMENTO - Material Design 3 DARK MODE
 
-    UPDATED:
-    - Background dark (zinc_900)
-    - Text colors dark theme
-    - Input fields dark
-    - Chips dark themed
+    AGGIORNATO:
+    - Chip Entrata/Uscita con colori distintivi
+    - Verde per Entrata (selezionato)
+    - Rosso per Uscita (selezionato)
+    - Grigio scuro quando non selezionato
+    - selectionRequired="true" per obbligare la selezione
 -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -44,7 +45,7 @@
             style="@style/TextAppearance.Monio.LabelMedium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tipo di movimento"
+            android:text="Tipo di movimento *"
             android:textColor="@color/text_primary"
             android:layout_marginBottom="@dimen/spacing_xs" />
 
@@ -54,25 +55,40 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/spacing_md"
             app:singleSelection="true"
+            app:selectionRequired="true"
             app:checkedChip="@id/chipUscita">
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipEntrata"
                 style="@style/Widget.Material3.Chip.Filter"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="⬆️ Entrata"
-                android:textColor="@color/text_primary"
-                app:chipBackgroundColor="@color/zinc_800" />
+                android:textColor="@color/chip_text_color"
+                android:textSize="@dimen/text_size_body_large"
+                android:paddingTop="@dimen/spacing_sm"
+                android:paddingBottom="@dimen/spacing_sm"
+                android:textStyle="bold"
+                app:chipBackgroundColor="@color/chip_entrata_background"
+                app:chipStrokeWidth="0dp"
+                app:chipMinHeight="56dp" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipUscita"
                 style="@style/Widget.Material3.Chip.Filter"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="⬇️ Uscita"
-                android:textColor="@color/text_primary"
-                app:chipBackgroundColor="@color/zinc_800"
+                android:textColor="@color/chip_text_color"
+                android:textSize="@dimen/text_size_body_large"
+                android:paddingTop="@dimen/spacing_sm"
+                android:paddingBottom="@dimen/spacing_sm"
+                android:textStyle="bold"
+                app:chipBackgroundColor="@color/chip_uscita_background"
+                app:chipStrokeWidth="0dp"
+                app:chipMinHeight="56dp"
                 android:checked="true" />
         </com.google.android.material.chip.ChipGroup>
 
