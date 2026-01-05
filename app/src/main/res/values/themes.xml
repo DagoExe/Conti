@@ -399,4 +399,8 @@
         <item name="android:popupElevation">@dimen/elevation_lg</item>
         <item name="android:dropDownVerticalOffset">@dimen/spacing_xxs</item>
     </style>
+    <style name="Theme.Conti.Dialog.FullScreen" parent="Base.Theme.Conti">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowBackground">@color/zinc_950</item>
+    </style>
 </resources>

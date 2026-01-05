@@ -1,9 +1,11 @@
 package com.example.conti.models
 
+import android.os.Parcelable
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.PropertyName
 import com.google.firebase.firestore.ServerTimestamp
+import kotlinx.parcelize.Parcelize
 
 /**
  * Modello per un movimento bancario in Firestore.
@@ -42,6 +44,7 @@ data class Transaction(
  *
  * Struttura Firestore: /users/{userId}/subscriptions/{subscriptionId}
  */
+@Parcelize
 data class Subscription(
     @DocumentId
     val id: String = "",
@@ -61,7 +64,7 @@ data class Subscription(
     val createdAt: Timestamp? = null,
     @ServerTimestamp
     val lastUpdated: Timestamp? = null
-) {
+) : Parcelable {
     constructor() : this(
         id = "",
         accountId = "",
